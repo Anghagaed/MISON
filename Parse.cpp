@@ -12,7 +12,7 @@ int parser::parseWord(string line, bitmaps words, vector<pair<string, string> >&
 	words.generateColonPositions(0, line.size(), 0, colonP);
 	string temp = "";
 	parseWord(0, temp, colonP, result);
-	cout << "HashCheck is " << hashCheck << endl;
+	//cout << "HashCheck is " << hashCheck << endl;
 	return 1;
 
 }
@@ -46,6 +46,8 @@ int findDefaultPos(string line, int pos, int& result) {
 	return -1;
 }
 
+// Return 0 if record is not valid, 1 if record is valid. If return 1, vector result will stores pairs of <field,output> associated with query
+
 int parser::parseWord(int level, string append, vector<int>& colonP, vector<pair<string, string> >& result) {
 	hash<string> ptr;
 	for (int i = 0; i < colonP.size(); ++i) {
@@ -77,6 +79,7 @@ int parser::parseWord(int level, string append, vector<int>& colonP, vector<pair
 					betterAppend = append + '.' + field;
 				}
 				cout << "Going to next level and beyond" << endl;
+				++hashCheck;
 				parseWord(level + 1, betterAppend, newColonP, result);
 			}
 			else if (line[colonP[i] + 1] == '[') {
@@ -98,7 +101,10 @@ int parser::parseWord(int level, string append, vector<int>& colonP, vector<pair
 				++hashCheck;
 			}
 		}
-		//if (hashCheck == queryFields.size())
-			//break;
+		if (hashCheck == queryFields.size()) {
+			return 1;
+			break;
+		}
 	}
+	return 0;
 }

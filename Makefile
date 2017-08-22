@@ -25,4 +25,5 @@ fileHandler.o: fileHandler.h fileHandler.cpp
 clean: 
 	rm -f *.o
 	rm -f *.out
+	rm -f *.gch
 
