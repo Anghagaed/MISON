@@ -74,12 +74,19 @@ bool bitmaps::bitsetCreate() {
 				case ':':
 					map[j].colonBitset[i] = 1;
 					break;
+				case ',':
+					map[j].commaBitset[i] = 1;
 				case '{':
 					map[j].lbracketBitset[i] = 1;
 					break;
 				case '}':
 					map[j].rbracketBitset[i] = 1;
 					break;
+				case '[':
+					map[j].arraylbracketBitset[i] = 1;
+					break;
+				case ']':
+					map[j].arrayrbracketBitset[i] = 1;
 				}
 				prev[1] = prev[0];
 				prev[0] = word[j][i];
@@ -273,20 +280,27 @@ ostream& operator << (ostream &o, bitmaps& bm) {
 		cout << "\\  bitset: " << bm.map[i].escapeBitset << endl;
 		cout << "\"  bitset: " << bm.map[i].quoteBitset << endl;
 		cout << ":  bitset: " << bm.map[i].colonBitset << endl;
+		cout << ",  bitset: " << bm.map[i].commaBitset << endl;
 		cout << "{  bitset: " << bm.map[i].lbracketBitset << endl;
 		cout << "}  bitset: " << bm.map[i].rbracketBitset << endl;
+		cout << "[  bitset: " << bm.map[i].arraylbracketBitset << endl;
+		cout << "]  bitset: " << bm.map[i].arrayrbracketBitset << endl;
 		cout << "Phase 2: " << endl;
 		cout << "SQ bitset: " << bm.map[i].structQBitset << endl;
 		cout << "Phase 3: " << endl;
 		cout << "strbitset: " << bm.map[i].strBitset << endl;
 		cout << "Phase 4: " << endl;
 		cout << "SC bitset: " << bm.map[i].structCBitset << endl;
+		cout << "Levels: " << bm.map[i].levels.size() << endl;
 		for (int j = 0; j < bm.map[i].levels.size(); ++j) {
 			cout << "L" << j << ":        ";
-			cout << bm.map[i].levels[j] << endl;;
+			cout << bm.map[i].levels[j] << endl;
 		}
 		cout << endl;
+		//cout << "a" << endl;
+
 	}
+	//cout << "b" << endl;
 }
 
 void bitmaps::printPhase4() {

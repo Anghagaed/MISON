@@ -25,8 +25,8 @@ const bitset<B_INT> all0;
 class bitmaps {
 private:
 	struct mapContainer {
-		bitset<B_INT> escapeBitset, quoteBitset, colonBitset,
-			lbracketBitset, rbracketBitset, structQBitset,
+		bitset<B_INT> escapeBitset, quoteBitset, colonBitset, commaBitset,
+			lbracketBitset, rbracketBitset, arraylbracketBitset, arrayrbracketBitset, structQBitset,
 			strBitset, structCBitset, structLBitset, structRBitset;
 		vector<bitset<B_INT> > levels;
 		mapContainer(int& layers);

@@ -29,7 +29,10 @@ int main(int argc, char *argv[]) {
 	tester = fHandler.split();
 	bitmaps test(layers, tester);
 	test.bitsetCreate();
+
+	cout << test;
 	//test.printPhase4();
+	cout << "Finished printing bitmaps" << endl; 
 
 	vector<vector<int>> colonL;
 	vector<int> colonP;
@@ -37,12 +40,8 @@ int main(int argc, char *argv[]) {
 	vector<string> toHash;
 	string temp;
 	temp = "reviews"; toHash.push_back(temp);
-	//temp = "state"; toHash.push_back(temp);
 	temp = "attributes.breakfast"; toHash.push_back(temp);
 	temp = "attributes.lunch"; toHash.push_back(temp);
-	temp = "attributes"; toHash.push_back(temp);
-	//temp = "categories[]"; toHash.push_back(temp);
-	//temp = "state"; toHash.push_back(temp);
 
 	stringmap queryFields;
 	for (int i = 0; i < toHash.size(); ++i) {
