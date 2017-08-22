@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <unordered_map>
 #include <functional>
+#include <math.h>
 
 #define B_INT 32
 
