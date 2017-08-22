@@ -27,7 +27,7 @@ private:
 	struct mapContainer {
 		bitset<B_INT> escapeBitset, quoteBitset, colonBitset, commaBitset,
 			lbracketBitset, rbracketBitset, arraylbracketBitset, arrayrbracketBitset, structQBitset,
-			strBitset, structCBitset, structLBitset, structRBitset;
+			strBitset, structCBitset, structLBitset, structRBitset, structCMBitset, structALBBitset, structARBBitset;
 		vector<bitset<B_INT> > levels;
 		mapContainer(int& layers);
 	};
