@@ -244,7 +244,7 @@ bool bitmaps::generateColonPositions(int start, int end, int level, vector<int>&
 	if (colonPositions.size())
 		colonPositions.clear();
 	unsigned mcolon;
-	for (int i = start / B_INT; i < end / B_INT; ++i) {
+	for (int i = start / B_INT; i < ceil(double(end) / B_INT); ++i) {
 		mcolon = static_cast<unsigned> (map[i].levels[level].to_ulong());
 		while (mcolon != 0) {
 			bitset<B_INT> mbit = (mcolon & -mcolon) - 1;
