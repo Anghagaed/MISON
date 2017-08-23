@@ -13,10 +13,11 @@
 
 using namespace std;
 
-string defaultPath = "jsonTest1.txt";
+string defaultPath = "jsonTest5.txt";
 
 int main(int argc, char *argv[]) {
 	int layers = 2;
+	int arraylayers = 4;
 	vector<string> tester;
 	string filePath;
 	if (argc == 2) {
@@ -27,7 +28,7 @@ int main(int argc, char *argv[]) {
 	}
 	fileHandler fHandler(filePath);
 	tester = fHandler.split();
-	bitmaps test(layers, tester);
+	bitmaps test(layers, arraylayers, tester);
 	test.bitsetCreate();
 
 	cout << test;

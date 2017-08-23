@@ -29,7 +29,8 @@ private:
 			lbracketBitset, rbracketBitset, arraylbracketBitset, arrayrbracketBitset, structQBitset,
 			strBitset, structCBitset, structLBitset, structRBitset, structCMBitset, structALBBitset, structARBBitset;
 		vector<bitset<B_INT> > levels;
-		mapContainer(int& layers);
+		vector<bitset<B_INT> > CMlevels;
+		mapContainer(int& layers, int& arraylayers);
 	};
 	// Size of map and word will always be the same. Each map is the bitmap associated with each word
 	vector<mapContainer> map;
@@ -38,7 +39,7 @@ private:
 
 public:
 	bitmaps();
-	bitmaps(int&, vector<string>&);
+	bitmaps(int&, int&, vector<string>&);
 
 	/* Return 1 for success, 0 for failure
 	* Create bitmap for MISON structural indexes according

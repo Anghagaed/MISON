@@ -4,18 +4,23 @@ bitmaps::bitmaps() {
 	
 }
 
-bitmaps::mapContainer::mapContainer(int& layers) {
+bitmaps::mapContainer::mapContainer(int& layers, int& arraylayers) {
 	levels.reserve(layers);
+	CMlevels.reserve(arraylayers);
 	bitset<B_INT> temp;
+	bitset<B_INT> cmtemp;
 	for (int i = 0; i < layers; ++i) {
 		levels.push_back(temp);
 	}
+	for(int i = 0; i < arraylayers; ++i){
+		CMlevels.push_back(cmtemp);
+	}
 }
-bitmaps::bitmaps(int& layers, vector<string>& wordSplit) {
+bitmaps::bitmaps(int& layers, int& arraylayers, vector<string>& wordSplit) {
 	word = wordSplit;
 	// Reserve space to avoid reallocation
 	map.reserve(word.size());
-	mapContainer temp(layers);
+	mapContainer temp(layers, arraylayers);
 	for (int i = 0; i < word.size(); ++i) {
 		map.push_back(temp);
 	}
@@ -39,13 +44,20 @@ bool bitmaps::mirror(int& index) {
 	mirror(map[index].escapeBitset);
 	mirror(map[index].quoteBitset);
 	mirror(map[index].colonBitset);
+	mirror(map[index].commaBitset);
 	mirror(map[index].lbracketBitset);
 	mirror(map[index].rbracketBitset);
+	mirror(map[index].arraylbracketBitset);
+	mirror(map[index].arrayrbracketBitset);
 	mirror(map[index].structQBitset);
 	mirror(map[index].strBitset);
 	mirror(map[index].structCBitset);
+	mirror(map[index].structCMBitset);
 	for (int i = 0; i < map[index].levels.size(); ++i) {
 		mirror(map[index].levels[i]);
+	}
+	for (int i = 0; i < map[index].CMlevels.size(); ++i) {
+		mirror(map[index].CMlevels[i]);
 	}
 
 	return 1;
@@ -76,6 +88,7 @@ bool bitmaps::bitsetCreate() {
 					break;
 				case ',':
 					map[j].commaBitset[i] = 1;
+					break;
 				case '{':
 					map[j].lbracketBitset[i] = 1;
 					break;
@@ -155,109 +168,46 @@ bool bitmaps::bitsetCreate() {
 		map[i].structARBBitset = bitset<B_INT>(temp);
 	}
 
+
+
 	//cout << "Phase 4" << endl;
-	/*
-	// Phase 4 
-	{
-		// copy colon bitmap to leveled colon bitmaps
-		// *** NOTE: map[0].structCBitset PART MUST BE MODIFIED
-		//map[0].structCBitset = bitset<B_INT>(std::string("00000100000000000000000000100000"));
-		for (int i = 0; i < map.size(); ++i)
-			for (int j = 0; j < map[i].levels.size(); ++j)
-				map[i].levels[j] = map[i].structCBitset;
-		unsigned mLeft, mRight;									// m(left), m(right)
-		unsigned mLbit, mRbit;									// m(left bit), m(right bit)
-		const unsigned lvls = map[0].levels.size();					// Number of nesting levels
-																	//cout << "lvls: " << lvls << endl;
-		stack<vector<unsigned> > S;
-
-		for (int i = 0; i < map.size(); ++i)
-		{
-			mLeft = static_cast<unsigned> (map[i].lbracketBitset.to_ulong());
-			mRight = static_cast<unsigned> (map[i].rbracketBitset.to_ulong());
-			do 													// iterate over each right brace
-			{
-				// extract the rightmost 1
-				mRbit = mRight & -mRight;
-				mLbit = mLeft & -mLeft;
-
-				while (mLbit != 0 && (mRbit == 0 || mLbit < mRbit))
-				{
-					vector<unsigned> push;						// 0 = "j", 1 = mLbit
-					push.push_back(i);
-					push.push_back(mLbit);
-					S.push(push);								// push left bit to stack
-					mLeft = mLeft & (mLeft - 1);				// remove the rightmost 1
-					mLbit = mLeft & -mLeft;					// extract the rightmost 1
-				}
-				if (mRbit != 0)
-				{
-
-					vector<unsigned> pop = S.top();				// 0 = "j", 1 = mLbit
-					mLbit = pop[1];
-					S.pop();
-					//cout << "m(right bit) exists i: " << i << " j: " << pop[0] << endl;
-					//cout << "S.size() after pop: " << S.size() << endl;
-					if (0 < S.size() && S.size() <= lvls)	// clear bits at the upper level
-					{
-						bitset<B_INT> flip;
-						//cout << "In 0 < |S| <= l" << endl;
-						if (i == pop[0])						// nested object is inside the word
-						{
-							//cout << "in IF" << endl;
-							flip = mRbit - mLbit;
-							flip.flip();
-							//map[i].levels[S.size()-1] &= static_cast<unsigned> (flip.to_ulong());
-							map[i].levels[S.size() - 1] &= flip;
-						}
-						else 									// nested object is across multiple words
-						{
-
-							map[pop[0]].levels[S.size() - 1] &= mLbit - 1;
-							//cout << "map[pop[0]].levels[S.size()-1]: " << map[pop[0]].levels[S.size() - 1] << endl;
-							flip = mRbit - 1;
-							flip.flip();
-
-							map[i].levels[S.size() - 1] &= flip;
-							for (int k = pop[0] + 1; k < i; ++k) {
-								//cout << "i " << i << " j " << pop[0] << " k " << k << endl;
-								//cout << S.size() << endl;
-								map[k].levels[S.size() - 1].reset();
-							}
-						}
-					}
-				}
-				mRight &= mRight - 1;						// remove the rightmost 1
-			} while (mRbit != 0);
-		}
-	}
-
-	*/
-
 
 	// Phase 4 
 	{
 		// copy colon bitmap to leveled colon bitmaps
 		// *** NOTE: map[0].structCBitset PART MUST BE MODIFIED
 		//map[0].structCBitset = bitset<B_INT>(std::string("00000100000000000000000000100000"));
-		for (int i = 0; i < map.size(); ++i)
+		for (int i = 0; i < map.size(); ++i){
 			for (int j = 0; j < map[i].levels.size(); ++j){
 				map[i].levels[j] = map[i].structCBitset;
-				map[i].levels[j] = map[i].structCMBitset;
 			}
+			for(int j = 0; j < map[i].CMlevels.size(); ++j){
+				map[i].CMlevels[j] = map[i].structCMBitset;
+			}
+		}
+
 		unsigned mLeft, mRight;									// m(left), m(right)
 		unsigned mLbit, mRbit;									// m(left bit), m(right bit)
-
+		
+		//for array support
 		unsigned mCMLeft, mCMRight;
 		unsigned mCMLbit, mCMRbit;
+
 		const unsigned lvls = map[0].levels.size();					// Number of nesting levels
+		const unsigned cmlvls = map[0].CMlevels.size();
 																	//cout << "lvls: " << lvls << endl;
 		stack<vector<unsigned> > S;
+		stack<vector<unsigned> > SCM;
 
 		for (int i = 0; i < map.size(); ++i)
 		{
 			mLeft = static_cast<unsigned> (map[i].lbracketBitset.to_ulong());
 			mRight = static_cast<unsigned> (map[i].rbracketBitset.to_ulong());
+			
+			mCMLeft = static_cast<unsigned> (map[i].arraylbracketBitset.to_ulong());
+			mCMRight = static_cast<unsigned> (map[i].arrayrbracketBitset.to_ulong());
+
+
 			do 													// iterate over each right brace
 			{
 				// extract the rightmost 1
@@ -295,12 +245,21 @@ bool bitmaps::bitsetCreate() {
 						}
 						else 									// nested object is across multiple words
 						{
-
+							/*
+							cout << "in ELSE" << endl;
+							cout << "Before:" << endl;
+							cout << "map[pop[0]].levels[S.size()-1]: " << map[pop[0]].levels[S.size() - 1] << endl;
+							*/
 							map[pop[0]].levels[S.size() - 1] &= mLbit - 1;
 							//cout << "map[pop[0]].levels[S.size()-1]: " << map[pop[0]].levels[S.size() - 1] << endl;
 							flip = mRbit - 1;
 							flip.flip();
-
+							/*
+							cout << "Before:" << endl;
+							cout << "map[i].levels[S.size()-1]: " << map[i].levels[S.size() - 1] << endl;
+							map[i].levels[S.size()-1] &= flip;
+							cout << "map[i].levels[S.size()-1]: " << map[i].levels[S.size() - 1] << endl;
+							*/
 							map[i].levels[S.size() - 1] &= flip;
 							for (int k = pop[0] + 1; k < i; ++k) {
 								//cout << "i " << i << " j " << pop[0] << " k " << k << endl;
@@ -312,13 +271,70 @@ bool bitmaps::bitsetCreate() {
 				}
 				mRight &= mRight - 1;						// remove the rightmost 1
 			} while (mRbit != 0);
+
+
+			//for array support
+			do 													// iterate over each right brace
+			{
+				// extract the rightmost 1
+				mCMRbit = mCMRight & -mCMRight;
+				mCMLbit = mCMLeft & -mCMLeft;
+
+				while (mCMLbit != 0 && (mCMRbit == 0 || mCMLbit < mCMRbit))
+				{
+					vector<unsigned> push;						// 0 = "j", 1 = mLbit
+					push.push_back(i);
+					push.push_back(mCMLbit);
+					SCM.push(push);								// push left bit to stack
+					mCMLeft = mCMLeft & (mCMLeft - 1);				// remove the rightmost 1
+					mCMLbit = mCMLeft & -mCMLeft;					// extract the rightmost 1
+				}
+				if (mCMRbit != 0)
+				{
+
+					vector<unsigned> pop = SCM.top();				// 0 = "j", 1 = mLbit
+					mCMLbit = pop[1];
+					SCM.pop();
+					//cout << "m(right bit) exists i: " << i << " j: " << pop[0] << endl;
+					//cout << "S.size() after pop: " << S.size() << endl;
+					if (0 < SCM.size() && SCM.size() <= cmlvls)	// clear bits at the upper level
+					{
+						bitset<B_INT> flip;
+						//cout << "In 0 < |S| <= l" << endl;
+						if (i == pop[0])						// nested object is inside the word
+						{
+							//cout << "in IF" << endl;
+							flip = mCMRbit - mCMLbit;
+							flip.flip();
+							//map[i].levels[S.size()-1] &= static_cast<unsigned> (flip.to_ulong());
+							map[i].CMlevels[SCM.size() - 1] &= flip;
+						}
+						else 									// nested object is across multiple words
+						{
+
+							map[pop[0]].CMlevels[SCM.size() - 1] &= mCMLbit - 1;
+							//cout << "map[pop[0]].levels[S.size()-1]: " << map[pop[0]].levels[S.size() - 1] << endl;
+							flip = mCMRbit - 1;
+							flip.flip();
+
+							map[i].CMlevels[SCM.size() - 1] &= flip;
+							for (int k = pop[0] + 1; k < i; ++k) {
+								//cout << "i " << i << " j " << pop[0] << " k " << k << endl;
+								//cout << S.size() << endl;
+								map[k].CMlevels[SCM.size() - 1].reset();
+							}
+						}
+					}
+				}
+				mCMRight &= mCMRight - 1;						// remove the rightmost 1
+			} while (mCMRbit != 0);
+
+
 		}
 	}
 
 
 
-
-	
 	const unsigned lvls = map[0].levels.size();
 	for (int a = 0; a < map.size(); ++a) {
 		for (int b = lvls - 1; b > 0; --b) {
@@ -334,6 +350,19 @@ bool bitmaps::bitsetCreate() {
 			temp1 = static_cast<unsigned> (map[a].levels[b].to_ulong());
 			temp2 = static_cast<unsigned> (map[a].levels[b - 1].to_ulong());
 			map[a].levels[b] = temp1 - (temp1 & temp2);
+		
+		}
+	}
+
+	const unsigned cmlvls = map[0].CMlevels.size();
+	for (int a = 0; a < map.size(); ++a) {
+		for (int b = cmlvls - 1; b > 0; --b) {
+			unsigned temp1, temp2;
+			//for array support
+			temp1 = static_cast<unsigned> (map[a].CMlevels[b].to_ulong());
+			temp2 = static_cast<unsigned> (map[a].CMlevels[b - 1].to_ulong());
+			map[a].CMlevels[b] = temp1 - (temp1 & temp2);
+		
 		}
 	}
 
@@ -373,9 +402,9 @@ ostream& operator << (ostream &o, bitmaps& bm) {
 		cout << "\\  bitset: " << bm.map[i].escapeBitset << endl;
 		cout << "\"  bitset: " << bm.map[i].quoteBitset << endl;
 		cout << ":  bitset: " << bm.map[i].colonBitset << endl;
-		cout << ",  bitset: " << bm.map[i].commaBitset << endl;
 		cout << "{  bitset: " << bm.map[i].lbracketBitset << endl;
 		cout << "}  bitset: " << bm.map[i].rbracketBitset << endl;
+		cout << ",  bitset: " << bm.map[i].commaBitset << endl;
 		cout << "[  bitset: " << bm.map[i].arraylbracketBitset << endl;
 		cout << "]  bitset: " << bm.map[i].arrayrbracketBitset << endl;
 		cout << "Phase 2: " << endl;
@@ -384,16 +413,20 @@ ostream& operator << (ostream &o, bitmaps& bm) {
 		cout << "strbitset: " << bm.map[i].strBitset << endl;
 		cout << "Phase 4: " << endl;
 		cout << "SC bitset: " << bm.map[i].structCBitset << endl;
-		cout << "Levels: " << bm.map[i].levels.size() << endl;
 		for (int j = 0; j < bm.map[i].levels.size(); ++j) {
 			cout << "L" << j << ":        ";
-			cout << bm.map[i].levels[j] << endl;
+			cout << bm.map[i].levels[j] << endl;;
 		}
 		cout << endl;
-		//cout << "a" << endl;
-
+		cout << "SCMbitset: " << bm.map[i].structCMBitset << endl;
+		//cout << "CMLevels: " << bm.map[i].CMlevels.size() << endl;
+		for (int j = 0; j < bm.map[i].CMlevels.size(); ++j) {
+			cout << "L" << j << ":        ";
+			cout << bm.map[i].CMlevels[j] << endl;
+		}
+		cout << endl;
+		cout << endl;
 	}
-	//cout << "b" << endl;
 }
 
 void bitmaps::printPhase4() {
