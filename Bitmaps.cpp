@@ -392,6 +392,28 @@ bool bitmaps::generateColonPositions(int start, int end, int level, vector<int>&
 	return 1;
 }
 
+bool bitmaps::generateCommaPositions(int start, int end, int level, vector<int>& commaPositions) {
+	if (commaPositions.size())
+		commaPositions.clear();
+	unsigned mcomma;
+	for (int i = start / B_INT; i < ceil(double(end) / B_INT); ++i) {
+		mcomma = static_cast<unsigned> (map[i].CMlevels[level].to_ulong());
+		while (mcomma != 0) {
+			bitset<B_INT> mbit = (mcomma & -mcomma) - 1;
+			int offset = i * B_INT + mbit.count();
+			if (start <= offset && offset <= end) {
+				commaPositions.push_back(offset);
+			}
+			mcomma = mcomma & (mcomma - 1);
+		}
+	}
+	cout << "Comma Position is: " << endl;
+	for (int i = 0; i < commaPositions.size(); ++i) {
+		cout << commaPositions[i] << " ";
+	}
+	cout << endl;
+	return 1;
+}
 
 
 // Printing bitmaps

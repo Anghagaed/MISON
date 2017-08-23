@@ -62,6 +62,8 @@ public:
 	*/
 	bool generateColonPositions(int start, int end, int level, vector<int>& colonPositions);
 
+	bool generateCommaPositions(int start, int end, int level, vector<int>& commaPositions);
+
 	// Printing bitmaps
 	friend ostream& operator << (ostream&, bitmaps&);
 };
