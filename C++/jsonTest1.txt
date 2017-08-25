@@ -1,0 +1,1 @@
+{"id":"id:\"a\"", "reviews":50, "attributes":{"breakfast":false, "lunch":true, "dinner":true, "latenight":true},"categories":["Restaurant", "Bars"], "state":"WA", "city":"seattle"}
