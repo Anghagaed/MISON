@@ -31,5 +31,7 @@ class Bitmap(val bit : Int) {
   def >>(shiftBy: Int): Bitmap = {
     new Bitmap(bits >> shiftBy);
   }
-  override def toString: String = s"$bits"
+  def toBinary(i: Int, digits: Int = 32) = //Credit: https://stackoverflow.com/questions/9442381/formatting-binary-values-in-scala
+    String.format("%" + digits + "s", i.toBinaryString).replace(' ', '0')
+  override def toString: String = toBinary(bits);
 }
