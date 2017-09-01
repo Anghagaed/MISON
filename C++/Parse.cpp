@@ -1,6 +1,15 @@
 #include "Parse.h"
 
-parser::parser(stringmap queryFields) {
+FieldInfo::FieldInfo() {
+	this->type = 0;
+}
+
+FieldInfo::FieldInfo(int type, string field) {
+	this->type = type;
+	subField.push_back(field);
+}
+
+parser::parser(hashmap queryFields) {
 	this->queryFields = queryFields;
 }
 
@@ -11,9 +20,8 @@ int parser::parseWord(string line, bitmaps words, vector<pair<string, string> >&
 	vector<int> colonP;
 	words.generateColonPositions(0, line.size(), 0, colonP);
 	string temp = "";
-	parseWord(0, temp, colonP, result);
+	return parseWord(0, temp, colonP, result);
 	//cout << "HashCheck is " << hashCheck << endl;
-	return 1;
 
 }
 
@@ -57,16 +65,8 @@ int parser::parseWord(int level, string append, vector<int>& colonP, vector<pair
 		};
 		string field = append + line.substr(pos, colonP[i] - 1 - pos);
 		cout << "Found Field " << field << endl;
-		/*
-		if (pos == (colonP[i] - 2)) {
-			field = line.substr(pos, 1);
-		}
-		else {
-			field = line.substr(pos, colonP[i] - 1 - pos);
-		}
-		*/
 
-		stringmap::const_iterator got = queryFields.find(ptr(field));
+		hashmap::const_iterator got = queryFields.find(ptr(field));
 		if (got != queryFields.end()) {
 			if (line[colonP[i] + 1] == '{') {
 				vector<int> newColonP;
@@ -83,6 +83,7 @@ int parser::parseWord(int level, string append, vector<int>& colonP, vector<pair
 				parseWord(level + 1, betterAppend, newColonP, result);
 			}
 			else if (line[colonP[i] + 1] == '[') {
+				//string output;
 				cout << "ARRAY FIELDS NOT SUPPORTED" << endl;
 			}
 			else {
@@ -103,7 +104,6 @@ int parser::parseWord(int level, string append, vector<int>& colonP, vector<pair
 		}
 		if (hashCheck == queryFields.size()) {
 			return 1;
-			break;
 		}
 	}
 	return 0;

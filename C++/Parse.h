@@ -8,20 +8,31 @@
 #include "Bitmaps.h"
 
 
-typedef unordered_map<unsigned, string> stringmap;
+struct FieldInfo {
+	// 0 = Not Array Field
+	// 1 = Array Field : Grab Everything
+	// 2 = Array Field : Grab a list defined by variable
+	int type;
+	vector<string> subField;
+	FieldInfo(int type = 0, string field = "empty");
+	FieldInfo();
+};
+
+typedef unordered_map<unsigned, vector<string>* > arraymap;
+typedef unordered_map<unsigned, FieldInfo> hashmap;
 
 using namespace std;
 
 class parser {
 private:
-	stringmap queryFields;
+	hashmap queryFields;
 	string line;
 	bitmaps words;
 	int hashCheck;
 private:
 	int parseWord(int level, string append, vector<int>& colonP, vector<pair<string, string> >& result);
 public:
-	parser(stringmap queryFields);
+	parser(hashmap queryFields);
 	int parseWord(string line, bitmaps words, vector<pair<string, string> >& result);
 
 };
