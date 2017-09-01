@@ -2,4 +2,4 @@
 *.o
 *.gch
 *.out
-*.out
+*.cache-main
