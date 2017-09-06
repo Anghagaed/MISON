@@ -13,7 +13,7 @@
 
 using namespace std;
 
-string defaultPath = "Test Files/jsonTest5.txt";
+string defaultPath = "Test Files/jsonTest1.txt";
 
 int main(int argc, char *argv[]) {
 	int layers = 2;
