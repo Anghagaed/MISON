@@ -9,6 +9,7 @@ import Bits._
  * ListBuffer is used as an alternative.
  */
 import scala.collection.mutable.ListBuffer;
+import scala.math.ceil;
 class Bitmaps (layers: Int, arrayLayers: Int, wordSplit: Vector[String]) {
   // constructor:on
   class mapContainer (layers: Int, arrayLayers: Int)
@@ -26,6 +27,7 @@ class Bitmaps (layers: Int, arrayLayers: Int, wordSplit: Vector[String]) {
   	for(i <- 0 until arrayLayers)
   	  CMlevels(i) = new Bits(0);
   }
+  private val B_INT = 32;
   private var word: Vector[String] = wordSplit;
   var map: Array[mapContainer] = new Array[mapContainer](word.size);
   for(i <- 0 until word.size)
@@ -261,6 +263,26 @@ class Bitmaps (layers: Int, arrayLayers: Int, wordSplit: Vector[String]) {
 		
 	  	}
 	  }
+  }
+  def generateColonPositions(start: Int, end: Int, level: Int, colonPositions: Vector[Int]): Unit = {
+	  var colonPositions = Vector.empty[Int];
+    var mcolon: Bits = new Bits(0);
+	  for (i <- (start / B_INT) until ceil(end.toDouble / B_INT).toInt) {
+		  mcolon = map(i).levels(level);
+		  while (mcolon != 0) {
+			  mcolon = (mcolon & -mcolon.bits) - 1;
+			  var offset: Int = i * B_INT + mcolon.count();
+			  if (start <= offset && offset <= end) {
+				  colonPositions = colonPositions:+(offset);
+			  }
+			  mcolon = mcolon & (mcolon - 1);
+		  }
+	  }
+	  println("Colon Position is: ");
+	  for (i <- 0 until colonPositions.length) {
+		  print(colonPositions(i) + " ");
+	  }
+	  println();
   }
   override def toString: String = {
     var output: String = "";
