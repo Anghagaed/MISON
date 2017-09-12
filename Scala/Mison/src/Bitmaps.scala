@@ -11,6 +11,7 @@ import Bits._
 import scala.collection.mutable.ListBuffer;
 import scala.math.ceil;
 class Bitmaps (layers: Int, arrayLayers: Int, wordSplit: Vector[String]) {
+
   // constructor:on
   class mapContainer (layers: Int, arrayLayers: Int)
   {

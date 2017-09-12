@@ -2,9 +2,10 @@
 import Bitmaps._;
 import Bits._;
 import fileHandler.fileHandler;
+import Parser._;
 //import scala.collection.mutable.Stack;
-import scala.collection.immutable.List;
-import scala.collection.mutable.ListBuffer;
+import scala.collection.immutable._;
+import scala.collection.mutable._;
 object Main {
   def BitsTest()
   {
@@ -58,6 +59,18 @@ object Main {
     print(temp._1);
     println(temp._2);
   }
+  def ParserHashTest() {
+    var testString = "urls.id.yun.checker.hello";
+    System.out.println(testString.hashCode());
+    var container : ArrayBuffer[String] = ArrayBuffer();
+    container += testString;
+    // Index starts at 0. Access with (index)
+    System.out.println(container(0));
+    var testParser: MISONParser = new MISONParser(container);
+    System.out.println(testParser.queryInfo.levels);
+    System.out.println(testParser.queryInfo.hashFields.size);
+    
+  }
   def main(args: Array[String])
   {
     /*
@@ -75,7 +88,8 @@ object Main {
     //BitsTest();
     //println("filehandler test");
     //fileHandlerTest();
-    println("Bitmaps test");
-    BitmapsTest();
+    //println("Bitmaps test");
+    //BitmapsTest();
+    ParserHashTest();
   }
 }
