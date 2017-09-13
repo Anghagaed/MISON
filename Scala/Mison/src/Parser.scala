@@ -19,7 +19,6 @@ class MISONParser(queryFieldsList: ArrayBuffer[String],
     var hashFields: HashSet[Int] =  createHashField(queryFieldsList);
     
     private def createHashField(queryFieldsList: ArrayBuffer[String]) : HashSet[Int] = {
-      hashFields.clear();
       var splitCharacter: String = ".";
       var hashQuery : HashSet[Int] = new HashSet();
       for (i <- 0 until queryFieldsList.length) {
@@ -57,7 +56,8 @@ class MISONParser(queryFieldsList: ArrayBuffer[String],
   }
   
   // Parse one file and add all positive tuples into var result.
-  private def parseFile(filePath: String): Unit = {
+  // Return true for success, false for failure
+  private def parseFile(filePath: String): Boolean = {
     fileHandler.setNewFilePath(filePath);
     
     // Go through entire file one line at a time
@@ -67,9 +67,8 @@ class MISONParser(queryFieldsList: ArrayBuffer[String],
           queryFieldsInfo.nestingLevels,
           defaultArrayLayers,
           stringSplitted);
-      for (i <- 0 until stringSplitted.length) {
-        
-      }
+      
     }
+    return true;
   }
  }
