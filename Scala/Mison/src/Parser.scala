@@ -3,6 +3,13 @@ import fileHandler._;
 import Bitmaps._
 import scala.collection.mutable._;
 
+/* MISON Simple Parser without speculative loading.
+ * Argument: 		queryFieldList arrays of query fields. i.e. SELECT [a, b, c]... a, b, c 
+ * 							will be in queryFieldList
+ * 							filePaths arrays of file paths. More then one if the table is split 
+ * 							into multiple files
+ */
+
 class MISONParser(queryFieldsList: ArrayBuffer[String], 
     filePaths: ArrayBuffer[String] = new ArrayBuffer[String]) {
   // ADT to hold calculate and holds levels of necessary nesting for query
@@ -36,8 +43,8 @@ class MISONParser(queryFieldsList: ArrayBuffer[String],
     
   }
   // Constructor: on
-  
-  private var queryFieldsInfo: queryFields = new queryFields(queryFieldsList);
+  var defaultArrayLayers = 0;
+  var queryFieldsInfo: queryFields = new queryFields(queryFieldsList);
   private var fileHandler: fileHandler = new fileHandler;
   var result: ArrayBuffer[String] = new ArrayBuffer[String];
   // Constructor Off
@@ -46,17 +53,23 @@ class MISONParser(queryFieldsList: ArrayBuffer[String],
     for (i <- 0 until filePaths.length) {
       parseFile(filePaths(i));
     }
-    return result;
+    return result;  
   }
   
   // Parse one file and add all positive tuples into var result.
   private def parseFile(filePath: String): Unit = {
     fileHandler.setNewFilePath(filePath);
-    if (fileHandler.convertFileIntoVector) {
-      var fileStrVector = fileHandler.getFileVector;
-    }
-    else {
-      
+    
+    // Go through entire file one line at a time
+    while(fileHandler.getNextLine) {
+      var stringSplitted = fileHandler.getFileVector;
+      var bitmaps: Bitmaps = new Bitmaps(
+          queryFieldsInfo.nestingLevels,
+          defaultArrayLayers,
+          stringSplitted);
+      for (i <- 0 until stringSplitted.length) {
+        
+      }
     }
   }
  }
