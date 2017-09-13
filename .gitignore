@@ -3,3 +3,7 @@
 *.gch
 *.out
 *.cache-main
+*.class
+/Scala/MISON/bin/
+/Scala/MISON/.cache-main
+/Scala/MISON/.metadata
