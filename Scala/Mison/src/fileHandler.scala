@@ -20,10 +20,9 @@ class fileHandler() {
   
   def setNewFilePath(newPath: String): Unit = {
     filePath = newPath;
-    convertFileIntoVector;
   }
   
-  private def convertFileIntoVector: Boolean = {
+  def convertFileIntoVector: Boolean = {
     return (read && split);
   }
   
@@ -31,7 +30,7 @@ class fileHandler() {
     return vec;
   }
   
-  // Collin code with some modification
+  // Colin code with some modification
   private def read: Boolean = {
     val source = io.Source.fromFile(filePath)
     text = try source.mkString 

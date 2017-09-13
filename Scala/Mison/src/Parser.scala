@@ -4,7 +4,7 @@ import Bitmaps._
 import scala.collection.mutable._;
 
 class MISONParser(queryFieldsList: ArrayBuffer[String], 
-    filePath: ArrayBuffer[String] = new ArrayBuffer[String]) {
+    filePaths: ArrayBuffer[String] = new ArrayBuffer[String]) {
   // ADT to hold calculate and holds levels of necessary nesting for query
   // and string hashing the query fields
   class queryFields (queryFieldsList: ArrayBuffer[String]) {
@@ -39,7 +39,24 @@ class MISONParser(queryFieldsList: ArrayBuffer[String],
   
   private var queryFieldsInfo: queryFields = new queryFields(queryFieldsList);
   private var fileHandler: fileHandler = new fileHandler;
+  var result: ArrayBuffer[String] = new ArrayBuffer[String];
   // Constructor Off
+  // Main Function that parse the file and return arrayBuilder of String for result
+  def parseQuery(): ArrayBuffer[String] = {
+    for (i <- 0 until filePaths.length) {
+      parseFile(filePaths(i));
+    }
+    return result;
+  }
   
-  def parseQuery(): ArrayB
-}
+  // Parse one file and add all positive tuples into var result.
+  private def parseFile(filePath: String): Unit = {
+    fileHandler.setNewFilePath(filePath);
+    if (fileHandler.convertFileIntoVector) {
+      var fileStrVector = fileHandler.getFileVector;
+    }
+    else {
+      
+    }
+  }
+ }
