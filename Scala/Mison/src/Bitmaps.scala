@@ -1,5 +1,6 @@
 package Bitmaps
 import Bits._
+import scala.util.control.Breaks._
 /* https://www.scala-lang.org/api/current/scala/collection/immutable/Stack.html
  * (Since version 2.11.0) Stack is an inelegant and potentially
  * poorly-performing wrapper around List. Use List instead: 
@@ -265,14 +266,14 @@ class Bitmaps (layers: Int, arrayLayers: Int, wordSplit: Vector[String]) {
 	  	}
 	  }
   }
-  def generateColonPositions(start: Int, end: Int, level: Int, colonPositions: Vector[Int]): Unit = {
-	  var colonPositions = Vector.empty[Int];
+  def generateColonPositions(start: Int, end: Int, level: Int): Vector[Int] = {
+    var colonPositions = Vector.empty[Int];
     var mcolon: Bits = new Bits(0);
-	  for (i <- (start / B_INT) until ceil(end.toDouble / B_INT).toInt) {
+    for (i <- (start / B_INT) until ceil(end.toDouble / B_INT).toInt) {
 		  mcolon = map(i).levels(level);
-		  while (mcolon != 0) {
-			  mcolon = (mcolon & -mcolon.bits) - 1;
-			  var offset: Int = i * B_INT + mcolon.count();
+		  while (mcolon.bits != 0) {
+		    val mBit  = (mcolon & -mcolon.bits) - 1;
+			  var offset: Int = i * B_INT + mBit.count();
 			  if (start <= offset && offset <= end) {
 				  colonPositions = colonPositions:+(offset);
 			  }
@@ -284,6 +285,7 @@ class Bitmaps (layers: Int, arrayLayers: Int, wordSplit: Vector[String]) {
 		  print(colonPositions(i) + " ");
 	  }
 	  println();
+	  return colonPositions;
   }
   override def toString: String = {
     var output: String = "";

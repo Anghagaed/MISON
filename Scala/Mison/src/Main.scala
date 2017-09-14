@@ -45,16 +45,25 @@ object Main {
   }
   def BitmapsTest()
   {
-    /*
-    val fHandler = new fileHandler("./Test Files/jsonTest1.txt");
-    fHandler.read
-    fHandler.split
-    val layers = 2;
-    val arrayLayers = 3;
-    val bms: Bitmaps = new Bitmaps(layers, arrayLayers, fHandler.vector);
-    bms.createBitmap;
-    println(bms);
-    * */
+    
+    val fHandler = new fileHandler();
+    fHandler.setNewFilePath("./Test Files/jsonTest2.txt");
+    while(fHandler.getNext)
+    {
+      // temp test values
+      val layers = 2;
+      val arrayLayers = 3;
+      
+      // begin testing
+      val bms: Bitmaps = new Bitmaps(layers, arrayLayers, fHandler.getFileVector);
+      bms.createBitmap;
+      println(bms);
+      val start: Int = 0;
+      val end: Int = 31;
+      val level: Int = 0;
+      println("generating colon positions...");
+      val tempvec = bms.generateColonPositions(start, end, level);
+    }
   }
   def ListBufferTest()
   {/*
@@ -104,9 +113,9 @@ object Main {
     //println("filehandler test");
     //fileHandlerTest();
     //println("Bitmaps test");
-    //BitmapsTest();
+    BitmapsTest();
     //ParserHashTest();
-    fileHandlerTest()
-    ParserHashTest();
+    //fileHandlerTest()
+    //ParserHashTest();
   }
 }
