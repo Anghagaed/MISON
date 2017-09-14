@@ -61,7 +61,7 @@ class MISONParser(queryFieldsList: ArrayBuffer[String],
     fileHandler.setNewFilePath(filePath);
     
     // Go through entire file one line at a time
-    while(fileHandler.getNextLine) {
+    while(fileHandler.hasNext) {
       var stringSplitted = fileHandler.getFileVector;
       var bitmaps: Bitmaps = new Bitmaps(
           queryFieldsInfo.nestingLevels,

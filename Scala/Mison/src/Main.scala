@@ -31,15 +31,16 @@ object Main {
   }
   def fileHandlerTest()
   {
-    /*
+    
     println("Begin Testing")
-    val fHandler = new fileHandler("./Test Files/jsonTest4.txt");
-    for(a <- 0 until fHandler.vector.size){
-      println(fHandler.vector(a))
+    val fHandler = new fileHandler();
+    fHandler.setNewFilePath("./Test Files/blank.txt");    
+    for(a <- 0 until fHandler.getFileVector.size){
+      println(fHandler.getFileVector(a))
     }
+    println(fHandler.getFileVector.size);
     println("End Testing")
-    fHandler.fp;
-    * */
+    
   }
   def BitmapsTest()
   {
@@ -100,5 +101,6 @@ object Main {
     //println("Bitmaps test");
     //BitmapsTest();
     //ParserHashTest();
+    fileHandlerTest()
   }
 }
