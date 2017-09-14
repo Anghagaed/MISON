@@ -34,11 +34,12 @@ object Main {
     
     println("Begin Testing")
     val fHandler = new fileHandler();
-    fHandler.setNewFilePath("./Test Files/blank.txt");    
-    for(a <- 0 until fHandler.getFileVector.size){
-      println(fHandler.getFileVector(a))
+    fHandler.setNewFilePath("./Test Files/jsonTest2.txt");
+    while(fHandler.getNext){
+      for(a <- 0 until fHandler.getFileVector.size){
+        println(fHandler.getFileVector(a))
+      }
     }
-    println(fHandler.getFileVector.size);
     println("End Testing")
     
   }

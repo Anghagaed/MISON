@@ -8,12 +8,12 @@ import java.io.IOException
 // Need to handle multiple lines in file case. We want fileHandler to return one line at a time
 // Need to change read and split and/or implement new functions
 class fileHandler() {
-  private var text: String = "";                //full text
+  private var text: String = "";
   //private var currentLine = "";      
-  private var vec = Vector.empty[String];        //full text split up into 32 character sections
+  private var vec = Vector.empty[String];
   private var filePath: String = "";
   
-  private var source = io.Source.fromFile(filePath)
+  private var it: Option[Iterator[String]] = None
   
   /*
   def fp = filePath
@@ -21,40 +21,51 @@ class fileHandler() {
   def getSize = text.length()
   def getText = text
   */
+
   
   def setNewFilePath(newPath: String): Unit = {
     filePath = newPath;
-    source = io.Source.fromFile(filePath)
+    it = Some(io.Source.fromFile(filePath).getLines)
   }
   
   //def getNextLine: Boolean = {
   //  return (read && split);
   //}
   
+  /*
   // Return true if there is still another line to get. Return false if at end of file
   def hasNext:Boolean = {
-    return source.hasNext;
+    return io.Source.fromFile(filePath).hasNext;
   }
+  * */
   
-  def getNext: String = {
-      return source.getLines().mkString;
+  // Reads next line
+  def getNext: Boolean = {
+    if(it.get.hasNext){
+      text = it.get.next()
+      split
+      return true;
+    }
+    return false;
   }
   
   def getFileVector: Vector[String] = {
     return vec;
   }
  
+  /*
   // Colin code with some modification
   private def read: Boolean = {
     //val source = io.Source.fromFile(filePath)
-    text = try source.mkString 
+    text = try io.Source.fromFile(filePath).mkString 
     catch {case e: IOException => 
              e.printStackTrace();
              return false;
     }
-    finally println("donereading")//source.close()
+    finally io.Source.fromFile(filePath).close()
     return true;
   }
+  */
   
   // Colin code with some modification
   private def split: Boolean = {
