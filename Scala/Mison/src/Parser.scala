@@ -71,4 +71,8 @@ class MISONParser(queryFieldsList: ArrayBuffer[String],
     }
     return true;
   }
+  
+  private def parseLine() {
+    
+  }
  }
