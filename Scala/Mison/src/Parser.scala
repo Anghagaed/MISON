@@ -44,7 +44,7 @@ class MISONParser(queryFieldsList: ArrayBuffer[String],
   // Constructor: on
   var defaultArrayLayers = 0;
   var queryFieldsInfo: queryFields = new queryFields(queryFieldsList);
-  private var fileHandler: fileHandler = new fileHandler;
+  private var fileHandler: fileHandler = new fileHandler();
   var result: ArrayBuffer[String] = new ArrayBuffer[String];
   // Constructor Off
   // Main Function that parse the file and return arrayBuilder of String for result
@@ -61,7 +61,7 @@ class MISONParser(queryFieldsList: ArrayBuffer[String],
     fileHandler.setNewFilePath(filePath);
     
     // Go through entire file one line at a time
-    while(fileHandler.hasNext) {
+    while(fileHandler.getNext) {
       var stringSplitted = fileHandler.getFileVector;
       var bitmaps: Bitmaps = new Bitmaps(
           queryFieldsInfo.nestingLevels,
