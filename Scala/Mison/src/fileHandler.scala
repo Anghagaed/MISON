@@ -15,14 +15,6 @@ class fileHandler() {
   
   private var it: Option[Iterator[String]] = None
   
-  /*
-  def fp = filePath
-  def vector = vec
-  def getSize = text.length()
-  def getText = text
-  */
-
-  
   def setNewFilePath(newPath: String): Unit = {
     filePath = newPath;
     it = Some(io.Source.fromFile(filePath).getLines)
@@ -53,6 +45,10 @@ class fileHandler() {
     return vec;
   }
  
+  def getLineString: String = {
+    return text;
+  }
+  
   /*
   // Colin code with some modification
   private def read: Boolean = {

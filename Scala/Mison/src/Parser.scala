@@ -42,13 +42,16 @@ class MISONParser(queryFieldsList: ArrayBuffer[String],
     
   }
   // Constructor: on
-  var defaultArrayLayers = 0;
   var queryFieldsInfo: queryFields = new queryFields(queryFieldsList);
   private var fileHandler: fileHandler = new fileHandler();
   var result: ArrayBuffer[String] = new ArrayBuffer[String];
+  var recordFoundInLine: Int = 0;
+  var currentRecord: String = "";
+  var defaultArrayLayers: Int = 0;
   // Constructor Off
   // Main Function that parse the file and return arrayBuilder of String for result
   def parseQuery(): ArrayBuffer[String] = {
+    result.clear();
     for (i <- 0 until filePaths.length) {
       parseFile(filePaths(i));
     }
@@ -67,12 +70,30 @@ class MISONParser(queryFieldsList: ArrayBuffer[String],
           queryFieldsInfo.nestingLevels,
           defaultArrayLayers,
           stringSplitted);
-      
+      currentRecord = fileHandler.getLineString;
+      var initialColonPos = bitmaps.generateColonPositions(0, currentRecord.length - 1, 0);
+      var queryResult = parseLine(0, "", initialColonPos);
+      if (queryResult) {
+        result += currentRecord;
+      }
     }
     return true;
   }
-  
-  private def parseLine() {
-    
+  // Parse one record (line) and determine if the record is part of the query.
+  // Return true for success, false for failure
+  private def parseLine(curLevel: Int, append: String, colonPos: Vector[Int]): Boolean = {
+    var queryResult: Boolean = false;
+    var recordValue: String = "";
+    for (i <- 0 until colonPos.length) {
+      var pos = currentRecord.indexOf("\"", colonPos(i) - 2);
+      // Error Checking - REMOVE FOR FINAL VERSION
+      if (pos == -1) {
+        System.out.println("This line: " + currentRecord + " has no quotes at all");
+        return false;
+      }
+      var field: String = append + currentRecord.substring();
+    }
+    return queryResult;
   }
+  
  }
