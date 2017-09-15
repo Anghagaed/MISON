@@ -91,7 +91,9 @@ class MISONParser(queryFieldsList: ArrayBuffer[String],
         System.out.println("This line: " + currentRecord + " has no quotes at all");
         return false;
       }
-      var field: String = append + currentRecord.substring();
+      var field: String = append + currentRecord.substring(pos, colonPos(i) - 2);
+      
+      
     }
     return queryResult;
   }
