@@ -81,7 +81,7 @@ class MISONParser(queryFieldsList: ArrayBuffer[String],
   }
   // Parse one record (line) and determine if the record is part of the query.
   // Return true for success, false for failure
-  private def parseLine(curLevel: Int, append: String, colonPos: Vector[Int]): Boolean = {
+  private def parseLine(curLevel: Int, append: String, colonPos: Array[Int]): Boolean = {
     var queryResult: Boolean = false;
     var recordValue: String = "";
     for (i <- 0 until colonPos.length) {
@@ -93,7 +93,9 @@ class MISONParser(queryFieldsList: ArrayBuffer[String],
       }
       var field: String = append + currentRecord.substring(pos, colonPos(i) - 2);
       
-      
+      if () {
+        
+      }
     }
     return queryResult;
   }
