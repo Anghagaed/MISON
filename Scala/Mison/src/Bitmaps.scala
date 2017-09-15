@@ -266,8 +266,10 @@ class Bitmaps (layers: Int, arrayLayers: Int, wordSplit: Vector[String]) {
 	  	}
 	  }
   }
-  def generateColonPositions(start: Int, end: Int, level: Int): Vector[Int] = {
-    var colonPositions = Vector.empty[Int];
+  //def generateColonPositions(start: Int, end: Int, level: Int): Vector[Int] = {
+  //  var colonPositions = Vector.empty[Int];
+  def generateColonPositions(start: Int, end: Int, level: Int): Array[Int] = {
+    var colonPositions = Array.fill(B_INT)(-1);//new Array[Int](B_INT);
     var mcolon: Bits = new Bits(0);
     for (i <- (start / B_INT) until ceil(end.toDouble / B_INT).toInt) {
 		  mcolon = map(i).levels(level);
@@ -275,15 +277,16 @@ class Bitmaps (layers: Int, arrayLayers: Int, wordSplit: Vector[String]) {
 		    val mBit  = (mcolon & -mcolon.bits) - 1;
 			  var offset: Int = i * B_INT + mBit.count();
 			  if (start <= offset && offset <= end) {
-				  colonPositions = colonPositions:+(offset);
+				  colonPositions = (offset)+:colonPositions;
 			  }
 			  mcolon = mcolon & (mcolon - 1);
 		  }
 	  }
 	  println("Colon Position is: ");
-	  for (i <- 0 until colonPositions.length) {
-		  print(colonPositions(i) + " ");
-	  }
+	  //for (i <- 0 until colonPositions.length) {
+		//  print(colonPositions(i) + " ");
+	  //}
+	  colonPositions.filter(_ != -1).foreach(x => print(s"${x} "));
 	  println();
 	  return colonPositions;
   }

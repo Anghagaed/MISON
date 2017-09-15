@@ -62,7 +62,7 @@ object Main {
       val end: Int = 31;
       val level: Int = 0;
       println("generating colon positions...");
-      val tempvec = bms.generateColonPositions(start, end, level);
+      var tempArr = bms.generateColonPositions(start, end, level);
     }
   }
   def ListBufferTest()
