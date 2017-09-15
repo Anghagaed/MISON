@@ -12,43 +12,43 @@ class fileHandler() {
   //private var currentLine = "";      
   private var vec = Vector.empty[String];
   private var filePath: String = "";
-  
+
   private var it: Option[Iterator[String]] = None
-  
+
   def setNewFilePath(newPath: String): Unit = {
     filePath = newPath;
     it = Some(io.Source.fromFile(filePath).getLines)
   }
-  
+
   //def getNextLine: Boolean = {
   //  return (read && split);
   //}
-  
+
   /*
   // Return true if there is still another line to get. Return false if at end of file
   def hasNext:Boolean = {
     return io.Source.fromFile(filePath).hasNext;
   }
   * */
-  
+
   // Reads next line
   def getNext: Boolean = {
-    if(it.get.hasNext){
+    if (it.get.hasNext) {
       text = it.get.next()
       split
       return true;
     }
     return false;
   }
-  
+
   def getFileVector: Vector[String] = {
     return vec;
   }
- 
+
   def getLineString: String = {
     return text;
   }
-  
+
   /*
   // Colin code with some modification
   private def read: Boolean = {
@@ -62,15 +62,14 @@ class fileHandler() {
     return true;
   }
   */
-  
+
   // Colin code with some modification
   private def split: Boolean = {
-    for(a <- 0 until text.length() if a % 32 == 0){
-      if(a + 32 <= text.length()){
-        vec = vec:+(text.substring(a, a+32))
-      }
-      else{
-        vec = vec:+(text.substring(a, text.length()))
+    for (a <- 0 until text.length() if a % 32 == 0) {
+      if (a + 32 <= text.length()) {
+        vec = vec :+ (text.substring(a, a + 32))
+      } else {
+        vec = vec :+ (text.substring(a, text.length()))
 
       }
     }

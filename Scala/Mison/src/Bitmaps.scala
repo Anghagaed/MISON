@@ -11,64 +11,56 @@ import scala.util.control.Breaks._
  */
 import scala.collection.mutable.ListBuffer;
 import scala.math.ceil;
-class Bitmaps (layers: Int, arrayLayers: Int, wordSplit: Vector[String]) {
+class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: Vector[String]) {
 
   // constructor:on
-  class mapContainer (layers: Int, arrayLayers: Int)
-  {
-    var escapeBitset, quoteBitset, colonBitset, commaBitset,
-			lbracketBitset, rbracketBitset, arraylbracketBitset, 
-			arrayrbracketBitset, structQBitset, strBitset, 
-			structCBitset, structLBitset, structRBitset, 
-			structCMBitset, structALBBitset, structARBBitset: 
-			Bits = new Bits(0);
-  	var levels: Array[Bits] = new Array[Bits](layers);
-  	var CMlevels: Array[Bits] = new Array[Bits](arrayLayers);
-  	for(i <- 0 until layers)
-  	  levels(i) = new Bits(0);
-  	for(i <- 0 until arrayLayers)
-  	  CMlevels(i) = new Bits(0);
+  class mapContainer(layers: Int, arrayLayers: Int) {
+    var escapeBitset, quoteBitset, colonBitset, commaBitset, lbracketBitset, rbracketBitset, arraylbracketBitset, arrayrbracketBitset, structQBitset, strBitset, structCBitset, structLBitset, structRBitset, structCMBitset, structALBBitset, structARBBitset: Bits = new Bits(0);
+    var levels: Array[Bits] = new Array[Bits](layers);
+    var CMlevels: Array[Bits] = new Array[Bits](arrayLayers);
+    for (i <- 0 until layers)
+      levels(i) = new Bits(0);
+    for (i <- 0 until arrayLayers)
+      CMlevels(i) = new Bits(0);
   }
   private val B_INT = 32;
   private var word: Vector[String] = wordSplit;
   var map: Array[mapContainer] = new Array[mapContainer](word.size);
-  for(i <- 0 until word.size)
+  for (i <- 0 until word.size)
     map(i) = new mapContainer(layers, arrayLayers);
   // constructor:off
-  
+
   // methods:on
   def createBitmap: Unit = {
-    fillBits();           // phase 1 & 2
-    convertToStruct();    // phase 3/(pre)4
-    fillColonBits();      // phase 4
+    fillBits(); // phase 1 & 2
+    convertToStruct(); // phase 3/(pre)4
+    fillColonBits(); // phase 4
   }
   def fillBits(): Unit = {
     var prev: Array[Char] = new Array[Char](2);
-    for(j <- 0 until map.size)
-    {
-      for(i <- 0 until word(j).size)
-      {
+    for (j <- 0 until map.size) {
+      for (i <- 0 until word(j).size) {
         val currentChar = word(j)(i);
         currentChar match {
-          case '\\' => 
+          case '\\' =>
             map(j).escapeBitset.set(i, 1);
-          case '\"' => 
+          case '\"' =>
             map(j).quoteBitset.set(i, 1);
-            if(prev(0) != '\\' || (prev(0) == '\\' && prev(1) == '\\')) 
+            if (prev(0) != '\\' || (prev(0) == '\\' && prev(1) == '\\'))
               map(j).structQBitset.set(i, 1);
           case ':' =>
             map(j).colonBitset.set(i, 1);
           case ',' =>
             map(j).commaBitset.set(i, 1);
           case '{' =>
-					  map(j).lbracketBitset.set(i, 1);
-				  case '}' =>
-					  map(j).rbracketBitset.set(i, 1);
-				  case '[' =>
-					  map(j).arraylbracketBitset.set(i, 1);
-				  case ']' => 
-				  	map(j).arrayrbracketBitset.set(i, 1);
-				  case _ => // do nothing for others
+            map(j).lbracketBitset.set(i, 1);
+          case '}' =>
+            map(j).rbracketBitset.set(i, 1);
+          case '[' =>
+            map(j).arraylbracketBitset.set(i, 1);
+          case ']' =>
+            map(j).arrayrbracketBitset.set(i, 1);
+          case _ => // do nothing for others
         }
         prev(1) = prev(0);
         prev(0) = word(j)(i);
@@ -76,130 +68,124 @@ class Bitmaps (layers: Int, arrayLayers: Int, wordSplit: Vector[String]) {
     }
   }
   def convertToStruct(): Unit = {
-    var n: Int = 0;  // Number of quotes count
-    for(j <- 0 until map.size)
-    {
+    var n: Int = 0; // Number of quotes count
+    for (j <- 0 until map.size) {
       var mQuote: Bits = map(j).structQBitset;
       var mString: Bits = new Bits(0);
       // Loop until the number of quote in mQuote is 0
-      for(i <- map(j).structQBitset.count until 0 by -1)
-      {
+      for (i <- map(j).structQBitset.count until 0 by -1) {
         // Extract and smear the rightmost 1  m = S(mQuote) = mQuote ^ (mQuote - 1)
-        val m:Bits = mQuote ^ (mQuote - 1);
+        val m: Bits = mQuote ^ (mQuote - 1);
         // Extend mstring to the rightmost 1 mString = mString ^| m
         mString = mString ^ m;
         // remove the rightmost 1 mQuote = R(mQuote) = mQuote & (mQuote - 1)
-				mQuote &= (mQuote - 1);
-				n += 1;
+        mQuote &= (mQuote - 1);
+        n += 1;
       }
       // Flip mString if necessary given n mod 2 = 1
       if (n % 2 == 1)
-			  mString.flip();
-			map(j).strBitset = mString;
+        mString.flip();
+      map(j).strBitset = mString;
     }
     for (i <- 0 until map.size) {
-		  var strMask = map(i).strBitset;
-		  var temp: Bits = new Bits(0);
-		  // Colon
-		  temp = map(i).colonBitset;
-		  temp = temp - (temp & strMask);
-		  map(i).structCBitset = temp;
-		  // left Brace
-		  temp = map(i).lbracketBitset;
-		  temp = temp - (temp & strMask);
-		  map(i).structLBitset = temp;
-		  // right Brace
-		  temp = map(i).rbracketBitset;
-		  temp = temp - (temp & strMask);
-		  map(i).structRBitset = temp;
+      var strMask = map(i).strBitset;
+      var temp: Bits = new Bits(0);
+      // Colon
+      temp = map(i).colonBitset;
+      temp = temp - (temp & strMask);
+      map(i).structCBitset = temp;
+      // left Brace
+      temp = map(i).lbracketBitset;
+      temp = temp - (temp & strMask);
+      map(i).structLBitset = temp;
+      // right Brace
+      temp = map(i).rbracketBitset;
+      temp = temp - (temp & strMask);
+      map(i).structRBitset = temp;
 
-		  //for support of array fields
-		  // comma
-		  temp = map(i).commaBitset;
-		  temp = temp - (temp & strMask);
-		  map(i).structCMBitset = temp;
-		  // left bracket
-		  temp = map(i).arraylbracketBitset;
-		  temp = temp - (temp & strMask);
-		  map(i).structALBBitset = temp;
-		  // right bracket
-		  temp = map(i).arrayrbracketBitset;
-		  temp = temp - (temp & strMask);
-		  map(i).structARBBitset = temp;
-	  }
+      //for support of array fields
+      // comma
+      temp = map(i).commaBitset;
+      temp = temp - (temp & strMask);
+      map(i).structCMBitset = temp;
+      // left bracket
+      temp = map(i).arraylbracketBitset;
+      temp = temp - (temp & strMask);
+      map(i).structALBBitset = temp;
+      // right bracket
+      temp = map(i).arrayrbracketBitset;
+      temp = temp - (temp & strMask);
+      map(i).structARBBitset = temp;
+    }
   }
   def fillColonBits(): Unit = {
     // copy colon bitmap to leveled colon bitmaps
-    
+
     for (i <- 0 until map.size) {
-			for (j <- 0 until map(i).levels.size) 
-				map(i).levels(j) = map(i).structCBitset;
-			//for(j <- 0 until map(i).CMlevels.size) 
-			//	map(i).CMlevels(j) = map(i).structCMBitset;
-		}
-    var mLeft, mRight: Bits = new Bits(0);									// m(left), m(right)
-		var mLbit, mRbit: Bits = new Bits(0);									// m(left bit), m(right bit)
-		
-		//for array support
-		//var mCMLeft, mCMRight: Bits = new Bits(0);
-		//var mCMLbit, mCMRbit: Bits = new Bits(0);
+      for (j <- 0 until map(i).levels.size)
+        map(i).levels(j) = map(i).structCBitset;
+      //for(j <- 0 until map(i).CMlevels.size) 
+      //	map(i).CMlevels(j) = map(i).structCMBitset;
+    }
+    var mLeft, mRight: Bits = new Bits(0); // m(left), m(right)
+    var mLbit, mRbit: Bits = new Bits(0); // m(left bit), m(right bit)
 
-		val lvls: Int = map(0).levels.size;					// Number of nesting levels
-		//val cmlvls: Int = map(0).CMlevels.size;
-		
-		// ListBuffer: Stack alternative
-		var S: ListBuffer[Tuple2[Int,Bits]] = ListBuffer();
-		//var SCM: ListBuffer[Tuple2[Int,Int]] = ListBuffer();
-		
-		for (i <- 0 until map.size)
-		{
-			mLeft = map(i).lbracketBitset;
-			mRight = map(i).rbracketBitset;
-			
-			//mCMLeft = map(i).arraylbracketBitset;
-			//mCMRight = map(i).arrayrbracketBitset;
-			do 													// iterate over each right brace
-			{
-				// extract the rightmost 1
-				mRbit = mRight & -mRight.bits;
-				mLbit = mLeft & -mLeft.bits;
+    //for array support
+    //var mCMLeft, mCMRight: Bits = new Bits(0);
+    //var mCMLbit, mCMRbit: Bits = new Bits(0);
 
-				while (mLbit.bits != 0 && (mRbit.bits == 0 || mLbit < mRbit))
-				{
-					// 1 = "j", 2 = mLbit
-					S.insert(0, (i, mLbit));
-					mLeft = mLeft & (mLeft - 1);				// remove the rightmost 1
-					mLbit = mLeft & -mLeft.bits;					// extract the rightmost 1
-				}
-				if (mRbit.bits != 0)
-				{
-					val pop = S.remove(0);				// 0 = "j", 1 = mLbit
-					val j = pop._1;
-					mLbit = pop._2;
-					if (0 < S.size && S.size <= lvls)	// clear bits at the upper level
-					{
-						var flip: Bits = new Bits(0);
-						if (i == j)						// nested object is inside the word
-						{
-							flip = mRbit - mLbit;
-							flip.flip();
-							map(i).levels(S.size - 1) &= flip;
-						}
-						else 									// nested object is across multiple words
-						{
-							map(j).levels(S.size - 1) &= mLbit - 1;
-							flip = mRbit - 1;
-							flip.flip();
-							map(i).levels(S.size - 1) &= flip;
-							for (k <- j + 1 until i) {
-								map(k).levels(S.size - 1) = new Bits(0);
-							}
-						}
-					}
-				}
-				mRight &= mRight - 1;						// remove the rightmost 1
-			} while (mRbit.bits != 0);
-			/*
+    val lvls: Int = map(0).levels.size; // Number of nesting levels
+    //val cmlvls: Int = map(0).CMlevels.size;
+
+    // ListBuffer: Stack alternative
+    var S: ListBuffer[Tuple2[Int, Bits]] = ListBuffer();
+    //var SCM: ListBuffer[Tuple2[Int,Int]] = ListBuffer();
+
+    for (i <- 0 until map.size) {
+      mLeft = map(i).lbracketBitset;
+      mRight = map(i).rbracketBitset;
+
+      //mCMLeft = map(i).arraylbracketBitset;
+      //mCMRight = map(i).arrayrbracketBitset;
+      do // iterate over each right brace
+      {
+        // extract the rightmost 1
+        mRbit = mRight & -mRight.bits;
+        mLbit = mLeft & -mLeft.bits;
+
+        while (mLbit.bits != 0 && (mRbit.bits == 0 || mLbit < mRbit)) {
+          // 1 = "j", 2 = mLbit
+          S.insert(0, (i, mLbit));
+          mLeft = mLeft & (mLeft - 1); // remove the rightmost 1
+          mLbit = mLeft & -mLeft.bits; // extract the rightmost 1
+        }
+        if (mRbit.bits != 0) {
+          val pop = S.remove(0); // 0 = "j", 1 = mLbit
+          val j = pop._1;
+          mLbit = pop._2;
+          if (0 < S.size && S.size <= lvls) // clear bits at the upper level
+          {
+            var flip: Bits = new Bits(0);
+            if (i == j) // nested object is inside the word
+            {
+              flip = mRbit - mLbit;
+              flip.flip();
+              map(i).levels(S.size - 1) &= flip;
+            } else // nested object is across multiple words
+            {
+              map(j).levels(S.size - 1) &= mLbit - 1;
+              flip = mRbit - 1;
+              flip.flip();
+              map(i).levels(S.size - 1) &= flip;
+              for (k <- j + 1 until i) {
+                map(k).levels(S.size - 1) = new Bits(0);
+              }
+            }
+          }
+        }
+        mRight &= mRight - 1; // remove the rightmost 1
+      } while (mRbit.bits != 0);
+      /*
 			//for array support
 			do 													// iterate over each right brace
 			{
@@ -255,45 +241,44 @@ class Bitmaps (layers: Int, arrayLayers: Int, wordSplit: Vector[String]) {
 			} while (mCMRbit != 0);
 			* 
 			*/
-		}
-		
-	  for (a <- 0 until map.size) {
-		  for (b <- lvls - 1 until 0 by -1) {
-	  		val temp1 = map(a).levels(b);
-	  		val temp2 = map(a).levels(b - 1);
-  			map(a).levels(b) = temp1 - (temp1 & temp2);
-		
-	  	}
-	  }
+    }
+
+    for (a <- 0 until map.size) {
+      for (b <- lvls - 1 until 0 by -1) {
+        val temp1 = map(a).levels(b);
+        val temp2 = map(a).levels(b - 1);
+        map(a).levels(b) = temp1 - (temp1 & temp2);
+
+      }
+    }
   }
   //def generateColonPositions(start: Int, end: Int, level: Int): Vector[Int] = {
   //  var colonPositions = Vector.empty[Int];
   def generateColonPositions(start: Int, end: Int, level: Int): Array[Int] = {
-    var colonPositions = Array.fill(B_INT)(-1);//new Array[Int](B_INT);
+    var colonPositions = Array.fill(B_INT)(-1); //new Array[Int](B_INT);
     var mcolon: Bits = new Bits(0);
     for (i <- (start / B_INT) until ceil(end.toDouble / B_INT).toInt) {
-		  mcolon = map(i).levels(level);
-		  while (mcolon.bits != 0) {
-		    val mBit  = (mcolon & -mcolon.bits) - 1;
-			  var offset: Int = i * B_INT + mBit.count();
-			  if (start <= offset && offset <= end) {
-				  colonPositions = (offset)+:colonPositions;
-			  }
-			  mcolon = mcolon & (mcolon - 1);
-		  }
-	  }
-	  println("Colon Position is: ");
-	  //for (i <- 0 until colonPositions.length) {
-		//  print(colonPositions(i) + " ");
-	  //}
-	  colonPositions.filter(_ != -1).foreach(x => print(s"${x} "));
-	  println();
-	  return colonPositions;
+      mcolon = map(i).levels(level);
+      while (mcolon.bits != 0) {
+        val mBit = (mcolon & -mcolon.bits) - 1;
+        var offset: Int = i * B_INT + mBit.count();
+        if (start <= offset && offset <= end) {
+          colonPositions = (offset) +: colonPositions;
+        }
+        mcolon = mcolon & (mcolon - 1);
+      }
+    }
+    println("Colon Position is: ");
+    //for (i <- 0 until colonPositions.length) {
+    //  print(colonPositions(i) + " ");
+    //}
+    colonPositions.filter(_ != -1).foreach(x => print(s"${x} "));
+    println();
+    return colonPositions;
   }
   override def toString: String = {
     var output: String = "";
-    for(i <- 0 until word.size)
-    {
+    for (i <- 0 until word.size) {
       output += "String is: " + word(i);
       output += "\nPhase 1: ";
       output += "\n\\  bitset: " + map(i).escapeBitset;
@@ -310,8 +295,7 @@ class Bitmaps (layers: Int, arrayLayers: Int, wordSplit: Vector[String]) {
       output += "\nstrbitset: " + map(i).strBitset;
       output += "\nPhase 4: ";
       output += "\nSC bitset: " + map(i).structCBitset;
-      for(j <- 0 until map(i).levels.size)
-      {
+      for (j <- 0 until map(i).levels.size) {
         output += "\nL" + j + ":        ";
         output += map(i).levels(j);
       }
@@ -319,5 +303,43 @@ class Bitmaps (layers: Int, arrayLayers: Int, wordSplit: Vector[String]) {
     }
     return output;
   }
+
+  def getStartingBoundary(colonPosition: Int): Int = {
+    var output: Int = -1;
+    var startingLevel: Int = colonPosition / 32;
+    var pos = 31 - (colonPosition % 32);
+    for (i <- startingLevel to 0) {
+      map(i).structQBitset.flip();
+      output = map(i).structQBitset.getNextOnPosition(pos);
+      if (output != -1) {
+        map(i).structQBitset.flip();
+        return output;
+      }
+      map(i).structQBitset.flip();
+      pos = 0;
+    }
+    return -1;
+  }
+
+  def getEndingBoundary(colonPosition: Int): Int = {
+    var startingLevel: Int = colonPosition / 32;
+    var pos = colonPosition % 32;
+    for (i <- startingLevel to 0) {
+      var commaPos = map(i).structCBitset.getNextOnPosition(pos);
+      var bracketPos = map(i).structRBitset.getNextOnPosition(pos);
+      if (commaPos != -1 && bracketPos != -1) {
+        val returnVal = if (commaPos > bracketPos) commaPos else bracketPos;
+        return returnVal;
+      }
+      else if (commaPos != -1) {
+        return commaPos;
+      }
+      else {
+        return bracketPos;
+      }
+    }
+    return -1;
+  }
+
   // methods:off
 }

@@ -32,7 +32,7 @@ int findQuotePos(string line, int pos, int& result) {
 }
 
 // Return -1 if can't find it
-
+// findDefaultPos(this->line, colonP[i] + 1, endPos);
 int findDefaultPos(string line, int pos, int& result) {
 	int i = pos;
 	while (i < line.size()) {
