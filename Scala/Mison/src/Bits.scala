@@ -68,7 +68,10 @@ class Bits(val bit: Int) {
   // (bitwise) getter
   def get(index: Int): Int = {
     var mask: Int = 1 << index;
+    System.out.println("Mask is: " + mask);
     mask &= bits;
+    System.out.println("Mask &= bits is " + mask);
+    System.out.println("Mask >> index is " + (mask >> index));
     return mask >> index;
   }
 
@@ -86,14 +89,17 @@ class Bits(val bit: Int) {
   // get position of next bit that is a one starting from startingPos right to left.
   // return the position or -1 if failed
   def getNextOnPosition(startingPos: Int): Int = {
-    if (bits == 0 || startingPos >= SIZEOFINT) {
+    if ( (bits) == 0 || startingPos >= SIZEOFINT) {
+      System.out.println("0 or pos too big");
       return -1;
     }
-    for (i <- startingPos until SIZEOFINT) {
+    for (i <- startingPos until (SIZEOFINT)) {
+      System.out.println("i is " + i + " with this.get(i) is " + this.get(i));
       if (this.get(i) == 1) {
         return i;
       }
     }
+    System.out.println("Found Nothing");
     return -1;
   }
 }

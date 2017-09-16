@@ -313,12 +313,28 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: Vector[String]) {
       output = map(i).structQBitset.getNextOnPosition(pos);
       if (output != -1) {
         map(i).structQBitset.flip();
-        return output;
+        return (31 - output);
       }
       map(i).structQBitset.flip();
       pos = 0;
     }
     return -1;
+  }
+  
+  def testBitsScala() = {
+    System.out.println("Testing testBitsScala");
+    //Testing getNextOnPosition. Conclusion: It works
+    System.out.println("SQ bitset: " + map(0).structQBitset); 
+    /*
+    var x = -1;
+    do {
+      System.out.print("Call with " + (x + 1) + ": ");
+      x = map(0).structQBitset.getNextOnPosition(x+1);
+      System.out.println(x);
+    } while (x != -1);
+    */
+    System.out.print("Call with " + (29) + ": " + map(0).structQBitset.getNextOnPosition(29));
+    
   }
 
   def getEndingBoundary(colonPosition: Int): Int = {

@@ -58,8 +58,18 @@ object Main {
       val end: Int = 31;
       val level: Int = 0;
       println("generating colon positions...");
+      /*
       var tempArr = bms.generateColonPositions(start, end, level);
+      var stringtemp = fHandler.getLineString;
+      System.out.println(stringtemp);
+      System.out.println("StartBoundary is " + bms.getStartingBoundary(tempArr(2) - 1) + " and " 
+          + stringtemp.charAt(bms.getStartingBoundary(tempArr(2) - 1)));
+      */
+      bms.testBitsScala();
+      
     }
+    
+      
   }
   def ListBufferTest() { /*
     var S: ListBuffer[Tuple2[Int,Int]] = ListBuffer();
@@ -117,5 +127,11 @@ object Main {
     // Hang Test Function Calls
     //ParseStringTest();
     //ParserHashTest();
+    var x: Int = 1 << 31;
+    System.out.println(x);
+    System.out.println((x >> 30));
+    System.out.println((x >> 31));
+    var y:Int = 1;
+    System.out.println( (y << 31) >> 31);
   }
 }
