@@ -66,10 +66,9 @@ object Main {
           + stringtemp.charAt(bms.getStartingBoundary(tempArr(2) - 1)));
       */
       bms.testBitsScala();
-      
+
     }
-    
-      
+
   }
   def ListBufferTest() { /*
     var S: ListBuffer[Tuple2[Int,Int]] = ListBuffer();
@@ -128,10 +127,19 @@ object Main {
     //ParseStringTest();
     //ParserHashTest();
     var x: Int = 1 << 31;
-    System.out.println(x);
-    System.out.println((x >> 30));
-    System.out.println((x >> 31));
-    var y:Int = 1;
-    System.out.println( (y << 31) >> 31);
+    var y: Int = ~x;
+    var z: Int = -10;
+    // Goal: z in binary: 11111111 11111111 11111111 11110110 -> 01111111 11111111 11111111 11111011
+    // for operation z >> 1 when z < 0;
+    var mask: Int = 0x7FFFFFFF;
+
+    var bits = new Bits(0x80000000);
+    System.out.println("Before New Shift Left Function\n" + bits);
+    System.out.println("After New Shift Left Function");   
+    while (bits.bits != 0) {
+      //bits.bits = bits.bits >> 1;
+      bits.shiftLeft(1);
+      System.out.println(bits);
+    }
   }
 }

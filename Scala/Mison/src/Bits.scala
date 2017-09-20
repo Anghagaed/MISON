@@ -68,13 +68,17 @@ class Bits(val bit: Int) {
   // (bitwise) getter
   def get(index: Int): Int = {
     var mask: Int = 1 << index;
-    System.out.println("Mask is: " + mask);
-    mask &= bits;
-    System.out.println("Mask &= bits is " + mask);
-    System.out.println("Mask >> index is " + (mask >> index));
-    return mask >> index;
+    mask = ((mask & bits) >> index);
+    return absolute(mask);
   }
-
+  // return absolute value
+  private def absolute(input: Int): Int = {
+    if (input >= 0) {
+      return input;
+    } else {
+      return -input;
+    }
+  }
   // toString
   def toBinary(i: Int, digits: Int = 32) = //Credit: https://stackoverflow.com/questions/9442381/formatting-binary-values-in-scala
     String.format("%" + digits + "s", i.toBinaryString).replace(' ', '0')
@@ -86,10 +90,19 @@ class Bits(val bit: Int) {
     bits = ~bits;
   }
 
+  // Use this Function 
+
+  def shiftLeft(shiftNum: Int): Int = {
+    var temp:Int = get(31);
+    bits = (bits & 0x7FFFFFFF) >> 1;
+    set(30, temp);
+    return bits;
+  }
+
   // get position of next bit that is a one starting from startingPos right to left.
   // return the position or -1 if failed
   def getNextOnPosition(startingPos: Int): Int = {
-    if ( (bits) == 0 || startingPos >= SIZEOFINT) {
+    if ((bits) == 0 || startingPos >= SIZEOFINT) {
       System.out.println("0 or pos too big");
       return -1;
     }
