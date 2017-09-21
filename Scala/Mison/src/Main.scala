@@ -58,14 +58,23 @@ object Main {
       val end: Int = 31;
       val level: Int = 0;
       println("generating colon positions...");
-      /*
+      
+      // Start Boundary
       var tempArr = bms.generateColonPositions(start, end, level);
       var stringtemp = fHandler.getLineString;
       System.out.println(stringtemp);
-      System.out.println("StartBoundary is " + bms.getStartingBoundary(tempArr(2) - 1) + " and " 
-          + stringtemp.charAt(bms.getStartingBoundary(tempArr(2) - 1)));
-      */
-      bms.testBitsScala();
+      System.out.println("StartBoundary for colonPosition 10 is " 
+          + bms.getStartingBoundary(10) + " char: "
+          + stringtemp.charAt(bms.getStartingBoundary(10)) + " and "
+          + bms.getStartingBoundary(8) + " char: " 
+          + stringtemp.charAt(bms.getStartingBoundary(8)));
+      
+      // End Boundary
+      System.out.println(stringtemp);
+      System.out.println("EndBoundary for colonPostion 10 is "
+      + bms.getEndingBoundary(10) + " char: "
+      + stringtemp.charAt(bms.getEndingBoundary(10)));
+      //bms.testBitsScala();
 
     }
 
@@ -120,12 +129,13 @@ object Main {
     //println("filehandler test");
     //fileHandlerTest();
     //println("Bitmaps test");
-    //BitmapsTest();
+    BitmapsTest();
     //fileHandlerTest()
 
     // Hang Test Function Calls
     //ParseStringTest();
     //ParserHashTest();
+    /*
     var x: Int = 1 << 31;
     var y: Int = ~x;
     var z: Int = -10;
@@ -133,13 +143,12 @@ object Main {
     // for operation z >> 1 when z < 0;
     var mask: Int = 0x7FFFFFFF;
 
-    var bits = new Bits(0x80000000);
-    System.out.println("Before New Shift Left Function\n" + bits);
-    System.out.println("After New Shift Left Function");   
-    while (bits.bits != 0) {
-      //bits.bits = bits.bits >> 1;
-      bits.shiftLeft(1);
-      System.out.println(bits);
-    }
+    var bits = new Bits(0x58855885);
+    System.out.println(bits);
+    bits.mirror();
+    System.out.println(bits);
+    bits.mirror();
+    System.out.println(bits);
+    * */
   }
 }

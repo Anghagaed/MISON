@@ -1,5 +1,9 @@
 package Bits
 
+/*
+ * Mutable Container that emulates unsigned int for supports with bitwise operation
+ */
+
 class Bits(val bit: Int) {
   var bits: Int = bit;
   private var SIZEOFINT: Int = 32;
@@ -55,7 +59,11 @@ class Bits(val bit: Int) {
     new Bits(bits << shiftBy);
   }
   def >>(shiftBy: Int): Bits = {
-    new Bits(bits >> shiftBy);
+    if (bits >= 0) {
+      return new Bits(bits >> shiftBy);
+    } else {
+      return new Bits(this.shiftLeft(shiftBy));
+    }
   }
 
   // (bitwise) setter
@@ -89,30 +97,40 @@ class Bits(val bit: Int) {
   def flip(): Unit = {
     bits = ~bits;
   }
+  // Assume int is 32 bit.
+  def mirror(): Unit = {
+    for (i <- 0 until 15) {
+      var temp: Int = get(i);
+      set(i, get(31 - i));
+      set(31 - i, temp);
+    }
+  }
 
-  // Use this Function 
+  // shiftLeft function for negative scenerio
 
-  def shiftLeft(shiftNum: Int): Int = {
-    var temp:Int = get(31);
-    bits = (bits & 0x7FFFFFFF) >> 1;
-    set(30, temp);
-    return bits;
+  private def shiftLeft(shiftNum: Int): Int = {
+    var temp: Int = get(31);
+    var bit: Int = this.bits;
+    bit = (bit & 0x7FFFFFFF) >> 1;
+    bit &= ~(0x40000000);
+    bit |= temp << 30;
+    return bit;
   }
 
   // get position of next bit that is a one starting from startingPos right to left.
   // return the position or -1 if failed
   def getNextOnPosition(startingPos: Int): Int = {
-    if ((bits) == 0 || startingPos >= SIZEOFINT) {
+    if ((bits) == 0 || startingPos > SIZEOFINT) {
       System.out.println("0 or pos too big");
       return -1;
     }
     for (i <- startingPos until (SIZEOFINT)) {
-      System.out.println("i is " + i + " with this.get(i) is " + this.get(i));
+      //System.out.println("i is " + i + " with this.get(i) is " + this.get(i));
       if (this.get(i) == 1) {
         return i;
       }
     }
-    System.out.println("Found Nothing");
+    //System.out.println("Found Nothing");
     return -1;
   }
 }

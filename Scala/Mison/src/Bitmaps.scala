@@ -309,13 +309,17 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: Vector[String]) {
     var startingLevel: Int = colonPosition / 32;
     var pos = 31 - (colonPosition % 32);
     for (i <- startingLevel to 0) {
-      map(i).structQBitset.flip();
+      //System.out.println(map(i).structQBitset);
+      map(i).structQBitset.mirror();
+      //System.out.println(map(i).structQBitset);
       output = map(i).structQBitset.getNextOnPosition(pos);
+      //System.out.println("i " + i + " " + output);
+      //System.out.println(map(i).structQBitset.get(output));
       if (output != -1) {
-        map(i).structQBitset.flip();
+        map(i).structQBitset.mirror();
         return (31 - output);
       }
-      map(i).structQBitset.flip();
+      map(i).structQBitset.mirror();
       pos = 0;
     }
     return -1;
@@ -324,16 +328,18 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: Vector[String]) {
   def testBitsScala() = {
     System.out.println("Testing testBitsScala");
     //Testing getNextOnPosition. Conclusion: It works
-    System.out.println("SQ bitset: " + map(0).structQBitset); 
-    /*
+    //System.out.println("SQ bitset: " + map(0).structQBitset); 
+    
     var x = -1;
+    var y: Bits = new Bits(0x80000001);
+    System.out.println("y bitset: " + y);
     do {
       System.out.print("Call with " + (x + 1) + ": ");
-      x = map(0).structQBitset.getNextOnPosition(x+1);
+      //x = map(0).structQBitset.getNextOnPosition(x+1);
+      x = y.getNextOnPosition(x + 1);
       System.out.println(x);
     } while (x != -1);
-    */
-    System.out.print("Call with " + (29) + ": " + map(0).structQBitset.getNextOnPosition(29));
+    //System.out.print("Call with " + (31) + ": " + map(0).structQBitset.getNextOnPosition(31));
     
   }
 
