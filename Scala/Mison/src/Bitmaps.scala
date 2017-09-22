@@ -1,6 +1,7 @@
 package Bitmaps
 import Bits._
 import scala.util.control.Breaks._
+import scala.collection.mutable.ArrayBuffer
 /* https://www.scala-lang.org/api/current/scala/collection/immutable/Stack.html
  * (Since version 2.11.0) Stack is an inelegant and potentially
  * poorly-performing wrapper around List. Use List instead: 
@@ -254,8 +255,9 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: Vector[String]) {
   }
   //def generateColonPositions(start: Int, end: Int, level: Int): Vector[Int] = {
   //  var colonPositions = Vector.empty[Int];
-  def generateColonPositions(start: Int, end: Int, level: Int): Array[Int] = {
-    var colonPositions = Array.fill(B_INT)(-1); //new Array[Int](B_INT);
+  def generateColonPositions(start: Int, end: Int, level: Int): ArrayBuffer[Int] = {
+    //var colonPositions = Array.fill(B_INT)(-1); //new Array[Int](B_INT);
+    var colonPositions = new ArrayBuffer[Int]();
     var mcolon: Bits = new Bits(0);
     for (i <- (start / B_INT) until ceil(end.toDouble / B_INT).toInt) {
       mcolon = map(i).levels(level);
@@ -272,7 +274,7 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: Vector[String]) {
     //for (i <- 0 until colonPositions.length) {
     //  print(colonPositions(i) + " ");
     //}
-    colonPositions.filter(_ != -1).foreach(x => print(s"${x} "));
+    colonPositions.foreach(x => print(s"${x} "));
     println();
     return colonPositions;
   }

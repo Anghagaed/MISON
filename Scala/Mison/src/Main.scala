@@ -63,7 +63,7 @@ object Main {
       var tempArr = bms.generateColonPositions(start, end, level);
       var stringtemp = fHandler.getLineString;
       System.out.println(stringtemp);
-      System.out.println("StartBoundary for colonPosition 10 is " 
+      /*System.out.println("StartBoundary for colonPosition 10 is " 
           + bms.getStartingBoundary(10) + " char: "
           + stringtemp.charAt(bms.getStartingBoundary(10)) + " and "
           + bms.getStartingBoundary(8) + " char: " 
@@ -75,7 +75,7 @@ object Main {
       + bms.getEndingBoundary(10) + " char: "
       + stringtemp.charAt(bms.getEndingBoundary(10)));
       //bms.testBitsScala();
-
+*/
     }
 
   }
