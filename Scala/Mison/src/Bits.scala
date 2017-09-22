@@ -121,7 +121,7 @@ class Bits(val bit: Int) {
   // return the position or -1 if failed
   def getNextOnPosition(startingPos: Int): Int = {
     if ((bits) == 0 || startingPos > SIZEOFINT) {
-      System.out.println("0 or pos too big");
+      //System.out.println("0 or pos too big");
       return -1;
     }
     for (i <- startingPos until (SIZEOFINT)) {

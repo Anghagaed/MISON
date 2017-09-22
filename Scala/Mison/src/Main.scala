@@ -59,23 +59,26 @@ object Main {
       val level: Int = 0;
       println("generating colon positions...");
       
+      // Hang Test stuff
       // Start Boundary
       var tempArr = bms.generateColonPositions(start, end, level);
       var stringtemp = fHandler.getLineString;
       System.out.println(stringtemp);
-      /*System.out.println("StartBoundary for colonPosition 10 is " 
+      System.out.println("StartBoundary for colonPosition 10 is " 
           + bms.getStartingBoundary(10) + " char: "
           + stringtemp.charAt(bms.getStartingBoundary(10)) + " and "
           + bms.getStartingBoundary(8) + " char: " 
           + stringtemp.charAt(bms.getStartingBoundary(8)));
-      
+      var temp = "" + stringtemp.substring(bms.getStartingBoundary(bms.getStartingBoundary(10) - 1) + 1, bms.getStartingBoundary(10));
+      System.out.println(temp);
+      System.out.println(temp.length());
+      System.out.println( (stringtemp.charAt(bms.getStartingBoundary(10)) == '\"') );
       // End Boundary
       System.out.println(stringtemp);
       System.out.println("EndBoundary for colonPostion 10 is "
       + bms.getEndingBoundary(10) + " char: "
       + stringtemp.charAt(bms.getEndingBoundary(10)));
       //bms.testBitsScala();
-*/
     }
 
   }

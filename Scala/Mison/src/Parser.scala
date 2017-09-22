@@ -51,7 +51,8 @@ class MISONParser(queryFieldsList: ArrayBuffer[String],
   private var currentRecord: String = "";
   private var defaultArrayLayers: Int = 0;
   private var matchingFieldNumber: Int = 0;
-
+  private var bitmaps: Bitmaps = null;
+  private var lineRecordValue: String = "";
   // Constructor Off
   // Main Function that parse the file and return arrayBuilder of String for result
   def parseQuery(): ArrayBuffer[String] = {
@@ -69,17 +70,18 @@ class MISONParser(queryFieldsList: ArrayBuffer[String],
 
     // Go through entire file one line at a time
     while (fileHandler.getNext) {
-      var stringSplitted = fileHandler.getFileVector;
-      var bitmaps: Bitmaps = new Bitmaps(
+      val stringSplitted = fileHandler.getFileVector;
+      bitmaps = new Bitmaps(
         queryFieldsInfo.nestingLevels,
         defaultArrayLayers,
         stringSplitted);
       currentRecord = fileHandler.getLineString;
-      var initialColonPos = bitmaps.generateColonPositions(0, currentRecord.length - 1, 0);
+      val initialColonPos = bitmaps.generateColonPositions(0, currentRecord.length - 1, 0);
       matchingFieldNumber = 0;
-      var queryResult = parseLine(0, "", initialColonPos);
+      val queryResult = parseLine(0, "", initialColonPos);
       if (queryResult) {
-        result += currentRecord;
+       // result += currentRecord;
+       // Extract relevant fields value
       }
     }
     return true;
@@ -90,27 +92,47 @@ class MISONParser(queryFieldsList: ArrayBuffer[String],
   private def parseLine(curLevel: Int, append: String, colonPos: ArrayBuffer[Int]): Boolean = {
     var recordValue: String = "";
     for (i <- 0 until colonPos.length) {
-      var pos = currentRecord.indexOf("\"", colonPos(i) - 2);
+      // end pos of field name, no - 1 due to quirks of scala string.substring(startIndex, endIndex)
+      var endPos = bitmaps.getStartingBoundary(colonPos(i));
+      // start pos of field name
+      var startPos = bitmaps.getStartingBoundary(endPos - 1) + 1;
+      
       // Error Checking - REMOVE FOR FINAL VERSION
-      if (pos == -1) {
+      if (endPos == -1 || startPos == -1) {
+        System.out.println("startPos: " + startPos + " endPos: " + endPos);
         System.out.println("This record: " + currentRecord + "\n has no quotes at all");
         return false;
       }
-      var currentField: String = append + currentRecord.substring(pos, colonPos(i) - 2);
+      
+      val currentField = append + currentRecord.substring(startPos, endPos);
 
       if (queryFieldsInfo.hashFields.contains(currentField.hashCode())) {
         var nextChar: Char = currentRecord.charAt(colonPos(i) + 1);
         // Entering another nesting level case
         if (nextChar == '{') {
 
-        } // Element is an array
+        } 
+        // Element is an array
         else if (nextChar == '[') {
 
-        } else {
+        } 
+        // Field matches. Add the field element into result
+        else {
+          endPos = bitmaps.getEndingBoundary(colonPos(i));
+          startPos = colonPos(i) + 1;
+          if ( currentRecord.charAt(startPos) == '\"' ) {
+            // Change startPos and endPos to compensate for extra " character
+            startPos = startPos + 1;
+            endPos = endPos - 1;
+          }
+          val fieldValue = currentRecord.substring(startPos, endPos);
+          // TODO: Put this fieldValue somewhere for storage
         }
 
         // Check if all fields were matched
+        // Might need to reformat the string currentRecord?
         if (matchingFieldNumber == queryFieldsInfo.hashFields.size) {
+          
           return true;
         }
       }

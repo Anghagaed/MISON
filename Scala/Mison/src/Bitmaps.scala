@@ -349,7 +349,7 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: Vector[String]) {
     var startingLevel: Int = colonPosition / 32;
     var pos = colonPosition % 32;
     for (i <- startingLevel to 0) {
-      var commaPos = map(i).structCBitset.getNextOnPosition(pos);
+      var commaPos = map(i).structCMBitset.getNextOnPosition(pos);
       var bracketPos = map(i).structRBitset.getNextOnPosition(pos);
       if (commaPos != -1 && bracketPos != -1) {
         val returnVal = if (commaPos > bracketPos) commaPos else bracketPos;
