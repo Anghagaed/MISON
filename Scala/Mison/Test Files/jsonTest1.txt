@@ -1,1 +1,2 @@
-{"id":"id:\"a\"", "reviews":50, "attributes":{"breakfast":false, "lunch":true, "dinner":true, "latenight":true},"categories":["Restaurant", "Bars"], "state":"WA", "city":"seattle"}
+{"id":"id:\"a\"", "reviews":50, "attributes":{"breakfast":false, "lunch":true, "dinner":true, "latenight":true},"categories":["Restaurant", "Bars"], "state":"WA", "city":"seattle"},
+{"id":"id:\"b\"", "reviews":320, "attributes":{"breakfast":false, "lunch":true, "dinner":false, "latenight":false},"categories":["Hang", "Yun"], "state":"CA", "city":"california"}

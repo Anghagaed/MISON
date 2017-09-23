@@ -1,16 +1,15 @@
 package fileHandler
 
-import scala.collection.immutable.Vector
 import scala.io.Source._
 import java.io.IOException
 
-// Comment by Hang : Vector is immutable and would be slower in performance compare to a mutable container 
+// Comment by Hang : Array is immutable and would be slower in performance compare to a mutable container 
 // Need to handle multiple lines in file case. We want fileHandler to return one line at a time
 // Need to change read and split and/or implement new functions
 class fileHandler() {
   private var text: String = "";
   //private var currentLine = "";      
-  private var vec = Vector.empty[String];
+  private var arr = Array.empty[String];
   private var filePath: String = "";
 
   private var it: Option[Iterator[String]] = None
@@ -41,8 +40,8 @@ class fileHandler() {
     return false;
   }
 
-  def getFileVector: Vector[String] = {
-    return vec;
+  def getFileArray: Array[String] = {
+    return arr;
   }
 
   def getLineString: String = {
@@ -67,9 +66,9 @@ class fileHandler() {
   private def split: Boolean = {
     for (a <- 0 until text.length() if a % 32 == 0) {
       if (a + 32 <= text.length()) {
-        vec = vec :+ (text.substring(a, a + 32))
+        arr = arr :+ (text.substring(a, a + 32))
       } else {
-        vec = vec :+ (text.substring(a, text.length()))
+        arr = arr :+ (text.substring(a, text.length()))
 
       }
     }

@@ -34,8 +34,8 @@ object Main {
     val fHandler = new fileHandler();
     fHandler.setNewFilePath("./Test Files/jsonTest2.txt");
     while (fHandler.getNext) {
-      for (a <- 0 until fHandler.getFileVector.size) {
-        println(fHandler.getFileVector(a))
+      for (a <- 0 until fHandler.getFileArray.size) {
+        println(fHandler.getFileArray(a))
       }
     }
     println("End Testing")
@@ -51,18 +51,22 @@ object Main {
       val arrayLayers = 3;
 
       // begin testing
-      val bms: Bitmaps = new Bitmaps(layers, arrayLayers, fHandler.getFileVector);
+      val bms: Bitmaps = new Bitmaps(layers, arrayLayers, fHandler.getFileArray);
       bms.createBitmap;
       println(bms);
       val start: Int = 0;
       val end: Int = 31;
       val level: Int = 0;
-      println("generating colon positions...");
       
       // Hang Test stuff
       // Start Boundary
-      var tempArr = bms.generateColonPositions(start, end, level);
       var stringtemp = fHandler.getLineString;
+      
+      for(i <- 0 until layers){
+        println("generating colon positions for level " + i);
+        var tempArr = bms.generateColonPositions(start, stringtemp.length(), i);
+      }
+
       System.out.println(stringtemp);
       System.out.println("StartBoundary for colonPosition 10 is " 
           + bms.getStartingBoundary(10) + " char: "
@@ -103,11 +107,11 @@ object Main {
     // Index starts at 0. Access with (index)
     System.out.println(container(0));
     var testParser = new MISONParser(container);
-    System.out.println(testParser.queryFieldsInfo.nestingLevels);
-    System.out.println(testParser.queryFieldsInfo.hashFields.size);
-    var test = testParser.queryFieldsInfo.hashFields;
+    //System.out.println(testParser.queryFieldsInfo.nestingLevels);
+    //System.out.println(testParser.queryFieldsInfo.hashFields.size);
+    //var test = testParser.queryFieldsInfo.hashFields;
     var TestString2 = "urls.id.yun.checker.hello";
-    System.out.println(test.contains(TestString2.hashCode()));
+    //System.out.println(test.contains(TestString2.hashCode()));
     System.out.println(TestString2.hashCode());
     System.out.println(testString.hashCode());
   }
@@ -117,8 +121,8 @@ object Main {
   }
   
   def hashMapTest() {
-    var testHashMap: scala.collection.immutable.HashMap[Int, Int] = new scala.collection.immutable.HashMap();
-    val x = 1;
+    var testHashMap: scala.collection.immutable.HashMap[String, Int] = new scala.collection.immutable.HashMap();
+    val x = "Hello";
     val y = 2;
     val z = testHashMap.get(x);
     //System.out.println(z.get);              // z has nothing so get will return noSuchElementException
@@ -137,7 +141,28 @@ object Main {
     container += "urls.id.yun.checker.hello";
     container += "urls.id.yun.tacos.hello"
     var testParser = new MISONParser(container);
-    testParser.queryFieldsInfo.createHashField().foreach(println);
+    //testParser.queryFieldsInfo.createHashField().foreach(println);
+  }
+  def MISONParser() {
+    val DEBUG_STATUS = true;
+    
+    var testFile: ArrayBuffer[String] = new ArrayBuffer();
+    
+    // Add files into testFile
+    testFile += "./Test Files/jsonTest1.txt";
+    
+    var query: ArrayBuffer[String] = new ArrayBuffer();
+    // Add queries into array buffer
+    
+    query += "id";
+    query += "reviews";
+    query += "state";
+    query += "city";
+    
+    var parser: MISONParser = new MISONParser(query, testFile, DEBUG_STATUS);
+    
+    // 1 Record per element in result
+    var result: ArrayBuffer[String] = parser.parseQuery();
   }
   
   def main(args: Array[String]) {
@@ -180,5 +205,6 @@ object Main {
     * */
     //hashMapTest();
     NumQueriedFieldsTest();
+    //MISONParser();
   }
 }

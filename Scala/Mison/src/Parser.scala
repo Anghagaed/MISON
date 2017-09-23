@@ -5,14 +5,18 @@ import scala.collection.mutable._;
 import scala.collection.immutable.HashMap;
 
 /* MISON Simple Parser without speculative loading.
- * Argument: 		queryFieldList arrays of query fields. i.e. SELECT [a, b, c]... a, b, c 
- * 							will be in queryFieldList
- * 							filePaths arrays of file paths. More then one if the table is split 
- * 							into multiple files
+ * Argument: 		
+ * queryFieldList				arrays of query fields. i.e. SELECT [a, b, c]... a, b, c 
+ * 											will be in queryFieldList
+ * filePaths 						arrays of file paths. More then one if the table is split 
+ * 											into multiple files
+ * DEBUG_STATUS					DEBUG prints
  */
 
-class MISONParser(queryFieldsList: ArrayBuffer[String],
-                  filePaths: ArrayBuffer[String] = new ArrayBuffer[String]) {
+class MISONParser(
+    queryFieldsList: ArrayBuffer[String],
+    filePaths: ArrayBuffer[String] = new ArrayBuffer[String],
+    DEBUG_STATUS: Boolean = false) {
 
   // ADT to hold calculate and holds levels of necessary nesting for query
   // and string hashing the query fields
@@ -21,6 +25,7 @@ class MISONParser(queryFieldsList: ArrayBuffer[String],
     //var hashFields: HashSet[Int] = createHashField(queryFieldsList);
     var levelCount: Int = 0;
     var hashFields: HashSet[Int] = null;
+    //createHashField().foreach(println);    uncomment this for NumQueriedFieldsTest()
     createHashField();
     var fieldsOrder: scala.collection.immutable.HashMap[String, Int]
     = createFieldsOrder(queryFieldsList);
@@ -94,7 +99,7 @@ class MISONParser(queryFieldsList: ArrayBuffer[String],
   }
 
   // Constructor: on
-  var queryFieldsInfo: queryFields = new queryFields(queryFieldsList);
+  private var queryFieldsInfo: queryFields = new queryFields(queryFieldsList);
   private var fileHandler: fileHandler = new fileHandler();
   private var result: ArrayBuffer[String] = new ArrayBuffer[String];
   private var recordFoundInLine: Int = 0;
@@ -103,7 +108,10 @@ class MISONParser(queryFieldsList: ArrayBuffer[String],
   private var matchingFieldNumber: Int = 0;
   private var bitmaps: Bitmaps = null;
   private var lineRecordValue: String = "";
+  private val DEBUG_FLAG = DEBUG_STATUS;
+  private var lineOutput: Array[String] = null;
   // Constructor Off
+
   // Main Function that parse the file and return arrayBuilder of String for result
   def parseQuery(): ArrayBuffer[String] = {
     result.clear();
@@ -120,21 +128,33 @@ class MISONParser(queryFieldsList: ArrayBuffer[String],
 
     // Go through entire file one line at a time
     while (fileHandler.getNext) {
-      val stringSplitted = fileHandler.getFileVector;
-      bitmaps = new Bitmaps(
-        queryFieldsInfo.nestingLevels,
-        defaultArrayLayers,
-        stringSplitted);
-      currentRecord = fileHandler.getLineString;
+      initLineParse();
+      System.out.println(currentRecord.length);
       val initialColonPos = bitmaps.generateColonPositions(0, currentRecord.length - 1, 0);
-      matchingFieldNumber = 0;
+
       val queryResult = parseLine(0, "", initialColonPos);
       if (queryResult) {
-       // result += currentRecord;
-       // Extract relevant fields value
+        var output: String = "";
+        for (fields <- lineOutput) {
+          output += fields;
+        }
+        result += output;
       }
     }
     return true;
+  }
+
+  // Initialize parameters for line parsing
+  private def initLineParse() {
+    val stringSplitted = fileHandler.getFileArray;
+    bitmaps = new Bitmaps(
+      queryFieldsInfo.nestingLevels,
+      defaultArrayLayers,
+      stringSplitted);
+    currentRecord = fileHandler.getLineString;
+    matchingFieldNumber = 0;
+    lineOutput = new Array[String](queryFieldsInfo.fieldsOrder.size);
+    defaultArrayLayers = 0;
   }
 
   // Parse one record (line) and determine if the record is part of the query.
@@ -146,14 +166,16 @@ class MISONParser(queryFieldsList: ArrayBuffer[String],
       var endPos = bitmaps.getStartingBoundary(colonPos(i));
       // start pos of field name
       var startPos = bitmaps.getStartingBoundary(endPos - 1) + 1;
-      
-      // Error Checking - REMOVE FOR FINAL VERSION
-      if (endPos == -1 || startPos == -1) {
-        System.out.println("startPos: " + startPos + " endPos: " + endPos);
-        System.out.println("This record: " + currentRecord + "\n has no quotes at all");
-        return false;
+
+      // Error Checking, remove for 
+      if (DEBUG_FLAG == true) {
+        if (endPos == -1 || startPos == -1) {
+          System.out.println("startPos: " + startPos + " endPos: " + endPos);
+          System.out.println("This record: " + currentRecord + "\n has no quotes at all");
+          return false;
+        }
       }
-      
+
       val currentField = append + currentRecord.substring(startPos, endPos);
 
       if (queryFieldsInfo.hashFields.contains(currentField.hashCode())) {
@@ -161,28 +183,29 @@ class MISONParser(queryFieldsList: ArrayBuffer[String],
         // Entering another nesting level case
         if (nextChar == '{') {
 
-        } 
-        // Element is an array
+        } // Element is an array
         else if (nextChar == '[') {
 
-        } 
-        // Field matches. Add the field element into result
+        } // Field matches. Add the field element into result
         else {
           endPos = bitmaps.getEndingBoundary(colonPos(i));
           startPos = colonPos(i) + 1;
-          if ( currentRecord.charAt(startPos) == '\"' ) {
+          if (currentRecord.charAt(startPos) == '\"') {
             // Change startPos and endPos to compensate for extra " character
             startPos = startPos + 1;
             endPos = endPos - 1;
           }
           val fieldValue = currentRecord.substring(startPos, endPos);
-          // TODO: Put this fieldValue somewhere for storage
+          val pos = queryFieldsInfo.fieldsOrder.get(currentField).get;
+
+          lineOutput(pos) = fieldValue;
+          matchingFieldNumber += 1;
+
         }
 
         // Check if all fields were matched
         // Might need to reformat the string currentRecord?
         if (matchingFieldNumber == queryFieldsInfo.hashFields.size) {
-          
           return true;
         }
       }
