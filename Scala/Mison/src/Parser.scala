@@ -23,7 +23,11 @@ class MISONParser(
   class queryFields(queryFieldsList: ArrayBuffer[String]) {
     var nestingLevels: Int = 0;
     var hashFields: HashSet[Int] = createHashField(queryFieldsList);
+    var fieldsOrder: scala.collection.immutable.HashMap[String, Int] = 
+    createFieldsOrder(queryFieldsList);
 
+    private def createFieldsOrder(queryFieldsList: ArrayBuffer[String]): 
+    scala.collection.immutable.HashMap[String, Int] = {
       var order = new scala.collection.immutable.HashMap[String, Int]();
       for (i <- 0 until queryFieldsList.length) {
         order = order + (queryFieldsList(i) -> i);
