@@ -132,6 +132,17 @@ object Main {
     
   }
   
+  def NumQueriedFieldsTest() {
+    var container: ArrayBuffer[String] = ArrayBuffer();
+    container += "urls.id.yun.checker.hello";
+    container += "urls.id.urls.id.hello";
+    container += "urls.id.yun.checker.hello";
+    container += "urls.id.yun.checker.hello";
+    container += "urls.id.yun.checker.hello";
+    container += "urls.id.yun.tacos.hello"
+    var testParser = new MISONParser(container);
+    //testParser.queryFieldsInfo.createHashField().foreach(println);
+  }
   def MISONParser() {
     val DEBUG_STATUS = true;
     
@@ -152,8 +163,6 @@ object Main {
     
     // 1 Record per element in result
     var result: ArrayBuffer[String] = parser.parseQuery();
-    
-    
   }
   
   def main(args: Array[String]) {
@@ -195,6 +204,7 @@ object Main {
     System.out.println(bits);
     * */
     //hashMapTest();
-    MISONParser();
+    NumQueriedFieldsTest();
+    //MISONParser();
   }
 }
