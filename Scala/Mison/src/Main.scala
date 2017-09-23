@@ -34,8 +34,8 @@ object Main {
     val fHandler = new fileHandler();
     fHandler.setNewFilePath("./Test Files/jsonTest2.txt");
     while (fHandler.getNext) {
-      for (a <- 0 until fHandler.getFileVector.size) {
-        println(fHandler.getFileVector(a))
+      for (a <- 0 until fHandler.getFileArray.size) {
+        println(fHandler.getFileArray(a))
       }
     }
     println("End Testing")
@@ -51,7 +51,7 @@ object Main {
       val arrayLayers = 3;
 
       // begin testing
-      val bms: Bitmaps = new Bitmaps(layers, arrayLayers, fHandler.getFileVector);
+      val bms: Bitmaps = new Bitmaps(layers, arrayLayers, fHandler.getFileArray);
       bms.createBitmap;
       println(bms);
       val start: Int = 0;
@@ -62,7 +62,6 @@ object Main {
       // Start Boundary
       var stringtemp = fHandler.getLineString;
       
-      println(layers);
       for(i <- 0 until layers){
         println("generating colon positions for level " + i);
         var tempArr = bms.generateColonPositions(start, stringtemp.length(), i);
@@ -171,6 +170,6 @@ object Main {
     bits.mirror();
     System.out.println(bits);
     * */
-    hashMapTest();
+    //hashMapTest();
   }
 }

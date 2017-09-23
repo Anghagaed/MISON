@@ -12,7 +12,7 @@ import scala.collection.mutable.ArrayBuffer
  */
 import scala.collection.mutable.ListBuffer;
 import scala.math.ceil;
-class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: Vector[String]) {
+class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: Array[String]) {
 
   // constructor:on
   class mapContainer(layers: Int, arrayLayers: Int) {
@@ -25,7 +25,7 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: Vector[String]) {
       CMlevels(i) = new Bits(0);
   }
   private val B_INT = 32;
-  private var word: Vector[String] = wordSplit;
+  private var word: Array[String] = wordSplit;
   var map: Array[mapContainer] = new Array[mapContainer](word.size);
   for (i <- 0 until word.size)
     map(i) = new mapContainer(layers, arrayLayers);

@@ -82,7 +82,7 @@ class MISONParser(queryFieldsList: ArrayBuffer[String],
 
     // Go through entire file one line at a time
     while (fileHandler.getNext) {
-      val stringSplitted = fileHandler.getFileVector;
+      val stringSplitted = fileHandler.getFileArray;
       bitmaps = new Bitmaps(
         queryFieldsInfo.nestingLevels,
         defaultArrayLayers,
