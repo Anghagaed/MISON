@@ -40,7 +40,17 @@ class MISONParser(queryFieldsList: ArrayBuffer[String],
       }
       return hashQuery;
     }
-
+    // Gets number of query fields per level
+    def getNumQueriedFields(): ArrayBuffer[Int] = {
+      var numQueryFieldsList = new ArrayBuffer[Int]();
+      for(i <- 0 until nestingLevels) {
+        // count number of query fields in level i
+        for(e <- queryFieldsList) {
+          
+        }
+      }
+      return numQueryFieldsList;
+    }
   }
 
   // Constructor: on
