@@ -57,12 +57,17 @@ object Main {
       val start: Int = 0;
       val end: Int = 31;
       val level: Int = 0;
-      println("generating colon positions...");
       
       // Hang Test stuff
       // Start Boundary
-      var tempArr = bms.generateColonPositions(start, end, level);
       var stringtemp = fHandler.getLineString;
+      
+      println(layers);
+      for(i <- 0 until layers){
+        println("generating colon positions for level " + i);
+        var tempArr = bms.generateColonPositions(start, stringtemp.length(), i);
+      }
+
       System.out.println(stringtemp);
       System.out.println("StartBoundary for colonPosition 10 is " 
           + bms.getStartingBoundary(10) + " char: "
