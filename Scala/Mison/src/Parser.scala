@@ -23,9 +23,7 @@ class MISONParser(
   class queryFields(queryFieldsList: ArrayBuffer[String]) {
     var nestingLevels: Int = 0;
     var hashFields: HashSet[Int] = createHashField(queryFieldsList);
-    var fieldsOrder: scala.collection.immutable.HashMap[String, Int] = createFieldsOrder(queryFieldsList);
 
-    private def createFieldsOrder(queryFieldsList: ArrayBuffer[String]): scala.collection.immutable.HashMap[String, Int] = {
       var order = new scala.collection.immutable.HashMap[String, Int]();
       for (i <- 0 until queryFieldsList.length) {
         order = order + (queryFieldsList(i) -> i);
@@ -141,7 +139,20 @@ class MISONParser(
         var nextChar: Char = currentRecord.charAt(colonPos(i) + 1);
         // Entering another nesting level case
         if (nextChar == '{') {
-
+          var newColonPos: ArrayBuffer[Int] = 
+            bitmaps.generateColonPositions(colonPos(i), colonPos(i + 1), curLevel + 1);
+          var newAppend: String = "";
+          if (curLevel == 0) {
+            newAppend = currentField + '.';
+          }
+          else {
+            newAppend = append + '.' + currentField;
+          }
+          if (DEBUG_FLAG == true) {
+          System.out.println("Going to the next level and beyond");
+          }
+          matchingFieldNumber += 1;
+          parseLine(curLevel + 1, newAppend, newColonPos);
         } // Element is an array
         else if (nextChar == '[') {
 
