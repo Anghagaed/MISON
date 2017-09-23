@@ -107,11 +107,11 @@ object Main {
     // Index starts at 0. Access with (index)
     System.out.println(container(0));
     var testParser = new MISONParser(container);
-    System.out.println(testParser.queryFieldsInfo.nestingLevels);
-    System.out.println(testParser.queryFieldsInfo.hashFields.size);
-    var test = testParser.queryFieldsInfo.hashFields;
+    //System.out.println(testParser.queryFieldsInfo.nestingLevels);
+    //System.out.println(testParser.queryFieldsInfo.hashFields.size);
+    //var test = testParser.queryFieldsInfo.hashFields;
     var TestString2 = "urls.id.yun.checker.hello";
-    System.out.println(test.contains(TestString2.hashCode()));
+    //System.out.println(test.contains(TestString2.hashCode()));
     System.out.println(TestString2.hashCode());
     System.out.println(testString.hashCode());
   }
@@ -121,8 +121,8 @@ object Main {
   }
   
   def hashMapTest() {
-    var testHashMap: scala.collection.immutable.HashMap[Int, Int] = new scala.collection.immutable.HashMap();
-    val x = 1;
+    var testHashMap: scala.collection.immutable.HashMap[String, Int] = new scala.collection.immutable.HashMap();
+    val x = "Hello";
     val y = 2;
     val z = testHashMap.get(x);
     //System.out.println(z.get);              // z has nothing so get will return noSuchElementException

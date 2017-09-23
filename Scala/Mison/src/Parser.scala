@@ -11,26 +11,26 @@ import scala.collection.immutable.HashMap;
  * 							into multiple files
  */
 
-class MISONParser(queryFieldsList: ArrayBuffer[String],
-                  filePaths: ArrayBuffer[String] = new ArrayBuffer[String]) {
+class MISONParser(
+    queryFieldsList: ArrayBuffer[String],
+    filePaths: ArrayBuffer[String] = new ArrayBuffer[String],
+    DEBUG_STATUS: Boolean = false) {
 
   // ADT to hold calculate and holds levels of necessary nesting for query
   // and string hashing the query fields
   class queryFields(queryFieldsList: ArrayBuffer[String]) {
     var nestingLevels: Int = 0;
     var hashFields: HashSet[Int] = createHashField(queryFieldsList);
-    var fieldsOrder: scala.collection.immutable.HashMap[String, Int]
-    = createFieldsOrder(queryFieldsList);
-    
-    private def createFieldsOrder(queryFieldsList: ArrayBuffer[String])
-    :scala.collection.immutable.HashMap[String, Int]  = {
+    var fieldsOrder: scala.collection.immutable.HashMap[String, Int] = createFieldsOrder(queryFieldsList);
+
+    private def createFieldsOrder(queryFieldsList: ArrayBuffer[String]): scala.collection.immutable.HashMap[String, Int] = {
       var order = new scala.collection.immutable.HashMap[String, Int]();
       for (i <- 0 until queryFieldsList.length) {
         order = order + (queryFieldsList(i) -> i);
       }
       return order;
     }
-    
+
     private def createHashField(queryFieldsList: ArrayBuffer[String]): HashSet[Int] = {
       var splitCharacter: String = ".";
       var hashQuery: HashSet[Int] = new HashSet();
@@ -54,9 +54,9 @@ class MISONParser(queryFieldsList: ArrayBuffer[String],
     }
 
   }
-
+  
   // Constructor: on
-  var queryFieldsInfo: queryFields = new queryFields(queryFieldsList);
+  private var queryFieldsInfo: queryFields = new queryFields(queryFieldsList);
   private var fileHandler: fileHandler = new fileHandler();
   private var result: ArrayBuffer[String] = new ArrayBuffer[String];
   private var recordFoundInLine: Int = 0;
@@ -65,7 +65,10 @@ class MISONParser(queryFieldsList: ArrayBuffer[String],
   private var matchingFieldNumber: Int = 0;
   private var bitmaps: Bitmaps = null;
   private var lineRecordValue: String = "";
+  private val DEBUG_FLAG = DEBUG_STATUS;
+  private var lineOutput: Array[String] = null;
   // Constructor Off
+  
   // Main Function that parse the file and return arrayBuilder of String for result
   def parseQuery(): ArrayBuffer[String] = {
     result.clear();
@@ -87,18 +90,25 @@ class MISONParser(queryFieldsList: ArrayBuffer[String],
         queryFieldsInfo.nestingLevels,
         defaultArrayLayers,
         stringSplitted);
-      currentRecord = fileHandler.getLineString;
       val initialColonPos = bitmaps.generateColonPositions(0, currentRecord.length - 1, 0);
-      matchingFieldNumber = 0;
+      lineOutput = new Array[String](queryFieldsInfo.fieldsOrder.size);
       val queryResult = parseLine(0, "", initialColonPos);
       if (queryResult) {
-       // result += currentRecord;
-       // Extract relevant fields value
+        // result += currentRecord;
+        // Extract relevant fields value
       }
     }
     return true;
   }
-
+  
+  // Initialize parameters for line parsing
+  private def initLineParse() {
+    currentRecord = fileHandler.getLineString;
+    matchingFieldNumber = 0;
+    lineOutput = new Array[String](queryFieldsInfo.fieldsOrder.size);
+    defaultArrayLayers = 0;
+  }
+  
   // Parse one record (line) and determine if the record is part of the query.
   // Return true for success, false for failure
   private def parseLine(curLevel: Int, append: String, colonPos: ArrayBuffer[Int]): Boolean = {
@@ -108,14 +118,16 @@ class MISONParser(queryFieldsList: ArrayBuffer[String],
       var endPos = bitmaps.getStartingBoundary(colonPos(i));
       // start pos of field name
       var startPos = bitmaps.getStartingBoundary(endPos - 1) + 1;
-      
-      // Error Checking - REMOVE FOR FINAL VERSION
-      if (endPos == -1 || startPos == -1) {
-        System.out.println("startPos: " + startPos + " endPos: " + endPos);
-        System.out.println("This record: " + currentRecord + "\n has no quotes at all");
-        return false;
+
+      // Error Checking, remove for 
+      if (DEBUG_FLAG == true) {
+        if (endPos == -1 || startPos == -1) {
+          System.out.println("startPos: " + startPos + " endPos: " + endPos);
+          System.out.println("This record: " + currentRecord + "\n has no quotes at all");
+          return false;
+        }
       }
-      
+
       val currentField = append + currentRecord.substring(startPos, endPos);
 
       if (queryFieldsInfo.hashFields.contains(currentField.hashCode())) {
@@ -123,28 +135,30 @@ class MISONParser(queryFieldsList: ArrayBuffer[String],
         // Entering another nesting level case
         if (nextChar == '{') {
 
-        } 
-        // Element is an array
+        } // Element is an array
         else if (nextChar == '[') {
 
-        } 
-        // Field matches. Add the field element into result
+        } // Field matches. Add the field element into result
         else {
           endPos = bitmaps.getEndingBoundary(colonPos(i));
           startPos = colonPos(i) + 1;
-          if ( currentRecord.charAt(startPos) == '\"' ) {
+          if (currentRecord.charAt(startPos) == '\"') {
             // Change startPos and endPos to compensate for extra " character
             startPos = startPos + 1;
             endPos = endPos - 1;
           }
           val fieldValue = currentRecord.substring(startPos, endPos);
-          // TODO: Put this fieldValue somewhere for storage
+          val pos = queryFieldsInfo.fieldsOrder.get(currentField).get;
+          
+          lineOutput(pos) = fieldValue;
+          matchingFieldNumber += 1;
+          
         }
 
         // Check if all fields were matched
         // Might need to reformat the string currentRecord?
         if (matchingFieldNumber == queryFieldsInfo.hashFields.size) {
-          
+
           return true;
         }
       }
