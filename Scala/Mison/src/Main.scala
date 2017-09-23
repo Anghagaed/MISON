@@ -128,6 +128,18 @@ object Main {
     
   }
   
+  def NumQueriedFieldsTest() {
+    var container: ArrayBuffer[String] = ArrayBuffer();
+    container += "urls.id.yun.checker.hello";
+    container += "urls.id.urls.id.hello";
+    container += "urls.id.yun.checker.hello";
+    container += "urls.id.yun.checker.hello";
+    container += "urls.id.yun.checker.hello";
+    container += "urls.id.yun.tacos.hello"
+    var testParser = new MISONParser(container);
+    testParser.queryFieldsInfo.createHashField().foreach(println);
+  }
+  
   def main(args: Array[String]) {
     /*
     var mLeft, mRight: Bits = new Bits(41);
@@ -166,6 +178,7 @@ object Main {
     bits.mirror();
     System.out.println(bits);
     * */
-    hashMapTest();
+    //hashMapTest();
+    NumQueriedFieldsTest();
   }
 }

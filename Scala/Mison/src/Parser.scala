@@ -18,7 +18,10 @@ class MISONParser(queryFieldsList: ArrayBuffer[String],
   // and string hashing the query fields
   class queryFields(queryFieldsList: ArrayBuffer[String]) {
     var nestingLevels: Int = 0;
-    var hashFields: HashSet[Int] = createHashField(queryFieldsList);
+    //var hashFields: HashSet[Int] = createHashField(queryFieldsList);
+    var levelCount: Int = 0;
+    var hashFields: HashSet[Int] = null;
+    createHashField();
     var fieldsOrder: scala.collection.immutable.HashMap[String, Int]
     = createFieldsOrder(queryFieldsList);
     
@@ -31,35 +34,60 @@ class MISONParser(queryFieldsList: ArrayBuffer[String],
       return order;
     }
     
-    private def createHashField(queryFieldsList: ArrayBuffer[String]): HashSet[Int] = {
+    def createHashField(): ArrayBuffer[Int] = {
+      hashFields = new HashSet[Int];
+      var numQueryFieldsList = new ArrayBuffer[Int]();
       var splitCharacter: String = ".";
-      var hashQuery: HashSet[Int] = new HashSet();
-      for (i <- 0 until queryFieldsList.length) {
-        var fields: String = queryFieldsList(i);
+      var hashCode = 0;
+      for (fields <- queryFieldsList) {
         var index: Int = fields.indexOf(splitCharacter);
         var localFieldLevels: Int = 0;
         while (index != -1) {
-          // Has comma
+          // Has period
           var subfield: String = fields.substring(0, index - 1);
-          hashQuery += subfield.hashCode();
+          hashCode = subfield.hashCode();
+          if(!hashFields.contains(hashCode)) {
+            hashFields += hashCode;
+            if(localFieldLevels < numQueryFieldsList.size) {    // update count 
+              numQueryFieldsList(localFieldLevels) = numQueryFieldsList(localFieldLevels) + 1;
+            }
+            else {    // insert count
+              numQueryFieldsList.insert(localFieldLevels, 1);
+            }
+          }
           localFieldLevels += 1;
           index = fields.indexOf(splitCharacter, index + 1);
         }
-        hashQuery += fields.hashCode();
+        hashCode = fields.hashCode();
+        if(!hashFields.contains(hashCode)) {
+          hashFields += hashCode;
+          if(localFieldLevels < numQueryFieldsList.size) {    // update count 
+            numQueryFieldsList(localFieldLevels) = numQueryFieldsList(localFieldLevels) + 1;
+          }
+          else {    // insert count
+            numQueryFieldsList.insert(localFieldLevels, 1);
+          }
+        }
+        localFieldLevels += 1;      //accounts for the last field
         if (localFieldLevels > nestingLevels) {
           nestingLevels = localFieldLevels;
         }
       }
-      return hashQuery;
+      return numQueryFieldsList;
     }
     // Gets number of query fields per level
     def getNumQueriedFields(): ArrayBuffer[Int] = {
       var numQueryFieldsList = new ArrayBuffer[Int]();
-      for(i <- 0 until nestingLevels) {
+      var splitCharacter: Char = '.';
+      for(i <- 0 to nestingLevels) {
         // count number of query fields in level i
+        var uniqueQueryFields = new HashSet[String];
         for(e <- queryFieldsList) {
-          
+          val split = e.split(splitCharacter);
+          if(i < split.size)
+            uniqueQueryFields.add(split(i));
         }
+        numQueryFieldsList.insert(i, uniqueQueryFields.size);
       }
       return numQueryFieldsList;
     }
