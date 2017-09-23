@@ -5,10 +5,12 @@ import scala.collection.mutable._;
 import scala.collection.immutable.HashMap;
 
 /* MISON Simple Parser without speculative loading.
- * Argument: 		queryFieldList arrays of query fields. i.e. SELECT [a, b, c]... a, b, c 
- * 							will be in queryFieldList
- * 							filePaths arrays of file paths. More then one if the table is split 
- * 							into multiple files
+ * Argument: 		
+ * queryFieldList				arrays of query fields. i.e. SELECT [a, b, c]... a, b, c 
+ * 											will be in queryFieldList
+ * filePaths 						arrays of file paths. More then one if the table is split 
+ * 											into multiple files
+ * DEBUG_STATUS					DEBUG prints
  */
 
 class MISONParser(
@@ -54,7 +56,7 @@ class MISONParser(
     }
 
   }
-  
+
   // Constructor: on
   private var queryFieldsInfo: queryFields = new queryFields(queryFieldsList);
   private var fileHandler: fileHandler = new fileHandler();
@@ -68,7 +70,7 @@ class MISONParser(
   private val DEBUG_FLAG = DEBUG_STATUS;
   private var lineOutput: Array[String] = null;
   // Constructor Off
-  
+
   // Main Function that parse the file and return arrayBuilder of String for result
   def parseQuery(): ArrayBuffer[String] = {
     result.clear();
@@ -85,30 +87,35 @@ class MISONParser(
 
     // Go through entire file one line at a time
     while (fileHandler.getNext) {
-      val stringSplitted = fileHandler.getFileArray;
-      bitmaps = new Bitmaps(
-        queryFieldsInfo.nestingLevels,
-        defaultArrayLayers,
-        stringSplitted);
+      initLineParse();
+      System.out.println(currentRecord.length);
       val initialColonPos = bitmaps.generateColonPositions(0, currentRecord.length - 1, 0);
-      lineOutput = new Array[String](queryFieldsInfo.fieldsOrder.size);
+
       val queryResult = parseLine(0, "", initialColonPos);
       if (queryResult) {
-        // result += currentRecord;
-        // Extract relevant fields value
+        var output: String = "";
+        for (fields <- lineOutput) {
+          output += fields;
+        }
+        result += output;
       }
     }
     return true;
   }
-  
+
   // Initialize parameters for line parsing
   private def initLineParse() {
+    val stringSplitted = fileHandler.getFileArray;
+    bitmaps = new Bitmaps(
+      queryFieldsInfo.nestingLevels,
+      defaultArrayLayers,
+      stringSplitted);
     currentRecord = fileHandler.getLineString;
     matchingFieldNumber = 0;
     lineOutput = new Array[String](queryFieldsInfo.fieldsOrder.size);
     defaultArrayLayers = 0;
   }
-  
+
   // Parse one record (line) and determine if the record is part of the query.
   // Return true for success, false for failure
   private def parseLine(curLevel: Int, append: String, colonPos: ArrayBuffer[Int]): Boolean = {
@@ -149,16 +156,15 @@ class MISONParser(
           }
           val fieldValue = currentRecord.substring(startPos, endPos);
           val pos = queryFieldsInfo.fieldsOrder.get(currentField).get;
-          
+
           lineOutput(pos) = fieldValue;
           matchingFieldNumber += 1;
-          
+
         }
 
         // Check if all fields were matched
         // Might need to reformat the string currentRecord?
         if (matchingFieldNumber == queryFieldsInfo.hashFields.size) {
-
           return true;
         }
       }

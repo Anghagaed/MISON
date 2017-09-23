@@ -132,6 +132,30 @@ object Main {
     
   }
   
+  def MISONParser() {
+    val DEBUG_STATUS = true;
+    
+    var testFile: ArrayBuffer[String] = new ArrayBuffer();
+    
+    // Add files into testFile
+    testFile += "./Test Files/jsonTest1.txt";
+    
+    var query: ArrayBuffer[String] = new ArrayBuffer();
+    // Add queries into array buffer
+    
+    query += "id";
+    query += "reviews";
+    query += "state";
+    query += "city";
+    
+    var parser: MISONParser = new MISONParser(query, testFile, DEBUG_STATUS);
+    
+    // 1 Record per element in result
+    var result: ArrayBuffer[String] = parser.parseQuery();
+    
+    
+  }
+  
   def main(args: Array[String]) {
     /*
     var mLeft, mRight: Bits = new Bits(41);
@@ -171,5 +195,6 @@ object Main {
     System.out.println(bits);
     * */
     //hashMapTest();
+    MISONParser();
   }
 }
