@@ -115,6 +115,19 @@ object Main {
     var testString = "urls.id.yun.checker.hello";
     System.out.println(testString.charAt(0) == 'u');
   }
+  
+  def hashMapTest() {
+    var testHashMap: scala.collection.immutable.HashMap[Int, Int] = new scala.collection.immutable.HashMap();
+    val x = 1;
+    val y = 2;
+    val z = testHashMap.get(x);
+    //System.out.println(z.get);              // z has nothing so get will return noSuchElementException
+    testHashMap = testHashMap + (x -> y);
+    val z2 = testHashMap.get(x);
+    System.out.println(z2.get);
+    
+  }
+  
   def main(args: Array[String]) {
     /*
     var mLeft, mRight: Bits = new Bits(41);
@@ -132,7 +145,7 @@ object Main {
     //println("filehandler test");
     //fileHandlerTest();
     //println("Bitmaps test");
-    BitmapsTest();
+    //BitmapsTest();
     //fileHandlerTest()
 
     // Hang Test Function Calls
@@ -153,5 +166,6 @@ object Main {
     bits.mirror();
     System.out.println(bits);
     * */
+    hashMapTest();
   }
 }

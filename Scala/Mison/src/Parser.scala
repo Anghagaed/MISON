@@ -2,6 +2,7 @@ package Parser
 import fileHandler._;
 import Bitmaps._
 import scala.collection.mutable._;
+import scala.collection.immutable.HashMap;
 
 /* MISON Simple Parser without speculative loading.
  * Argument: 		queryFieldList arrays of query fields. i.e. SELECT [a, b, c]... a, b, c 
@@ -18,7 +19,18 @@ class MISONParser(queryFieldsList: ArrayBuffer[String],
   class queryFields(queryFieldsList: ArrayBuffer[String]) {
     var nestingLevels: Int = 0;
     var hashFields: HashSet[Int] = createHashField(queryFieldsList);
-
+    var fieldsOrder: scala.collection.immutable.HashMap[String, Int]
+    = createFieldsOrder(queryFieldsList);
+    
+    private def createFieldsOrder(queryFieldsList: ArrayBuffer[String])
+    :scala.collection.immutable.HashMap[String, Int]  = {
+      var order = new scala.collection.immutable.HashMap[String, Int]();
+      for (i <- 0 until queryFieldsList.length) {
+        order = order + (queryFieldsList(i) -> i);
+      }
+      return order;
+    }
+    
     private def createHashField(queryFieldsList: ArrayBuffer[String]): HashSet[Int] = {
       var splitCharacter: String = ".";
       var hashQuery: HashSet[Int] = new HashSet();
