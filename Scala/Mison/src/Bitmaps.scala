@@ -310,8 +310,16 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: Array[String]) {
     var output: Int = -1;
     var startingLevel: Int = colonPosition / 32;
     var pos = 31 - (colonPosition % 32);
-    for (i <- startingLevel to 0) {
+    /*
+    System.out.println("colonPosition: " + colonPosition);
+    System.out.println("StartingLevel: " + startingLevel);
+    System.out.println("Pos " + pos);
+    System.out.println("Starting loop");
+    * 
+    */
+    for (i <- startingLevel to 0 by -1) {
       //System.out.println(map(i).structQBitset);
+      //System.out.println("struct Q Bitset: " + map(i).structQBitset);
       map(i).structQBitset.mirror();
       //System.out.println(map(i).structQBitset);
       output = map(i).structQBitset.getNextOnPosition(pos);
@@ -319,7 +327,7 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: Array[String]) {
       //System.out.println(map(i).structQBitset.get(output));
       if (output != -1) {
         map(i).structQBitset.mirror();
-        return (31 - output);
+        return (31 - output) + (32 * i);
       }
       map(i).structQBitset.mirror();
       pos = 0;
@@ -348,22 +356,25 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: Array[String]) {
   def getEndingBoundary(colonPosition: Int): Int = {
     var startingLevel: Int = colonPosition / 32;
     var pos = colonPosition % 32;
-    for (i <- startingLevel to 0) {
+    for (i <- startingLevel to 0 by -1) {
+      //System.out.println("struct CM Bitset: " + map(i).structCMBitset);
+      //System.out.println("struct R Bitset: " + map(i).structRBitset);
       var commaPos = map(i).structCMBitset.getNextOnPosition(pos);
       var bracketPos = map(i).structRBitset.getNextOnPosition(pos);
       if (commaPos != -1 && bracketPos != -1) {
         val returnVal = if (commaPos > bracketPos) commaPos else bracketPos;
-        return returnVal;
+        return returnVal + (32 * i);
       }
       else if (commaPos != -1) {
-        return commaPos;
+        return commaPos + (32 * i);
       }
       else {
-        return bracketPos;
+        return bracketPos + (32 * i);
       }
     }
     return -1;
   }
 
   // methods:off
+  createBitmap;
 }

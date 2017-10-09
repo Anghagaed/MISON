@@ -163,6 +163,10 @@ object Main {
     
     // 1 Record per element in result
     var result: ArrayBuffer[String] = parser.parseQuery();
+    System.out.println("Printing");
+    for (q <- result) {
+      System.out.println(q);
+    }
   }
   
   def main(args: Array[String]) {
@@ -204,7 +208,7 @@ object Main {
     System.out.println(bits);
     * */
     //hashMapTest();
-    NumQueriedFieldsTest();
-    //MISONParser();
+    //NumQueriedFieldsTest();
+    MISONParser();
   }
 }
