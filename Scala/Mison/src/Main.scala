@@ -54,34 +54,34 @@ object Main {
       val bms: Bitmaps = new Bitmaps(layers, arrayLayers, fHandler.getFileArray);
       bms.createBitmap;
       println(bms);
-//      val start: Int = 0;
-//      val end: Int = 31;
-//      val level: Int = 0;
-//      
-      // Hang Test stuff (colons)
+      val start: Int = 0;
+      val end: Int = 31;
+      val level: Int = 0;
+
+      // Hang Test stuff
       // Start Boundary
-//      var stringtemp = fHandler.getLineString;
-//      
-//      for(i <- 0 until layers){
-//        println("generating colon positions for level " + i);
-//        var tempArr = bms.generateColonPositions(start, stringtemp.length(), i);
-//      }
-//
-//      System.out.println(stringtemp);
-//      System.out.println("StartBoundary for colonPosition 10 is " 
-//          + bms.getStartingBoundary(10) + " char: "
-//          + stringtemp.charAt(bms.getStartingBoundary(10)) + " and "
-//          + bms.getStartingBoundary(8) + " char: " 
-//          + stringtemp.charAt(bms.getStartingBoundary(8)));
-//      var temp = "" + stringtemp.substring(bms.getStartingBoundary(bms.getStartingBoundary(10) - 1) + 1, bms.getStartingBoundary(10));
-//      System.out.println(temp);
-//      System.out.println(temp.length());
-//      System.out.println( (stringtemp.charAt(bms.getStartingBoundary(10)) == '\"') );
-//      // End Boundary
-//      System.out.println(stringtemp);
-//      System.out.println("EndBoundary for colonPostion 10 is "
-//      + bms.getEndingBoundary(10) + " char: "
-//      + stringtemp.charAt(bms.getEndingBoundary(10)));
+      var stringtemp = fHandler.getLineString;
+
+      for (i <- 0 until layers) {
+        println("generating colon positions for level " + i);
+        var tempArr = bms.generateColonPositions(start, stringtemp.length(), i);
+      }
+
+      System.out.println(stringtemp);
+      System.out.println("StartBoundary for colonPosition 10 is "
+        + bms.getStartingBoundary(10) + " char: "
+        + stringtemp.charAt(bms.getStartingBoundary(10)) + " and "
+        + bms.getStartingBoundary(8) + " char: "
+        + stringtemp.charAt(bms.getStartingBoundary(8)));
+      var temp = "" + stringtemp.substring(bms.getStartingBoundary(bms.getStartingBoundary(10) - 1) + 1, bms.getStartingBoundary(10));
+      System.out.println(temp);
+      System.out.println(temp.length());
+      System.out.println((stringtemp.charAt(bms.getStartingBoundary(10)) == '\"'));
+      // End Boundary
+      System.out.println(stringtemp);
+      System.out.println("EndBoundary for colonPostion 10 is "
+        + bms.getEndingBoundary(10) + " char: "
+        + stringtemp.charAt(bms.getEndingBoundary(10)));
       //bms.testBitsScala();
     }
   }
@@ -95,8 +95,8 @@ object Main {
     temp = S.remove(0);
     print(temp._1);
     println(temp._2);
-    * 
-    */
+	 * 
+	 */
   }
   def ParserHashTest() {
     var testString = "urls.id.yun.checker.hello";
@@ -118,7 +118,7 @@ object Main {
     var testString = "urls.id.yun.checker.hello";
     System.out.println(testString.charAt(0) == 'u');
   }
-  
+
   def hashMapTest() {
     var testHashMap: scala.collection.immutable.HashMap[String, Int] = new scala.collection.immutable.HashMap();
     val x = "Hello";
@@ -128,9 +128,9 @@ object Main {
     testHashMap = testHashMap + (x -> y);
     val z2 = testHashMap.get(x);
     System.out.println(z2.get);
-    
+
   }
-  
+
   def NumQueriedFieldsTest() {
     var container: ArrayBuffer[String] = ArrayBuffer();
     container += "urls.id.yun.checker.hello";
@@ -143,31 +143,40 @@ object Main {
     //testParser.queryFieldsInfo.createHashField().foreach(println);
   }
   def MISONParser() {
-    val DEBUG_STATUS = true;
-    
+    val DEBUG_STATUS = false;
+
+    val fHandler = new fileHandler();
+    fHandler.setNewFilePath("./Test Files/jsonTest1.txt");
+    fHandler.getNext;
+
     var testFile: ArrayBuffer[String] = new ArrayBuffer();
-    
+
     // Add files into testFile
     testFile += "./Test Files/jsonTest1.txt";
-    
+
     var query: ArrayBuffer[String] = new ArrayBuffer();
     // Add queries into array buffer
-    
+
     query += "id";
     query += "reviews";
     query += "state";
     query += "city";
-    
+    query += "attributes.breakfast";
+    query += "attributes.lunch";
+    query += "attributes.dinner";
+
     var parser: MISONParser = new MISONParser(query, testFile, DEBUG_STATUS);
-    
+
     // 1 Record per element in result
+
     var result: ArrayBuffer[String] = parser.parseQuery();
-    System.out.println("Printing");
+    System.out.println("Printing result");
     for (q <- result) {
       System.out.println(q);
     }
+
   }
-  
+
   def main(args: Array[String]) {
     /*
     var mLeft, mRight: Bits = new Bits(41);
@@ -176,8 +185,8 @@ object Main {
     mRbit = mRight & -mRight.bits;
 	  mLbit = mLeft & -mLeft.bits;
 	  println("After : " + mLbit + " " + mRbit);
-	  * 
-	  */
+		 * 
+		 */
     //println("List Buffer test");
     //ListBufferTest();
     //println("Bits test");
@@ -185,7 +194,7 @@ object Main {
     //println("filehandler test");
     //fileHandlerTest();
     //println("Bitmaps test");
-    BitmapsTest();
+    //BitmapsTest();
     //fileHandlerTest()
 
     // Hang Test Function Calls
@@ -205,9 +214,9 @@ object Main {
     System.out.println(bits);
     bits.mirror();
     System.out.println(bits);
-    * */
+		 * */
     //hashMapTest();
     //NumQueriedFieldsTest();
-    //MISONParser();
+    MISONParser();
   }
 }

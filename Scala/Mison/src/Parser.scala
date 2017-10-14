@@ -24,7 +24,7 @@ class MISONParser(
     var nestingLevels: Int = 0;
     var levelCount: Int = 0;
     var hashFields: HashSet[Int] = null;
-    //createHashField().foreach(println);    uncomment this for NumQueriedFieldsTest()
+    //createHashField().foreach(println);    //uncomment this for NumQueriedFieldsTest()
     createHashField();
     var fieldsOrder: scala.collection.immutable.HashMap[String, Int] = createFieldsOrder(queryFieldsList);
 
@@ -46,8 +46,9 @@ class MISONParser(
         var localFieldLevels: Int = 0;
         while (index != -1) {
           // Has period
-          var subfield: String = fields.substring(0, index - 1);
+          var subfield: String = fields.substring(0, index);
           hashCode = subfield.hashCode();
+          //System.out.println(subfield);
           if (!hashFields.contains(hashCode)) {
             hashFields += hashCode;
             if (localFieldLevels < numQueryFieldsList.size) { // update count 
@@ -59,6 +60,9 @@ class MISONParser(
           localFieldLevels += 1;
           index = fields.indexOf(splitCharacter, index + 1);
         }
+        
+        // Last Field
+        //System.out.println(fields);
         hashCode = fields.hashCode();
         if (!hashFields.contains(hashCode)) {
           hashFields += hashCode;
@@ -94,7 +98,7 @@ class MISONParser(
   }
 
   // Constructor: on
-  private var queryFieldsInfo: queryFields = new queryFields(queryFieldsList);
+  var queryFieldsInfo: queryFields = new queryFields(queryFieldsList);
   private var fileHandler: fileHandler = new fileHandler();
   private var result: ArrayBuffer[String] = new ArrayBuffer[String];
   private var recordFoundInLine: Int = 0;
@@ -124,7 +128,7 @@ class MISONParser(
     // Go through entire file one line at a time
     while (fileHandler.getNext) {
       initLineParse();
-      System.out.println(currentRecord.length);
+      //System.out.println(currentRecord.length);
       val initialColonPos = bitmaps.generateColonPositions(0, currentRecord.length - 1, 0);
       /*
       if (DEBUG_FLAG == true) {
@@ -137,22 +141,21 @@ class MISONParser(
           System.out.println(currentRecord.charAt(i));
         }
       }
-      * 
-      */
-      System.out.println(initialColonPos.size);
+				 * 
+				 */
+      //System.out.println(initialColonPos.size);
       val queryResult = parseLine(0, "", initialColonPos);
       if (queryResult) {
-        var output: String = "";
-        for (fields <- lineOutput) {
-          output += fields;
+        var output: String = lineOutput(0);
+        for (i <- 1 until lineOutput.length) {
+          output += ", " + lineOutput(i);
         }
         result += output;
       }
       if (DEBUG_FLAG == true) {
         if (queryResult) {
           System.out.println("Record Matches");
-        }
-        else {
+        } else {
           System.out.println("Record does not match");
         }
       }
@@ -170,13 +173,6 @@ class MISONParser(
       stringSplitted);
     if (DEBUG_FLAG == true) {
       System.out.println("CurrentRecord: " + currentRecord);
-      /*
-      System.out.println("currentRecord is " + currentRecord);
-      System.out.println("stringSplitted prints");
-      for (i <- stringSplitted) {
-        System.out.println(i);
-      }
-      * */
     }
     matchingFieldNumber = 0;
     lineOutput = new Array[String](queryFieldsInfo.fieldsOrder.size);
@@ -186,22 +182,23 @@ class MISONParser(
   // Parse one record (line) and determine if the record is part of the query.
   // Return true for success, false for failure
   private def parseLine(curLevel: Int, append: String, colonPos: ArrayBuffer[Int]): Boolean = {
-    var recordValue: String = "";
-    //for (i <- 0 until colonPos.length) {
-    for (i <- colonPos.length - 3 to 0 by -1) {
-      System.out.println("i is " + i);
+    for (i <- colonPos.length - 1 to 0 by -1) {
+      //System.out.println("i is " + i);
       // end pos of field name, no - 1 due to quirks of scala string.substring(startIndex, endIndex)
       //System.out.println(bitmaps);
+
       var endPos = bitmaps.getStartingBoundary(colonPos(i));
-      System.out.println("endPos: " + endPos);
+      //System.out.println("endPos: " + endPos);
+
       // start pos of field name
       var startPos = bitmaps.getStartingBoundary(endPos - 1) + 1;
-      System.out.println("startPos: " + startPos);     
+      //System.out.println("startPos: " + startPos);
+
       // Error Checking, remove for 
       if (DEBUG_FLAG == true) {
         if (endPos == -1 || startPos == -1) {
           //System.out.println("startPos: " + startPos + " endPos: " + endPos);
-          System.out.println("This record: " + currentRecord + "\n has no quotes at all");
+          //System.out.println("This record: " + currentRecord + "\n has no quotes at all");
           return false;
         }
       }
@@ -211,15 +208,14 @@ class MISONParser(
       if (DEBUG_FLAG == true) {
         System.out.println("currentField is " + currentField);
       }
-      
+
       if (queryFieldsInfo.hashFields.contains(currentField.hashCode())) {
         var nextChar: Char = currentRecord.charAt(colonPos(i) + 1);
-        // Entering another nesting level case
         if (nextChar == '{') {
-          System.out.println("Nesting nesting nestin");
-          /*
+          //System.out.println("Nesting nesting nestin");
+          //System.out.println(colonPos(i) + " " + colonPos(i - 1));
           var newColonPos: ArrayBuffer[Int] =
-            bitmaps.generateColonPositions(colonPos(i), colonPos(i + 1), curLevel + 1);
+            bitmaps.generateColonPositions(colonPos(i), colonPos(i - 1), curLevel + 1);
           var newAppend: String = "";
           if (curLevel == 0) {
             newAppend = currentField + '.';
@@ -227,21 +223,27 @@ class MISONParser(
             newAppend = append + '.' + currentField;
           }
           if (DEBUG_FLAG == true) {
+            System.out.println(newAppend);
+            System.out.println("newColonPosition");
+            System.out.println(newColonPos.size);
+            for (i <- 0 until newColonPos.size) {
+              System.out.print(newColonPos(i) + " ");
+
+            }
             System.out.println("Going to the next level and beyond");
           }
           matchingFieldNumber += 1;
           parseLine(curLevel + 1, newAppend, newColonPos);
-          * */
-        } // Element is an array
-        else if (nextChar == '[') {
+          //System.out.println("Done with Nesting nesting nestin");
 
-        } // Field matches. Add the field element into result
-        else {
-          System.out.println("Match found");
+        } else if (nextChar == '[') {
+
+        } else {
+          //System.out.println("Match found");
           endPos = bitmaps.getEndingBoundary(colonPos(i));
           startPos = colonPos(i) + 1;
-          System.out.println("startPos: " + startPos); 
-          System.out.println("endPos: " + endPos);
+          //System.out.println("startPos: " + startPos);
+          //System.out.println("endPos: " + endPos);
           if (currentRecord.charAt(startPos) == '\"') {
             // Change startPos and endPos to compensate for extra " character
             startPos = startPos + 1;
@@ -249,7 +251,7 @@ class MISONParser(
           }
           val fieldValue = currentRecord.substring(startPos, endPos);
           val pos = queryFieldsInfo.fieldsOrder.get(currentField).get;
-          System.out.println("fieldValue is " + fieldValue);
+          //System.out.println("fieldValue is " + fieldValue);
           lineOutput(pos) = fieldValue;
           matchingFieldNumber += 1;
 
@@ -258,8 +260,10 @@ class MISONParser(
         // Check if all fields were matched
         // Might need to reformat the string currentRecord?
         if (matchingFieldNumber == queryFieldsInfo.hashFields.size) {
+          //System.out.println("Number is matching");
           return true;
         }
+
       }
     }
     return false;
