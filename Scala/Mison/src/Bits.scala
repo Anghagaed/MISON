@@ -99,7 +99,7 @@ class Bits(val bit: Int) {
   }
   // Assume int is 32 bit.
   def mirror(): Unit = {
-    for (i <- 0 until 15) {
+    for (i <- 0 until 16) {
       var temp: Int = get(i);
       set(i, get(31 - i));
       set(31 - i, temp);

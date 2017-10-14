@@ -64,6 +64,7 @@ class fileHandler() {
 
   // Colin code with some modification
   private def split: Boolean = {
+    arr = Array.empty[String];
     for (a <- 0 until text.length() if a % 32 == 0) {
       if (a + 32 <= text.length()) {
         arr = arr :+ (text.substring(a, a + 32))

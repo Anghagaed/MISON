@@ -270,12 +270,12 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: Array[String]) {
         mcolon = mcolon & (mcolon - 1);
       }
     }
-    println("Colon Position is: ");
+    //println("Colon Position is: ");
     //for (i <- 0 until colonPositions.length) {
     //  print(colonPositions(i) + " ");
     //}
-    colonPositions.foreach(x => print(s"${x} "));
-    println();
+    //colonPositions.foreach(x => print(s"${x} "));
+    //println();
     return colonPositions;
   }
   override def toString: String = {
@@ -318,13 +318,12 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: Array[String]) {
     * 
     */
     for (i <- startingLevel to 0 by -1) {
+      //System.out.println("Pos is " + pos);
       //System.out.println(map(i).structQBitset);
-      //System.out.println("struct Q Bitset: " + map(i).structQBitset);
       map(i).structQBitset.mirror();
       //System.out.println(map(i).structQBitset);
       output = map(i).structQBitset.getNextOnPosition(pos);
       //System.out.println("i " + i + " " + output);
-      //System.out.println(map(i).structQBitset.get(output));
       if (output != -1) {
         map(i).structQBitset.mirror();
         return (31 - output) + (32 * i);
@@ -334,12 +333,12 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: Array[String]) {
     }
     return -1;
   }
-  
+
   def testBitsScala() = {
     System.out.println("Testing testBitsScala");
     //Testing getNextOnPosition. Conclusion: It works
     //System.out.println("SQ bitset: " + map(0).structQBitset); 
-    
+
     var x = -1;
     var y: Bits = new Bits(0x80000001);
     System.out.println("y bitset: " + y);
@@ -350,27 +349,35 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: Array[String]) {
       System.out.println(x);
     } while (x != -1);
     //System.out.print("Call with " + (31) + ": " + map(0).structQBitset.getNextOnPosition(31));
-    
+
   }
 
   def getEndingBoundary(colonPosition: Int): Int = {
     var startingLevel: Int = colonPosition / 32;
     var pos = colonPosition % 32;
-    for (i <- startingLevel to 0 by -1) {
+    for (i <- startingLevel until map.length by 1) {
+      //System.out.println("Pos is " + pos + " for iteration " + i);
       //System.out.println("struct CM Bitset: " + map(i).structCMBitset);
       //System.out.println("struct R Bitset: " + map(i).structRBitset);
       var commaPos = map(i).structCMBitset.getNextOnPosition(pos);
       var bracketPos = map(i).structRBitset.getNextOnPosition(pos);
+      //System.out.println("commaPos is " + commaPos);
+      //System.out.println("bracketPos is " + bracketPos);
+
       if (commaPos != -1 && bracketPos != -1) {
-        val returnVal = if (commaPos > bracketPos) commaPos else bracketPos;
+        //System.out.println("Output Code 0");
+        val returnVal = if (commaPos < bracketPos) commaPos else bracketPos;
+        //System.out.println("returnVal is " + returnVal);
         return returnVal + (32 * i);
-      }
-      else if (commaPos != -1) {
+      } else if (commaPos != -1) {
+        //System.out.println("Output Code 1");
         return commaPos + (32 * i);
-      }
-      else {
+      } else if (bracketPos != -1) {
+        //System.out.println("Output Code 2");
         return bracketPos + (32 * i);
       }
+
+      pos = 0;
     }
     return -1;
   }
