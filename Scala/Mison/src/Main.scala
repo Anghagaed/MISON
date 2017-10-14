@@ -58,7 +58,7 @@ object Main {
       val end: Int = 31;
       val level: Int = 0;
       
-      // Hang Test stuff
+      // Hang Test stuff (colons)
       // Start Boundary
       var stringtemp = fHandler.getLineString;
       
@@ -83,8 +83,15 @@ object Main {
       + bms.getEndingBoundary(10) + " char: "
       + stringtemp.charAt(bms.getEndingBoundary(10)));
       //bms.testBitsScala();
+      
+      
+      // Hang Test Stuff (commas)
+      for(i <- 0 until layers){
+        println("generating comma positions for level " + i);
+        var tempArr = bms.generateCommaPositions(start, stringtemp.length(), i);
+      }
     }
-
+    
   }
   def ListBufferTest() { /*
     var S: ListBuffer[Tuple2[Int,Int]] = ListBuffer();
@@ -186,7 +193,7 @@ object Main {
     //println("filehandler test");
     //fileHandlerTest();
     //println("Bitmaps test");
-    //BitmapsTest();
+    BitmapsTest();
     //fileHandlerTest()
 
     // Hang Test Function Calls
@@ -209,6 +216,6 @@ object Main {
     * */
     //hashMapTest();
     //NumQueriedFieldsTest();
-    MISONParser();
+    //MISONParser();
   }
 }
