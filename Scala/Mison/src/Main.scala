@@ -54,44 +54,36 @@ object Main {
       val bms: Bitmaps = new Bitmaps(layers, arrayLayers, fHandler.getFileArray);
       bms.createBitmap;
       println(bms);
-      val start: Int = 0;
-      val end: Int = 31;
-      val level: Int = 0;
-      
+//      val start: Int = 0;
+//      val end: Int = 31;
+//      val level: Int = 0;
+//      
       // Hang Test stuff (colons)
       // Start Boundary
-      var stringtemp = fHandler.getLineString;
-      
-      for(i <- 0 until layers){
-        println("generating colon positions for level " + i);
-        var tempArr = bms.generateColonPositions(start, stringtemp.length(), i);
-      }
-
-      System.out.println(stringtemp);
-      System.out.println("StartBoundary for colonPosition 10 is " 
-          + bms.getStartingBoundary(10) + " char: "
-          + stringtemp.charAt(bms.getStartingBoundary(10)) + " and "
-          + bms.getStartingBoundary(8) + " char: " 
-          + stringtemp.charAt(bms.getStartingBoundary(8)));
-      var temp = "" + stringtemp.substring(bms.getStartingBoundary(bms.getStartingBoundary(10) - 1) + 1, bms.getStartingBoundary(10));
-      System.out.println(temp);
-      System.out.println(temp.length());
-      System.out.println( (stringtemp.charAt(bms.getStartingBoundary(10)) == '\"') );
-      // End Boundary
-      System.out.println(stringtemp);
-      System.out.println("EndBoundary for colonPostion 10 is "
-      + bms.getEndingBoundary(10) + " char: "
-      + stringtemp.charAt(bms.getEndingBoundary(10)));
+//      var stringtemp = fHandler.getLineString;
+//      
+//      for(i <- 0 until layers){
+//        println("generating colon positions for level " + i);
+//        var tempArr = bms.generateColonPositions(start, stringtemp.length(), i);
+//      }
+//
+//      System.out.println(stringtemp);
+//      System.out.println("StartBoundary for colonPosition 10 is " 
+//          + bms.getStartingBoundary(10) + " char: "
+//          + stringtemp.charAt(bms.getStartingBoundary(10)) + " and "
+//          + bms.getStartingBoundary(8) + " char: " 
+//          + stringtemp.charAt(bms.getStartingBoundary(8)));
+//      var temp = "" + stringtemp.substring(bms.getStartingBoundary(bms.getStartingBoundary(10) - 1) + 1, bms.getStartingBoundary(10));
+//      System.out.println(temp);
+//      System.out.println(temp.length());
+//      System.out.println( (stringtemp.charAt(bms.getStartingBoundary(10)) == '\"') );
+//      // End Boundary
+//      System.out.println(stringtemp);
+//      System.out.println("EndBoundary for colonPostion 10 is "
+//      + bms.getEndingBoundary(10) + " char: "
+//      + stringtemp.charAt(bms.getEndingBoundary(10)));
       //bms.testBitsScala();
-      
-      
-      // Hang Test Stuff (commas)
-      for(i <- 0 until layers){
-        println("generating comma positions for level " + i);
-        var tempArr = bms.generateCommaPositions(start, stringtemp.length(), i);
-      }
     }
-    
   }
   def ListBufferTest() { /*
     var S: ListBuffer[Tuple2[Int,Int]] = ListBuffer();

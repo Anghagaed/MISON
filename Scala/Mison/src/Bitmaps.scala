@@ -321,7 +321,6 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: Array[String]) {
     }
     return output;
   }
-
   def getStartingBoundary(colonPosition: Int): Int = {
     var output: Int = -1;
     var startingLevel: Int = colonPosition / 32;
@@ -350,7 +349,64 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: Array[String]) {
     }
     return -1;
   }
-  
+  // Given a colon position to an array field, it generates a substring enclosed by array field
+  // Returns null if enclosing the whole substring is impossible
+  // Assumes that there is the end array bracket and colon position is valid
+  def getArraySubString(colonPos: Int, level: Int): String = {
+    var start = colonPos + 1;            // start range of substring
+    var end:Int = -1;                    // end range of substring in endWord
+    var startWord:Int = (colonPos / 32); // word to begin searching
+    var endWord:Int = -1;                // end word
+    var currentLevel:Int = level;        // used to find the end bracket
+    var index = colonPos % 32;           // index used to help searching for the end
+    // start search
+    for(i <- startWord until map.size)
+    {
+      // extract next location for both '[' bracket and ']' bracket
+      while(true)
+      {
+        val arraylbracketpos = map(i).arraylbracketBitset.getNextOnPosition(index);
+        val arrayrbracketpos = map(i).arrayrbracketBitset.getNextOnPosition(index);
+        
+        // left bracket is closer
+        if(arraylbracketpos != -1 && arraylbracketpos < arrayrbracketpos)
+        {
+          currentLevel += 1;
+          index = arraylbracketpos;
+        }
+        // right bracket is closer
+        else if(arrayrbracketpos != -1 && arrayrbracketpos < arraylbracketpos)
+        {
+          currentLevel -= 1;
+          index = arrayrbracketpos;
+        }
+        // both brackets cannot be found
+        else
+          break;
+        // check for end condition
+        if(currentLevel == 0)
+        {
+          endWord = i;
+          end = index;
+          break;
+        }
+      }
+      if(currentLevel == 0)
+      {
+        //endWord = i;
+        //end = index;
+        break;
+      }
+      // reset index
+      index = 0;
+    }
+    // generate the result
+    var subStr:String = "";
+    for(i <- startWord until endWord)
+      subStr += word(i);
+    subStr += word(endWord).substring(0, end);
+    return subStr;
+  }
   def testBitsScala() = {
     System.out.println("Testing testBitsScala");
     //Testing getNextOnPosition. Conclusion: It works
