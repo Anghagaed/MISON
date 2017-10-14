@@ -12,7 +12,7 @@ import scala.collection.mutable.ArrayBuffer
  */
 import scala.collection.mutable.ListBuffer;
 import scala.math.ceil;
-class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: Array[String]) {
+class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String]) {
 
   // constructor:on
   class mapContainer(layers: Int, arrayLayers: Int) {
@@ -25,7 +25,7 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: Array[String]) {
       CMlevels(i) = new Bits(0);
   }
   private val B_INT = 32;
-  private var word: Array[String] = wordSplit;
+  private var word: ArrayBuffer[String] = wordSplit;
   var map: Array[mapContainer] = new Array[mapContainer](word.size);
   for (i <- 0 until word.size)
     map(i) = new mapContainer(layers, arrayLayers);
@@ -194,7 +194,7 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: Array[String]) {
 				mCMRbit = mCMRight & -mCMRight.bits;
 				mCMLbit = mCMLeft & -mCMLeft.bits;
 
-				while (mCMLbit != 0 && (mCMRbit == 0 || mCMLbit < mCMRbit))
+				while (mCMLbit.bits != 0 && (mCMRbit.bits == 0 || mCMLbit < mCMRbit))
 				{
 				  // 1 = "j", 2 = mLbit
 					SCM.insert(0, (i, mCMLbit));

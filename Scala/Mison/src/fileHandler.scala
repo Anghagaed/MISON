@@ -2,6 +2,7 @@ package fileHandler
 
 import scala.io.Source._
 import java.io.IOException
+import scala.collection.mutable.ArrayBuffer
 
 // Comment by Hang : Array is immutable and would be slower in performance compare to a mutable container 
 // Need to handle multiple lines in file case. We want fileHandler to return one line at a time
@@ -9,7 +10,7 @@ import java.io.IOException
 class fileHandler() {
   private var text: String = "";
   //private var currentLine = "";      
-  private var arr = Array.empty[String];
+  private var arr = ArrayBuffer.empty[String];
   private var filePath: String = "";
 
   private var it: Option[Iterator[String]] = None
@@ -40,7 +41,7 @@ class fileHandler() {
     return false;
   }
 
-  def getFileArray: Array[String] = {
+  def getFileArray: ArrayBuffer[String] = {
     return arr;
   }
 
@@ -64,7 +65,7 @@ class fileHandler() {
 
   // Colin code with some modification
   private def split: Boolean = {
-    arr = Array.empty[String];
+    arr = ArrayBuffer.empty[String];
     for (a <- 0 until text.length() if a % 32 == 0) {
       if (a + 32 <= text.length()) {
         arr = arr :+ (text.substring(a, a + 32))
