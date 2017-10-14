@@ -125,29 +125,29 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: Array[String]) {
     for (i <- 0 until map.size) {
       for (j <- 0 until map(i).levels.size)
         map(i).levels(j) = map(i).structCBitset;
-      //for(j <- 0 until map(i).CMlevels.size) 
-      //	map(i).CMlevels(j) = map(i).structCMBitset;
+      for(j <- 0 until map(i).CMlevels.size) 
+      	map(i).CMlevels(j) = map(i).structCMBitset;
     }
     var mLeft, mRight: Bits = new Bits(0); // m(left), m(right)
     var mLbit, mRbit: Bits = new Bits(0); // m(left bit), m(right bit)
 
     //for array support
-    //var mCMLeft, mCMRight: Bits = new Bits(0);
-    //var mCMLbit, mCMRbit: Bits = new Bits(0);
+    var mCMLeft, mCMRight: Bits = new Bits(0);
+    var mCMLbit, mCMRbit: Bits = new Bits(0);
 
     val lvls: Int = map(0).levels.size; // Number of nesting levels
-    //val cmlvls: Int = map(0).CMlevels.size;
+    val cmlvls: Int = map(0).CMlevels.size;
 
     // ListBuffer: Stack alternative
     var S: ListBuffer[Tuple2[Int, Bits]] = ListBuffer();
-    //var SCM: ListBuffer[Tuple2[Int,Int]] = ListBuffer();
+    var SCM: ListBuffer[Tuple2[Int, Bits]] = ListBuffer();
 
     for (i <- 0 until map.size) {
       mLeft = map(i).lbracketBitset;
       mRight = map(i).rbracketBitset;
 
-      //mCMLeft = map(i).arraylbracketBitset;
-      //mCMRight = map(i).arrayrbracketBitset;
+      mCMLeft = map(i).arraylbracketBitset;
+      mCMRight = map(i).arrayrbracketBitset;
       do // iterate over each right brace
       {
         // extract the rightmost 1
@@ -172,7 +172,8 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: Array[String]) {
               flip = mRbit - mLbit;
               flip.flip();
               map(i).levels(S.size - 1) &= flip;
-            } else // nested object is across multiple words
+            } 
+            else // nested object is across multiple words
             {
               map(j).levels(S.size - 1) &= mLbit - 1;
               flip = mRbit - 1;
@@ -186,62 +187,49 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: Array[String]) {
         }
         mRight &= mRight - 1; // remove the rightmost 1
       } while (mRbit.bits != 0);
-      /*
 			//for array support
 			do 													// iterate over each right brace
 			{
 				// extract the rightmost 1
-				mCMRbit = mCMRight & -mCMRight;
-				mCMLbit = mCMLeft & -mCMLeft;
+				mCMRbit = mCMRight & -mCMRight.bits;
+				mCMLbit = mCMLeft & -mCMLeft.bits;
 
 				while (mCMLbit != 0 && (mCMRbit == 0 || mCMLbit < mCMRbit))
 				{
 				  // 1 = "j", 2 = mLbit
-					S.insert(0, (i, mCMLbit));
+					SCM.insert(0, (i, mCMLbit));
 					mCMLeft = mCMLeft & (mCMLeft - 1);				// remove the rightmost 1
-					mCMLbit = mCMLeft & -mCMLeft;					// extract the rightmost 1
+					mCMLbit = mCMLeft & -mCMLeft.bits;					// extract the rightmost 1
 				}
-				if (mCMRbit != 0)
+				if (mCMRbit.bits != 0)
 				{
-
-					vector<unsigned> pop = SCM.top();				// 0 = "j", 1 = mLbit
-					mCMLbit = pop[1];
-					SCM.pop();
-					//cout << "m(right bit) exists i: " << i << " j: " << pop[0] << endl;
-					//cout << "S.size() after pop: " << S.size() << endl;
-					if (0 < SCM.size() && SCM.size() <= cmlvls)	// clear bits at the upper level
+					val pop = SCM.remove(0); // 0 = "j", 1 = mCMLbit
+					val j = pop._1;
+					mCMLbit = pop._2;
+					if (0 < SCM.size && SCM.size <= cmlvls)	// clear bits at the upper level
 					{
-						bitset<B_INT> flip;
-						//cout << "In 0 < |S| <= l" << endl;
-						if (i == pop[0])						// nested object is inside the word
+						var flip: Bits = new Bits(0);
+						if (i == j)						// nested object is inside the word
 						{
-							//cout << "in IF" << endl;
 							flip = mCMRbit - mCMLbit;
 							flip.flip();
-							//map[i].levels[S.size()-1] &= static_cast<unsigned> (flip.to_ulong());
-							map[i].CMlevels[SCM.size() - 1] &= flip;
+							map(i).CMlevels(SCM.size - 1) &= flip;
 						}
 						else 									// nested object is across multiple words
 						{
-
-							map[pop[0]].CMlevels[SCM.size() - 1] &= mCMLbit - 1;
-							//cout << "map[pop[0]].levels[S.size()-1]: " << map[pop[0]].levels[S.size() - 1] << endl;
+						  map(j).CMlevels(SCM.size - 1) &= mCMLbit - 1;
 							flip = mCMRbit - 1;
 							flip.flip();
 
-							map[i].CMlevels[SCM.size() - 1] &= flip;
-							for (int k = pop[0] + 1; k < i; ++k) {
-								//cout << "i " << i << " j " << pop[0] << " k " << k << endl;
-								//cout << S.size() << endl;
-								map[k].CMlevels[SCM.size() - 1].reset();
-							}
+							map(i).CMlevels(SCM.size - 1) &= flip;
+							for (k <- j + 1 until i) {
+                map(k).CMlevels(SCM.size - 1) = new Bits(0);
+              }
 						}
 					}
 				}
 				mCMRight &= mCMRight - 1;						// remove the rightmost 1
-			} while (mCMRbit != 0);
-			* 
-			*/
+			} while (mCMRbit.bits != 0);
     }
 
     for (a <- 0 until map.size) {
@@ -249,6 +237,12 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: Array[String]) {
         val temp1 = map(a).levels(b);
         val temp2 = map(a).levels(b - 1);
         map(a).levels(b) = temp1 - (temp1 & temp2);
+
+      }
+      for (b <- cmlvls - 1 until 0 by -1) {
+        val temp1 = map(a).CMlevels(b);
+        val temp2 = map(a).CMlevels(b - 1);
+        map(a).CMlevels(b) = temp1 - (temp1 & temp2);
 
       }
     }
@@ -277,6 +271,28 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: Array[String]) {
     //colonPositions.foreach(x => print(s"${x} "));
     //println();
     return colonPositions;
+  }
+  def generateCommaPositions(start: Int, end: Int, level: Int): ArrayBuffer[Int] = {
+    var commaPositions = new ArrayBuffer[Int]();
+    var mcomma: Bits = new Bits(0);
+    for (i <- (start / B_INT) until ceil(end.toDouble / B_INT).toInt) {
+      mcomma = map(i).CMlevels(level);
+      while (mcomma.bits != 0) {
+        val mBit = (mcomma & -mcomma.bits) - 1;
+        var offset: Int = i * B_INT + mBit.count();
+        if (start <= offset && offset <= end) {
+          commaPositions = (offset) +: commaPositions;
+        }
+        mcomma = mcomma & (mcomma - 1);
+      }
+    }
+    //println("Comma Position is: ");
+    //for (i <- 0 until colonPositions.length) {
+    //  print(colonPositions(i) + " ");
+    //}
+    commaPositions.foreach(x => print(s"${x} "));
+    println();
+    return commaPositions;
   }
   override def toString: String = {
     var output: String = "";
