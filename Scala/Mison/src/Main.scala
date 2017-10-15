@@ -51,7 +51,7 @@ object Main {
       val arrayLayers = 3;
 
       // begin testing
-      val bms: Bitmaps = new Bitmaps(layers, arrayLayers, fHandler.getFileArray);
+      val bms: Bitmaps = new Bitmaps(layers, arrayLayers, null);
       bms.createBitmap;
       println(bms);
       val start: Int = 0;
@@ -164,6 +164,7 @@ object Main {
     query += "attributes.breakfast";
     query += "attributes.lunch";
     query += "attributes.dinner";
+    query += "categories";
 
     var parser: MISONParser = new MISONParser(query, testFile, DEBUG_STATUS);
 

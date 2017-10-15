@@ -1,6 +1,6 @@
 package Bitmaps
 import Bits._
-import scala.util.control.Breaks._
+//import scala.util.control.Breaks._
 import scala.collection.mutable.ArrayBuffer
 /* https://www.scala-lang.org/api/current/scala/collection/immutable/Stack.html
  * (Since version 2.11.0) Stack is an inelegant and potentially
@@ -359,10 +359,12 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String]) {
     var currentLevel:Int = level;        // used to find the end bracket
     var index = colonPos % 32;           // index used to help searching for the end
     // start search
-    for(i <- startWord until map.size)
+    var i = startWord;
+    while(i < map.size && currentLevel != 0)
     {
+      var bothnegative = false;
       // extract next location for both '[' bracket and ']' bracket
-      while(true)
+      while(currentLevel != 0 && !bothnegative)
       {
         val arraylbracketpos = map(i).arraylbracketBitset.getNextOnPosition(index);
         val arrayrbracketpos = map(i).arrayrbracketBitset.getNextOnPosition(index);
@@ -379,22 +381,14 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String]) {
           currentLevel -= 1;
           index = arrayrbracketpos;
         }
-        // both brackets cannot be found
         else
-          break;
+          bothnegative = true;
         // check for end condition
         if(currentLevel == 0)
         {
           endWord = i;
           end = index;
-          break;
         }
-      }
-      if(currentLevel == 0)
-      {
-        //endWord = i;
-        //end = index;
-        break;
       }
       // reset index
       index = 0;
@@ -404,6 +398,62 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String]) {
     for(i <- startWord until endWord)
       subStr += word(i);
     subStr += word(endWord).substring(0, end);
+    return subStr;
+  }
+  def getArraySubString(colonPos: Int, level: Int, str:String): String = {
+    println(str);
+    var start = colonPos + 1;            // start range of substring
+    var end:Int = -1;                    // end range of substring in endWord
+    var startWord:Int = start / 32;     // word to begin searching
+    //var endWord:Int = -1;                // end word
+    var currentLevel:Int = level;        // used to find the end bracket
+    var index = start % 32;           // index used to help searching for the end
+    // start search
+    var i = startWord;
+    println(index);
+    println(startWord * B_INT + index);
+    println(str(start));
+    var foundEndpt = false;
+    while(i < map.size && !foundEndpt)
+    {
+      // extract next location for both '[' bracket and ']' bracket
+      var bothnegative = false;
+      while(!foundEndpt && !bothnegative)
+      {
+        val arraylbracketpos = map(i).arraylbracketBitset.getNextOnPosition(index);
+        val arrayrbracketpos = map(i).arrayrbracketBitset.getNextOnPosition(index);
+        println(arraylbracketpos + " " + arrayrbracketpos);
+        // left bracket is closer
+        if(arraylbracketpos != -1 && arraylbracketpos < arrayrbracketpos)
+        {
+          
+          currentLevel += 1;
+          index = arraylbracketpos;
+        }
+        // right bracket is closer
+        else if(arrayrbracketpos != -1 && arrayrbracketpos < arraylbracketpos)
+        {
+          currentLevel -= 1;
+          index = arrayrbracketpos;
+        }
+        // both brackets cannot be found
+        else
+          bothnegative = true;
+        // check for end condition
+        if(currentLevel == 0)
+        {
+          //endWord = i;
+          end = i * B_INT + index;
+          foundEndpt = true;
+        }
+      }
+      // reset index
+      index = 0;
+      i+=1;
+    }
+    // generate the result
+    println(start + " " + end);
+    var subStr:String = str.substring(start,end+1);
     return subStr;
   }
   def testBitsScala() = {

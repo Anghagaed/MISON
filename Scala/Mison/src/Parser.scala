@@ -237,7 +237,12 @@ class MISONParser(
           //System.out.println("Done with Nesting nesting nestin");
 
         } else if (nextChar == '[') {
-
+          val output: String = bitmaps.getArraySubString(colonPos(i), curLevel, currentRecord);
+          //val output: String = bitmaps.getArraySubString(colonPos(i), curLevel);
+          System.out.println("Array Field output is " + output);
+          val pos = queryFieldsInfo.fieldsOrder.get(currentField).get;
+          lineOutput(pos) = output;
+          matchingFieldNumber += 1;
         } else {
           //System.out.println("Match found");
           endPos = bitmaps.getEndingBoundary(colonPos(i));
