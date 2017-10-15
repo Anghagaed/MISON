@@ -125,8 +125,8 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String]) {
     for (i <- 0 until map.size) {
       for (j <- 0 until map(i).levels.size)
         map(i).levels(j) = map(i).structCBitset;
-      for(j <- 0 until map(i).CMlevels.size) 
-      	map(i).CMlevels(j) = map(i).structCMBitset;
+      for (j <- 0 until map(i).CMlevels.size)
+        map(i).CMlevels(j) = map(i).structCMBitset;
     }
     var mLeft, mRight: Bits = new Bits(0); // m(left), m(right)
     var mLbit, mRbit: Bits = new Bits(0); // m(left bit), m(right bit)
@@ -172,8 +172,7 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String]) {
               flip = mRbit - mLbit;
               flip.flip();
               map(i).levels(S.size - 1) &= flip;
-            } 
-            else // nested object is across multiple words
+            } else // nested object is across multiple words
             {
               map(j).levels(S.size - 1) &= mLbit - 1;
               flip = mRbit - 1;
@@ -187,49 +186,46 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String]) {
         }
         mRight &= mRight - 1; // remove the rightmost 1
       } while (mRbit.bits != 0);
-			//for array support
-			do 													// iterate over each right brace
-			{
-				// extract the rightmost 1
-				mCMRbit = mCMRight & -mCMRight.bits;
-				mCMLbit = mCMLeft & -mCMLeft.bits;
+      //for array support
+      do // iterate over each right brace
+      {
+        // extract the rightmost 1
+        mCMRbit = mCMRight & -mCMRight.bits;
+        mCMLbit = mCMLeft & -mCMLeft.bits;
 
-				while (mCMLbit.bits != 0 && (mCMRbit.bits == 0 || mCMLbit < mCMRbit))
-				{
-				  // 1 = "j", 2 = mLbit
-					SCM.insert(0, (i, mCMLbit));
-					mCMLeft = mCMLeft & (mCMLeft - 1);				// remove the rightmost 1
-					mCMLbit = mCMLeft & -mCMLeft.bits;					// extract the rightmost 1
-				}
-				if (mCMRbit.bits != 0)
-				{
-					val pop = SCM.remove(0); // 0 = "j", 1 = mCMLbit
-					val j = pop._1;
-					mCMLbit = pop._2;
-					if (0 < SCM.size && SCM.size <= cmlvls)	// clear bits at the upper level
-					{
-						var flip: Bits = new Bits(0);
-						if (i == j)						// nested object is inside the word
-						{
-							flip = mCMRbit - mCMLbit;
-							flip.flip();
-							map(i).CMlevels(SCM.size - 1) &= flip;
-						}
-						else 									// nested object is across multiple words
-						{
-						  map(j).CMlevels(SCM.size - 1) &= mCMLbit - 1;
-							flip = mCMRbit - 1;
-							flip.flip();
+        while (mCMLbit.bits != 0 && (mCMRbit.bits == 0 || mCMLbit < mCMRbit)) {
+          // 1 = "j", 2 = mLbit
+          SCM.insert(0, (i, mCMLbit));
+          mCMLeft = mCMLeft & (mCMLeft - 1); // remove the rightmost 1
+          mCMLbit = mCMLeft & -mCMLeft.bits; // extract the rightmost 1
+        }
+        if (mCMRbit.bits != 0) {
+          val pop = SCM.remove(0); // 0 = "j", 1 = mCMLbit
+          val j = pop._1;
+          mCMLbit = pop._2;
+          if (0 < SCM.size && SCM.size <= cmlvls) // clear bits at the upper level
+          {
+            var flip: Bits = new Bits(0);
+            if (i == j) // nested object is inside the word
+            {
+              flip = mCMRbit - mCMLbit;
+              flip.flip();
+              map(i).CMlevels(SCM.size - 1) &= flip;
+            } else // nested object is across multiple words
+            {
+              map(j).CMlevels(SCM.size - 1) &= mCMLbit - 1;
+              flip = mCMRbit - 1;
+              flip.flip();
 
-							map(i).CMlevels(SCM.size - 1) &= flip;
-							for (k <- j + 1 until i) {
+              map(i).CMlevels(SCM.size - 1) &= flip;
+              for (k <- j + 1 until i) {
                 map(k).CMlevels(SCM.size - 1) = new Bits(0);
               }
-						}
-					}
-				}
-				mCMRight &= mCMRight - 1;						// remove the rightmost 1
-			} while (mCMRbit.bits != 0);
+            }
+          }
+        }
+        mCMRight &= mCMRight - 1; // remove the rightmost 1
+      } while (mCMRbit.bits != 0);
     }
 
     for (a <- 0 until map.size) {
@@ -352,40 +348,33 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String]) {
   // Returns null if enclosing the whole substring is impossible
   // Assumes that there is the end array bracket and colon position is valid
   def getArraySubString(colonPos: Int, level: Int): String = {
-    var start = colonPos + 1;            // start range of substring
-    var end:Int = -1;                    // end range of substring in endWord
-    var startWord:Int = (colonPos / 32); // word to begin searching
-    var endWord:Int = -1;                // end word
-    var currentLevel:Int = level;        // used to find the end bracket
-    var index = colonPos % 32;           // index used to help searching for the end
+    var start = colonPos + 1; // start range of substring
+    var end: Int = -1; // end range of substring in endWord
+    var startWord: Int = (colonPos / 32); // word to begin searching
+    var endWord: Int = -1; // end word
+    var currentLevel: Int = level; // used to find the end bracket
+    var index = colonPos % 32; // index used to help searching for the end
     // start search
     var i = startWord;
-    while(i < map.size && currentLevel != 0)
-    {
+    while (i < map.size && currentLevel != 0) {
       var bothnegative = false;
       // extract next location for both '[' bracket and ']' bracket
-      while(currentLevel != 0 && !bothnegative)
-      {
+      while (currentLevel != 0 && !bothnegative) {
         val arraylbracketpos = map(i).arraylbracketBitset.getNextOnPosition(index);
         val arrayrbracketpos = map(i).arrayrbracketBitset.getNextOnPosition(index);
-        
+
         // left bracket is closer
-        if(arraylbracketpos != -1 && arraylbracketpos < arrayrbracketpos)
-        {
+        if (arraylbracketpos != -1 && arraylbracketpos < arrayrbracketpos) {
           currentLevel += 1;
           index = arraylbracketpos;
-        }
-        // right bracket is closer
-        else if(arrayrbracketpos != -1 && arrayrbracketpos < arraylbracketpos)
-        {
+        } // right bracket is closer
+        else if (arrayrbracketpos != -1 && arrayrbracketpos < arraylbracketpos) {
           currentLevel -= 1;
           index = arrayrbracketpos;
-        }
-        else
+        } else
           bothnegative = true;
         // check for end condition
-        if(currentLevel == 0)
-        {
+        if (currentLevel == 0) {
           endWord = i;
           end = index;
         }
@@ -394,54 +383,71 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String]) {
       index = 0;
     }
     // generate the result
-    var subStr:String = "";
-    for(i <- startWord until endWord)
+    var subStr: String = "";
+    for (i <- startWord until endWord)
       subStr += word(i);
     subStr += word(endWord).substring(0, end);
     return subStr;
   }
-  def getArraySubString(colonPos: Int, level: Int, str:String): String = {
+  def getArraySubString(colonPos: Int, level: Int, str: String): String = {
     println(str);
-    var start = colonPos + 1;            // start range of substring
-    var end:Int = -1;                    // end range of substring in endWord
-    var startWord:Int = start / 32;     // word to begin searching
+    var start = colonPos + 2; // start range of loop
+    var end: Int = -1; // end range of substring in endWord
+    var startWord: Int = start / 32; // word to begin searching
     //var endWord:Int = -1;                // end word
-    var currentLevel:Int = level;        // used to find the end bracket
-    var index = start % 32;           // index used to help searching for the end
+    var count: Int = 1; // used to find the end bracket
+    var index = start % 32; // index used to help searching for the end
     // start search
     var i = startWord;
     println(index);
-    println(startWord * B_INT + index);
+    println(colonPos + 1);
     println(str(start));
     var foundEndpt = false;
-    while(i < map.size && !foundEndpt)
-    {
+    println("Starting while loop 1");
+    
+    while (i < map.size && !foundEndpt) {
       // extract next location for both '[' bracket and ']' bracket
       var bothnegative = false;
-      while(!foundEndpt && !bothnegative)
-      {
+      println("Starting while loop 2 at i " + i);
+      while (!foundEndpt && !bothnegative) {
         val arraylbracketpos = map(i).arraylbracketBitset.getNextOnPosition(index);
         val arrayrbracketpos = map(i).arrayrbracketBitset.getNextOnPosition(index);
         println(arraylbracketpos + " " + arrayrbracketpos);
+        System.out.println("i is " + i);
+        /*
         // left bracket is closer
-        if(arraylbracketpos != -1 && arraylbracketpos < arrayrbracketpos)
-        {
-          
-          currentLevel += 1;
-          index = arraylbracketpos;
-        }
-        // right bracket is closer
-        else if(arrayrbracketpos != -1 && arrayrbracketpos < arraylbracketpos)
-        {
-          currentLevel -= 1;
-          index = arrayrbracketpos;
-        }
-        // both brackets cannot be found
+        if (arraylbracketpos != -1 && arraylbracketpos < arrayrbracketpos) {
+          System.out.println("AAAAA");
+          count += 1;
+          index = arraylbracketpos + 1;
+        } // right bracket is closer
+        else if (arrayrbracketpos != -1 && arrayrbracketpos < arraylbracketpos) {
+          System.out.println("AAAAABE");
+          count -= 1;
+          index = arrayrbracketpos +1;
+        } // both brackets cannot be found
         else
           bothnegative = true;
+          * */
+        if (arraylbracketpos != -1 && arrayrbracketpos != -1) {
+          if (arraylbracketpos > arrayrbracketpos) {
+            count -= 1;
+            index = arrayrbracketpos + 1;
+          } else {
+            count += 1;
+            index = arraylbracketpos + 1;
+          }
+        } else if (arraylbracketpos != -1) {
+          count += 1;
+          index = arraylbracketpos + 1;
+        } else if (arrayrbracketpos != -1) {
+          count -= 1;
+          index = arrayrbracketpos + 1;
+        } else {
+          bothnegative = true;
+        }
         // check for end condition
-        if(currentLevel == 0)
-        {
+        if (count == 0) {
           //endWord = i;
           end = i * B_INT + index;
           foundEndpt = true;
@@ -449,11 +455,11 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String]) {
       }
       // reset index
       index = 0;
-      i+=1;
+      i += 1;
     }
     // generate the result
     println(start + " " + end);
-    var subStr:String = str.substring(start,end+1);
+    var subStr: String = str.substring(colonPos + 1, end);
     return subStr;
   }
   def testBitsScala() = {

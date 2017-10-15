@@ -146,10 +146,11 @@ class MISONParser(
       //System.out.println(initialColonPos.size);
       val queryResult = parseLine(0, "", initialColonPos);
       if (queryResult) {
-        var output: String = lineOutput(0);
+        var output: String = "|" + lineOutput(0);
         for (i <- 1 until lineOutput.length) {
-          output += ", " + lineOutput(i);
+          output += "|" + lineOutput(i);
         }
+        output += "|";
         result += output;
       }
       if (DEBUG_FLAG == true) {

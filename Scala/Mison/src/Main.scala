@@ -165,6 +165,7 @@ object Main {
     query += "attributes.lunch";
     query += "attributes.dinner";
     query += "categories";
+    query += "attributes.brah";
 
     var parser: MISONParser = new MISONParser(query, testFile, DEBUG_STATUS);
 
