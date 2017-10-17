@@ -240,7 +240,7 @@ class MISONParser(
         } else if (nextChar == '[') {
           val output: String = bitmaps.getArraySubString(colonPos(i), curLevel, currentRecord);
           //val output: String = bitmaps.getArraySubString(colonPos(i), curLevel);
-          System.out.println("Array Field output is " + output);
+          //System.out.println("Array Field output is " + output);
           val pos = queryFieldsInfo.fieldsOrder.get(currentField).get;
           lineOutput(pos) = output;
           matchingFieldNumber += 1;
