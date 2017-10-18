@@ -213,7 +213,8 @@ class MISONParser(
 
       if (queryFieldsInfo.hashFields.contains(currentField.hashCode())) {
         var nextChar: Char = currentRecord.charAt(colonPos(i) + 1);
-        if (nextChar == '{') {
+        var nextChar2: Char = currentRecord.charAt(colonPos(i) + 2);
+        if (nextChar2 == '{') {
           //System.out.println("Nesting nesting nestin");
           //System.out.println(colonPos(i) + " " + colonPos(i - 1));
           var newColonPos: ArrayBuffer[Int] =
@@ -257,6 +258,8 @@ class MISONParser(
             endPos = endPos - 1;
           }
           val fieldValue = currentRecord.substring(startPos, endPos);
+          System.out.println(fieldValue);
+          System.out.println(currentField);
           val pos = queryFieldsInfo.fieldsOrder.get(currentField).get;
           //System.out.println("fieldValue is " + fieldValue);
           lineOutput(pos) = fieldValue;
