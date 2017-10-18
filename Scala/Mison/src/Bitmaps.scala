@@ -151,16 +151,16 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String]) {
       do // iterate over each right brace
       {
         // extract the rightmost 1
-        mRbit = mRight & -mRight.bits;
-        mLbit = mLeft & -mLeft.bits;
+        mRbit = mRight & -mRight.bits;    // MARKED
+        mLbit = mLeft & -mLeft.bits;      // MARKED
 
-        while (mLbit.bits != 0 && (mRbit.bits == 0 || mLbit < mRbit)) {
+        while (mLbit.bits != 0 && (mRbit.bits == 0 || mLbit < mRbit)) {  // MARKED
           // 1 = "j", 2 = mLbit
           S.insert(0, (i, mLbit));
           mLeft = mLeft & (mLeft - 1); // remove the rightmost 1
-          mLbit = mLeft & -mLeft.bits; // extract the rightmost 1
+          mLbit = mLeft & -mLeft.bits; // extract the rightmost 1        // MARKED
         }
-        if (mRbit.bits != 0) {
+        if (mRbit.bits != 0) {      // MARKED
           val pop = S.remove(0); // 0 = "j", 1 = mLbit
           val j = pop._1;
           mLbit = pop._2;
@@ -190,16 +190,16 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String]) {
       do // iterate over each right brace
       {
         // extract the rightmost 1
-        mCMRbit = mCMRight & -mCMRight.bits;
-        mCMLbit = mCMLeft & -mCMLeft.bits;
+        mCMRbit = mCMRight & -mCMRight.bits;    // MARKED
+        mCMLbit = mCMLeft & -mCMLeft.bits;      // MARKED
 
-        while (mCMLbit.bits != 0 && (mCMRbit.bits == 0 || mCMLbit < mCMRbit)) {
+        while (mCMLbit.bits != 0 && (mCMRbit.bits == 0 || mCMLbit < mCMRbit)) {  // MARKED
           // 1 = "j", 2 = mLbit
           SCM.insert(0, (i, mCMLbit));
           mCMLeft = mCMLeft & (mCMLeft - 1); // remove the rightmost 1
-          mCMLbit = mCMLeft & -mCMLeft.bits; // extract the rightmost 1
+          mCMLbit = mCMLeft & -mCMLeft.bits; // extract the rightmost 1  // MARKED
         }
-        if (mCMRbit.bits != 0) {
+        if (mCMRbit.bits != 0) {            // MARKED
           val pop = SCM.remove(0); // 0 = "j", 1 = mCMLbit
           val j = pop._1;
           mCMLbit = pop._2;
@@ -225,7 +225,7 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String]) {
           }
         }
         mCMRight &= mCMRight - 1; // remove the rightmost 1
-      } while (mCMRbit.bits != 0);
+      } while (mCMRbit.bits != 0);    // MARKED
     }
 
     for (a <- 0 until map.size) {
@@ -251,8 +251,8 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String]) {
     var mcolon: Bits = new Bits(0);
     for (i <- (start / B_INT) until ceil(end.toDouble / B_INT).toInt) {
       mcolon = map(i).levels(level);
-      while (mcolon.bits != 0) {
-        val mBit = (mcolon & -mcolon.bits) - 1;
+      while (mcolon.bits != 0) {        // MARKED
+        val mBit = (mcolon & -mcolon.bits) - 1;      // MARKED
         var offset: Int = i * B_INT + mBit.count();
         if (start <= offset && offset <= end) {
           colonPositions = (offset) +: colonPositions;
@@ -273,8 +273,8 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String]) {
     var mcomma: Bits = new Bits(0);
     for (i <- (start / B_INT) until ceil(end.toDouble / B_INT).toInt) {
       mcomma = map(i).CMlevels(level);
-      while (mcomma.bits != 0) {
-        val mBit = (mcomma & -mcomma.bits) - 1;
+      while (mcomma.bits != 0) {    // MARKED
+        val mBit = (mcomma & -mcomma.bits) - 1;    // MARKED
         var offset: Int = i * B_INT + mBit.count();
         if (start <= offset && offset <= end) {
           commaPositions = (offset) +: commaPositions;
