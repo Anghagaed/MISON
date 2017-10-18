@@ -146,26 +146,20 @@ object Main {
     val DEBUG_STATUS = false;
 
     val fHandler = new fileHandler();
-    fHandler.setNewFilePath("./Test Files/jsonTest1.txt");
+    fHandler.setNewFilePath("./Test Files/tweet.txt");
     fHandler.getNext;
 
     var testFile: ArrayBuffer[String] = new ArrayBuffer();
 
     // Add files into testFile
-    testFile += "./Test Files/jsonTest1.txt";
+    testFile += "./Test Files/tweet.txt";
 
     var query: ArrayBuffer[String] = new ArrayBuffer();
     // Add queries into array buffer
 
-    query += "id";
-    query += "reviews";
-    query += "state";
-    query += "city";
-    query += "attributes.breakfast";
-    query += "attributes.lunch";
-    query += "attributes.dinner";
-    query += "categories";
-    query += "attributes.brah";
+    query += "created_at";
+    query += "text";
+    query += "quoted_status.retweet_count";
 
     var parser: MISONParser = new MISONParser(query, testFile, DEBUG_STATUS);
 
