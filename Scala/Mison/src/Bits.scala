@@ -8,9 +8,57 @@ class Bits(val bit: Int) {
   var bits: Int = bit;
   private var SIZEOFINT: Int = 32;
   // boolean operators
-  def <(operand: Bits): Boolean = bits < operand.bits;
-  def >(operand: Bits): Boolean = bits > operand.bits;
-  def ==(operand: Bits): Boolean = bits == operand.bits;
+  def <(operand: Bits): Boolean = {
+    val leftNeg = this.bits < 0;
+    val rightNeg = this.bits < 0;
+    if ((!leftNeg && !rightNeg)
+      || (leftNeg && rightNeg)) {
+      return bits < operand.bits;
+    } else {
+      return (rightNeg == true);
+    }
+  }
+  def >(operand: Bits): Boolean = {
+    val leftNeg = this.bits < 0;
+    val rightNeg = this.bits < 0;
+    if ((!leftNeg && !rightNeg)
+      || (leftNeg && rightNeg)) {
+      return bits > operand.bits;
+    } else {
+      return (leftNeg == true);
+    }
+  }
+  def ==(operand: Bits): Boolean = {
+    bits == operand.bits;
+  }
+  def >=(operand: Bits): Boolean = {
+    if (bits == operand.bits) {
+      return true;
+    }
+    val leftNeg = this.bits < 0;
+    val rightNeg = this.bits < 0;
+    if ((!leftNeg && !rightNeg)
+      || (leftNeg && rightNeg)) {
+      return bits > operand.bits;
+    }
+    else {
+      return (leftNeg == true);
+    }
+  }
+  def <=(operand: Bits): Boolean = {
+    if (bits == operand.bits) {
+      return true;
+    }
+    val leftNeg = this.bits < 0;
+    val rightNeg = this.bits < 0;
+    if ((!leftNeg && !rightNeg)
+      || (leftNeg && rightNeg)) {
+      return bits < operand.bits;
+    }
+    else {
+      return (rightNeg == true);
+    }
+  }
 
   // other operators
   def +(operand: Bits): Bits = {

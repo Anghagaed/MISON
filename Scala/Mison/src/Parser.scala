@@ -212,9 +212,14 @@ class MISONParser(
       }
 
       if (queryFieldsInfo.hashFields.contains(currentField.hashCode())) {
-        var nextChar: Char = currentRecord.charAt(colonPos(i) + 1);
-        var nextChar2: Char = currentRecord.charAt(colonPos(i) + 2);
-        if (nextChar2 == '{') {
+        // Ignore white spaces
+        var j = 1;
+        var nextChar: Char = currentRecord.charAt(colonPos(i) + j);
+        while (nextChar == ' ') {
+          j += 1;
+          nextChar = currentRecord.charAt(colonPos(i) + j);
+        }
+        if (nextChar == '{') {
           //System.out.println("Nesting nesting nestin");
           //System.out.println(colonPos(i) + " " + colonPos(i - 1));
           var newColonPos: ArrayBuffer[Int] =

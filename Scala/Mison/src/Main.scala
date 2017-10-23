@@ -40,6 +40,8 @@ object Main {
     }
   }
   def main(args: Array[String]) {
-    Query1();
+    //Query1();
+    val x: Char = ' ';
+    println(x == ' ');
   }
 }
