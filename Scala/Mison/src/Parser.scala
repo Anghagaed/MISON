@@ -60,7 +60,7 @@ class MISONParser(
           localFieldLevels += 1;
           index = fields.indexOf(splitCharacter, index + 1);
         }
-        
+
         // Last Field
         //System.out.println(fields);
         hashCode = fields.hashCode();
@@ -172,6 +172,7 @@ class MISONParser(
       queryFieldsInfo.nestingLevels,
       defaultArrayLayers,
       stringSplitted);
+    
     if (DEBUG_FLAG == true) {
       System.out.println("CurrentRecord: " + currentRecord);
     }
@@ -183,8 +184,9 @@ class MISONParser(
   // Parse one record (line) and determine if the record is part of the query.
   // Return true for success, false for failure
   private def parseLine(curLevel: Int, append: String, colonPos: ArrayBuffer[Int]): Boolean = {
-    System.out.println(colonPos.length);
+    System.out.println(colonPos.length + " mah stuff");
     for (i <- colonPos.length - 1 to 0 by -1) {
+      println("i: " + i)
       //System.out.println("i is " + i);
       // end pos of field name, no - 1 due to quirks of scala string.substring(startIndex, endIndex)
       //System.out.println(bitmaps);
@@ -220,30 +222,41 @@ class MISONParser(
           nextChar = currentRecord.charAt(colonPos(i) + j);
         }
         if (nextChar == '{') {
-          //System.out.println("Nesting nesting nestin");
-          //System.out.println(colonPos(i) + " " + colonPos(i - 1));
-          var newColonPos: ArrayBuffer[Int] =
-            bitmaps.generateColonPositions(colonPos(i), colonPos(i - 1), curLevel + 1);
-          var newAppend: String = "";
-          if (curLevel == 0) {
-            newAppend = currentField + '.';
-          } else {
-            newAppend = append + '.' + currentField;
-          }
-          if (DEBUG_FLAG == true) {
-            System.out.println(newAppend);
-            System.out.println("newColonPosition");
-            System.out.println(newColonPos.size);
-            for (i <- 0 until newColonPos.size) {
-              System.out.print(newColonPos(i) + " ");
-
+          if (true) {
+          //if (curLevel > queryFieldsInfo.levelCount) {
+            //System.out.println("Nesting nesting nestin");
+            //System.out.println(colonPos(i) + " " + colonPos(i - 1));
+            println("aaa");
+            var newColonPos: ArrayBuffer[Int] = null;
+            if (i != 0) {
+              newColonPos = bitmaps.generateColonPositions(colonPos(i), colonPos(i - 1), curLevel + 1);
+            } else {
+              println("colonPos at 0 is " + colonPos(i) + "Current level is " + curLevel);
+              newColonPos = bitmaps.generateColonPositions(colonPos(i), bitmaps.getEndRightBraces, curLevel + 1);
             }
-            System.out.println("Going to the next level and beyond");
-          }
-          matchingFieldNumber += 1;
-          parseLine(curLevel + 1, newAppend, newColonPos);
-          //System.out.println("Done with Nesting nesting nestin");
 
+            println("bbb");
+
+            var newAppend: String = "";
+            if (curLevel == 0) {
+              newAppend = currentField + '.';
+            } else {
+              newAppend = append + '.' + currentField;
+            }
+            if (DEBUG_FLAG == true) {
+              System.out.println(newAppend);
+              System.out.println("newColonPosition");
+              System.out.println(newColonPos.size);
+              for (i <- 0 until newColonPos.size) {
+                System.out.print(newColonPos(i) + " ");
+
+              }
+              System.out.println("\nGoing to the next level and beyond");
+            }
+            matchingFieldNumber += 1;
+            parseLine(curLevel + 1, newAppend, newColonPos);
+            //System.out.println("Done with Nesting nesting nestin");
+          }
         } else if (nextChar == '[') {
           val output: String = bitmaps.getArraySubString(colonPos(i), curLevel, currentRecord);
           //val output: String = bitmaps.getArraySubString(colonPos(i), curLevel);

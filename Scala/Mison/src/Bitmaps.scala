@@ -36,6 +36,7 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String]) {
     fillBits(); // phase 1 & 2
     convertToStruct(); // phase 3/(pre)4
     fillColonBits(); // phase 4
+    println(toString())
   }
   def fillBits(): Unit = {
     var prev: Array[Char] = new Array[Char](2);
@@ -249,7 +250,9 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String]) {
     //var colonPositions = Array.fill(B_INT)(-1); //new Array[Int](B_INT);
     var colonPositions = new ArrayBuffer[Int]();
     var mcolon: Bits = new Bits(0);
+    println("end = " + end + " ceil(end/B_INT) = " + ceil(end.toDouble / B_INT).toInt);
     for (i <- (start / B_INT) until ceil(end.toDouble / B_INT).toInt) {
+      println("i = " + i );
       mcolon = map(i).levels(level);
       while (mcolon.bits != 0) {        // MARKED
         val mBit = (mcolon & -mcolon.bits) - 1;      // MARKED
@@ -266,6 +269,7 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String]) {
     //}
     //colonPositions.foreach(x => print(s"${x} "));
     ////println();
+    println("ccccccc");
     return colonPositions;
   }
   def generateCommaPositions(start: Int, end: Int, level: Int): ArrayBuffer[Int] = {
@@ -412,42 +416,31 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String]) {
       while (!foundEndpt && !bothnegative) {
         val arraylbracketpos = map(i).arraylbracketBitset.getNextOnPosition(index);
         val arrayrbracketpos = map(i).arrayrbracketBitset.getNextOnPosition(index);
-        //println(arraylbracketpos + " " + arrayrbracketpos);
-        //System.out.//println("i is " + i);
-        /*
-        // left bracket is closer
-        if (arraylbracketpos != -1 && arraylbracketpos < arrayrbracketpos) {
-          //System.out.//println("AAAAA");
-          count += 1;
-          index = arraylbracketpos + 1;
-        } // right bracket is closer
-        else if (arrayrbracketpos != -1 && arrayrbracketpos < arraylbracketpos) {
-          //System.out.//println("AAAAABE");
-          count -= 1;
-          index = arrayrbracketpos +1;
-        } // both brackets cannot be found
-        else
-          bothnegative = true;
-          * */
         if (arraylbracketpos != -1 && arrayrbracketpos != -1) {
           if (arraylbracketpos > arrayrbracketpos) {
             count -= 1;
             index = arrayrbracketpos + 1;
+            println("a");
           } else {
             count += 1;
             index = arraylbracketpos + 1;
+            println("b");
           }
         } else if (arraylbracketpos != -1) {
           count += 1;
           index = arraylbracketpos + 1;
+          println("c");
         } else if (arrayrbracketpos != -1) {
           count -= 1;
           index = arrayrbracketpos + 1;
+          println("d");
         } else {
+          println("Both are Negative " + count);
           bothnegative = true;
         }
         // check for end condition
-        if (count == 0) {
+        if (count == 1) {
+          println("Found EndPt");
           //endWord = i;
           end = i * B_INT + index;
           foundEndpt = true;
@@ -458,7 +451,7 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String]) {
       i += 1;
     }
     // generate the result
-    //println(start + " " + end);
+    println(start + " " + end);
     var subStr: String = str.substring(colonPos + 1, end);
     return subStr;
   }
@@ -466,7 +459,6 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String]) {
     //System.out.//println("Testing testBitsScala");
     //Testing getNextOnPosition. Conclusion: It works
     ////System.out.//println("SQ bitset: " + map(0).structQBitset); 
-
     var x = -1;
     var y: Bits = new Bits(0x80000001);
     //System.out.//println("y bitset: " + y);
@@ -476,7 +468,6 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String]) {
       x = y.getNextOnPosition(x + 1);
       //System.out.//println(x);
     } while (x != -1);
-    ////System.out.print("Call with " + (31) + ": " + map(0).structQBitset.getNextOnPosition(31));
 
   }
 
@@ -510,6 +501,18 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String]) {
     return -1;
   }
 
+  def getEndRightBraces: Int = {
+    var pos = -1;
+    var temp = map(map.length-1).structRBitset.getNextOnPosition(0);
+    while (temp != -1) {
+      pos = temp;
+      temp = map(map.length-1).structRBitset.getNextOnPosition(temp + 1);
+    }
+    pos = pos + 32 * (map.length - 2);
+    println(pos);
+    return pos;
+  }
   // methods:off
   createBitmap;
+  
 }
