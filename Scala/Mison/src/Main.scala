@@ -29,6 +29,20 @@ object Main {
     MISONParse(query, testFile, DEBUG_STATUS);
 
   }
+  def Query2() {
+    val DEBUG_STATUS = true;
+
+    var testFile: ArrayBuffer[String] = new ArrayBuffer();
+
+    // Add files into testFile
+    testFile += "./Test Files/tweet.txt";
+
+    var query: ArrayBuffer[String] = new ArrayBuffer();
+    // Add queries into array buffer
+    query += "entities.user_mentions";
+
+    MISONParse(query, testFile, DEBUG_STATUS);
+  }
   def MISONParse(queryFieldsList: ArrayBuffer[String],
     filePaths: ArrayBuffer[String] = new ArrayBuffer[String],
     DEBUG_STATUS: Boolean) {
@@ -40,8 +54,9 @@ object Main {
     }
   }
   def main(args: Array[String]) {
-    //Query1();
-    val x: Char = ' ';
-    println(x == ' ');
+    Query2();
+    
+    //val x: Char = ' ';
+    //println(x == ' ');
   }
 }
