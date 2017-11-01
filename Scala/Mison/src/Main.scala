@@ -120,11 +120,11 @@ object Main {
       3,
       0,
       stringSplitted);
-	  //println(bitmaps);
+	  println(bitmaps);
 	}
 	def main(args: Array[String]) {
-		//Query3();
-		BitmapTest();
+		Query3();
+		//BitmapTest();
 		//BitsTest();
 		//val x: Char = ' ';
 		//println(x == ' ');

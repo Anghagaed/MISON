@@ -226,7 +226,7 @@ class MISONParser(
           //if (curLevel > queryFieldsInfo.levelCount) {
             //System.out.println("Nesting nesting nestin");
             //System.out.println(colonPos(i) + " " + colonPos(i - 1));
-            println("aaa");
+            //println("aaa");
             var newColonPos: ArrayBuffer[Int] = null;
             if (i != 0) {
               newColonPos = bitmaps.generateColonPositions(colonPos(i), colonPos(i - 1), curLevel + 1);
@@ -235,7 +235,7 @@ class MISONParser(
               newColonPos = bitmaps.generateColonPositions(colonPos(i), currentRecord.length - 1, curLevel + 1);
             }
 
-            println("bbb");
+            //println("bbb");
 
             var newAppend: String = "";
             if (curLevel == 0) {

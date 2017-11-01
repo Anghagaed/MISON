@@ -31,7 +31,7 @@ int main(int argc, char *argv[]) {
 	bitmaps test(layers, arraylayers, tester);
 	test.bitsetCreate();
 
-	//cout << test;
+	cout << test;
 	//test.printPhase4();
 	//cout << "Finished printing bitmaps" << endl;
 	//

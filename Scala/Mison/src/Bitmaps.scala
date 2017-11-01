@@ -166,25 +166,25 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String]) {
     for (i <- 0 until map.size) {
       mLeft = map(i).lbracketBitset;
       mRight = map(i).rbracketBitset;
-      println("i = " + i + "mRight: " + mRight+ " bits = " + mRight.bits);
+      //println("i = " + i + "mRight: " + mRight+ " bits = " + mRight.bits);
       do // iterate over each right brace
       {
         //println("i = " + i);
         // extract the rightmost 1
-        //if(i == 36) {
+//        if(i == 36) {
 //          println("Before:\nmLbit =       " + mLbit + " bits = " + mLbit.bits);
 //          println("mRbit =       " + mRbit + " bits = " + mRbit.bits);
 //          println("mLeft =       " + mLeft + " bits = " + mLeft.bits);
-          //println("Before while:\nBefore\nmRight =      " + mRight + " bits = " + mRight.bits);
-        //} 
+//          println("mRight =      " + mRight + " bits = " + mRight.bits);
+//        } 
         mRbit = mRight & -mRight.bits; // MARKED
         mLbit = mLeft & -mLeft.bits; // MARKED
-        //if(i == 36) {
+//        if(i == 36) {
 //          println("After:\nmLbit =       " + mLbit + " bits = " + mLbit.bits);
 //          println("mRbit =       " + mRbit + " bits = " + mRbit.bits);
 //          println("mLeft =       " + mLeft + " bits = " + mLeft.bits);
-          //println("After\nmRight =      " + mRight + " bits = " + mRight.bits);
-        //} 
+//          println("mRight =      " + mRight + " bits = " + mRight.bits + "\n");
+//        } 
         while (!(mLbit == 0) && (mRbit == 0 || mLbit < mRbit)) { // MARKED
           // 1 = "j", 2 = mLbit
           S.insert(0, (i, mLbit));
@@ -253,24 +253,23 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String]) {
     if (level >= this.layers) {
       return new ArrayBuffer[Int]();
     } else {
-      println("generate colon pos is called");
+      //println("generate colon pos is called");
       var colonPositions = new ArrayBuffer[Int]();
       var mcolon: Bits = new Bits(0);
       for (i <- (start / B_INT) until ceil(end.toDouble / B_INT).toInt) {
-        if (i == 36) {
-          println("level: " + level);
-          println("word:   " + word(i));
-          println("wordr:  " + word(i).reverse);
-        }
+//        if (i == 36) {
+//          println("level: " + level);
+//          println("word:   " + word(i));
+//          println("wordr:  " + word(i).reverse);
+//        }
         mcolon = map(i).levels(level);
         while (!(mcolon == 0)) { // MARKED
           val mBit = (mcolon & -mcolon.bits) - 1; // MARKED
-          if (i == 36) {
-            println("mcolon: " + mcolon)
-          }
+//          if (i == 36) {
+//            println("mcolon: " + mcolon)
+//          }
           var offset: Int = i * B_INT + mBit.count();
           if (start <= offset && offset <= end) {
-            println("inserts into colonPos!");
             colonPositions = (offset) +: colonPositions;
           }
           mcolon = mcolon & (mcolon - 1);
@@ -282,7 +281,7 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String]) {
       //}
       //colonPositions.foreach(x => print(s"${x} "));
       ////println();
-      println("ccccccc");
+      //println("ccccccc");
       return colonPositions;
     }
   }

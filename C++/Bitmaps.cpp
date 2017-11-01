@@ -239,14 +239,14 @@ bool bitmaps::bitsetCreate() {
 			mCMLeft = static_cast<unsigned> (map[i].arraylbracketBitset.to_ulong());
 			mCMRight = static_cast<unsigned> (map[i].arrayrbracketBitset.to_ulong());
 
-			bitset<32>mRbs(mRight);
-			cout << "i = " << i << " mRight: " << mRbs << " bits = " << mRight << "\n";
+			//bitset<32>mRbs(mRight);
+			//cout << "i = " << i << " mRight: " << mRbs << " bits = " << mRight << "\n";
 
 			do 													// iterate over each right brace
 			{
 				//cout << "i = " << i << endl;
 				// extract the rightmost 1
-				//if(i == 36) {
+				// if(i == 36) {
 				// 	bitset<32>mR(mRbit);
 				// 	bitset<32>mL(mLbit);
 				// 	bitset<32>mRbs(mRight);
@@ -254,11 +254,11 @@ bool bitmaps::bitsetCreate() {
 				// 	cout << "Before:\nmLbit =       " << mL << " bits = " << mLbit << "\n";
     //     			cout << "mRbit =       " << mR << " bits = " << mRbit << "\n";
     //     			cout << "mLeft =       " << mLbs << " bits = " << mLeft << "\n";
-        		//	cout << "Before while:\nBefore\nmRight =      " << mRbs << " bits = " << mRight << "\n";
-				//}
+    //     			cout << "mRight =      " << mRbs << " bits = " << mRight << "\n";
+				// }
 				mRbit = mRight & -mRight;
 				mLbit = mLeft & -mLeft;
-				//if(i == 36) {
+				// if(i == 36) {
 				// 	bitset<32>mR(mRbit);
 				// 	bitset<32>mL(mLbit);
 				//    bitset<32>mRbs(mRight);
@@ -266,8 +266,8 @@ bool bitmaps::bitsetCreate() {
 				// 	cout << "After:\nmLbit =       " << mL << " bits = " << mLbit << "\n";
     //     			cout << "mRbit =       " << mR << " bits = " << mRbit << "\n";
     //     			cout << "mLeft =       " << mLbs << " bits = " << mLeft << "\n";
-        		//	cout << "After\nmRight =      " << mRbs << " bits = " << mRight << "\n";
-				//}
+    //     			cout << "mRight =      " << mRbs << " bits = " << mRight << "\n\n";
+				// }
 				while (mLbit != 0 && (mRbit == 0 || mLbit < mRbit))
 				{
 					// if (i == 36) {
@@ -314,7 +314,7 @@ bool bitmaps::bitsetCreate() {
 					// cout << "i = " << i << endl;
 					// cout << "j = " << pop[0] << " mLbit = " << b << endl;
 					// bitset<32> c(mRbit);
-					// cout << "mRbit =       " << c << "\n" << endl;
+					//cout << "mRbit =       " << c << "\n" << endl;
 					//cout << "m(right bit) exists i: " << i << " j: " << pop[0] << endl;
 					//cout << "S.size() after pop: " << S.size() << endl;
 					if (0 < S.size() && S.size() <= lvls)	// clear bits at the upper level
