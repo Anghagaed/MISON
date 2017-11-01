@@ -36,7 +36,7 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String]) {
     fillBits(); // phase 1 & 2
     convertToStruct(); // phase 3/(pre)4
     fillColonBits(); // phase 4
-    println(toString())
+    //println(toString())
   }
   def fillBits(): Unit = {
     var prev: Array[Char] = new Array[Char](2);
@@ -152,16 +152,16 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String]) {
       do // iterate over each right brace
       {
         // extract the rightmost 1
-        mRbit = mRight & -mRight.bits;    // MARKED
-        mLbit = mLeft & -mLeft.bits;      // MARKED
+        mRbit = mRight & -mRight.bits; // MARKED
+        mLbit = mLeft & -mLeft.bits; // MARKED
 
-        while (mLbit.bits != 0 && (mRbit.bits == 0 || mLbit < mRbit)) {  // MARKED
+        while (!(mLbit == 0) && (mRbit == 0 || mLbit < mRbit)) { // MARKED
           // 1 = "j", 2 = mLbit
           S.insert(0, (i, mLbit));
           mLeft = mLeft & (mLeft - 1); // remove the rightmost 1
           mLbit = mLeft & -mLeft.bits; // extract the rightmost 1        // MARKED
         }
-        if (mRbit.bits != 0) {      // MARKED
+        if (!(mRbit == 0)) { // MARKED
           val pop = S.remove(0); // 0 = "j", 1 = mLbit
           val j = pop._1;
           mLbit = pop._2;
@@ -186,21 +186,21 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String]) {
           }
         }
         mRight &= mRight - 1; // remove the rightmost 1
-      } while (mRbit.bits != 0);
+      } while (!(mRbit == 0));
       //for array support
       do // iterate over each right brace
       {
         // extract the rightmost 1
-        mCMRbit = mCMRight & -mCMRight.bits;    // MARKED
-        mCMLbit = mCMLeft & -mCMLeft.bits;      // MARKED
+        mCMRbit = mCMRight & -mCMRight.bits; // MARKED
+        mCMLbit = mCMLeft & -mCMLeft.bits; // MARKED
 
-        while (mCMLbit.bits != 0 && (mCMRbit.bits == 0 || mCMLbit < mCMRbit)) {  // MARKED
+        while (!(mCMLbit == 0) && (mCMRbit == 0 || mCMLbit < mCMRbit)) { // MARKED
           // 1 = "j", 2 = mLbit
           SCM.insert(0, (i, mCMLbit));
           mCMLeft = mCMLeft & (mCMLeft - 1); // remove the rightmost 1
           mCMLbit = mCMLeft & -mCMLeft.bits; // extract the rightmost 1  // MARKED
         }
-        if (mCMRbit.bits != 0) {            // MARKED
+        if (!(mCMRbit == 0)) { // MARKED
           val pop = SCM.remove(0); // 0 = "j", 1 = mCMLbit
           val j = pop._1;
           mCMLbit = pop._2;
@@ -226,7 +226,7 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String]) {
           }
         }
         mCMRight &= mCMRight - 1; // remove the rightmost 1
-      } while (mCMRbit.bits != 0);    // MARKED
+      } while (!(mCMRbit == 0)); // MARKED
     }
 
     for (a <- 0 until map.size) {
@@ -247,38 +247,44 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String]) {
   //def generateColonPositions(start: Int, end: Int, level: Int): Vector[Int] = {
   //  var colonPositions = Vector.empty[Int];
   def generateColonPositions(start: Int, end: Int, level: Int): ArrayBuffer[Int] = {
-    //var colonPositions = Array.fill(B_INT)(-1); //new Array[Int](B_INT);
-    var colonPositions = new ArrayBuffer[Int]();
-    var mcolon: Bits = new Bits(0);
-    println("end = " + end + " ceil(end/B_INT) = " + ceil(end.toDouble / B_INT).toInt);
-    for (i <- (start / B_INT) until ceil(end.toDouble / B_INT).toInt) {
-      println("i = " + i );
-      mcolon = map(i).levels(level);
-      while (mcolon.bits != 0) {        // MARKED
-        val mBit = (mcolon & -mcolon.bits) - 1;      // MARKED
-        var offset: Int = i * B_INT + mBit.count();
-        if (start <= offset && offset <= end) {
-          colonPositions = (offset) +: colonPositions;
+    if (level >= this.layers) {
+      return new ArrayBuffer[Int]();
+    } 
+    else {
+      println("generate colon pos is called");
+      //var colonPositions = Array.fill(B_INT)(-1); //new Array[Int](B_INT);
+      var colonPositions = new ArrayBuffer[Int]();
+      var mcolon: Bits = new Bits(0);
+      //println("end = " + end + " ceil(end/B_INT) = " + ceil(end.toDouble / B_INT).toInt);
+      for (i <- (start / B_INT) until ceil(end.toDouble / B_INT).toInt) {
+        //println("i = " + i );
+        mcolon = map(i).levels(level);
+        while (!(mcolon == 0)) { // MARKED
+          val mBit = (mcolon & -mcolon.bits) - 1; // MARKED
+          var offset: Int = i * B_INT + mBit.count();
+          if (start <= offset && offset <= end) {
+            colonPositions = (offset) +: colonPositions;
+          }
+          mcolon = mcolon & (mcolon - 1);
         }
-        mcolon = mcolon & (mcolon - 1);
       }
+      ////println("Colon Position is: ");
+      //for (i <- 0 until colonPositions.length) {
+      //  print(colonPositions(i) + " ");
+      //}
+      //colonPositions.foreach(x => print(s"${x} "));
+      ////println();
+      println("ccccccc");
+      return colonPositions;
     }
-    ////println("Colon Position is: ");
-    //for (i <- 0 until colonPositions.length) {
-    //  print(colonPositions(i) + " ");
-    //}
-    //colonPositions.foreach(x => print(s"${x} "));
-    ////println();
-    println("ccccccc");
-    return colonPositions;
   }
   def generateCommaPositions(start: Int, end: Int, level: Int): ArrayBuffer[Int] = {
     var commaPositions = new ArrayBuffer[Int]();
     var mcomma: Bits = new Bits(0);
     for (i <- (start / B_INT) until ceil(end.toDouble / B_INT).toInt) {
       mcomma = map(i).CMlevels(level);
-      while (mcomma.bits != 0) {    // MARKED
-        val mBit = (mcomma & -mcomma.bits) - 1;    // MARKED
+      while (!(mcomma == 0)) { // MARKED
+        val mBit = (mcomma & -mcomma.bits) - 1; // MARKED
         var offset: Int = i * B_INT + mBit.count();
         if (start <= offset && offset <= end) {
           commaPositions = (offset) +: commaPositions;
@@ -408,7 +414,7 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String]) {
     //println(str(start));
     var foundEndpt = false;
     //println("Starting while loop 1");
-    
+
     while (i < map.size && !foundEndpt) {
       // extract next location for both '[' bracket and ']' bracket
       var bothnegative = false;
@@ -503,10 +509,10 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String]) {
 
   def getEndRightBraces: Int = {
     var pos = -1;
-    var temp = map(map.length-1).structRBitset.getNextOnPosition(0);
+    var temp = map(map.length - 1).structRBitset.getNextOnPosition(0);
     while (temp != -1) {
       pos = temp;
-      temp = map(map.length-1).structRBitset.getNextOnPosition(temp + 1);
+      temp = map(map.length - 1).structRBitset.getNextOnPosition(temp + 1);
     }
     pos = pos + 32 * (map.length - 2);
     println(pos);
@@ -514,5 +520,5 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String]) {
   }
   // methods:off
   createBitmap;
-  
+  toString()
 }

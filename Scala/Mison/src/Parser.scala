@@ -186,7 +186,7 @@ class MISONParser(
   private def parseLine(curLevel: Int, append: String, colonPos: ArrayBuffer[Int]): Boolean = {
     System.out.println(colonPos.length + " mah stuff");
     for (i <- colonPos.length - 1 to 0 by -1) {
-      println("i: " + i)
+      //println("i: " + i)
       //System.out.println("i is " + i);
       // end pos of field name, no - 1 due to quirks of scala string.substring(startIndex, endIndex)
       //System.out.println(bitmaps);
@@ -232,7 +232,7 @@ class MISONParser(
               newColonPos = bitmaps.generateColonPositions(colonPos(i), colonPos(i - 1), curLevel + 1);
             } else {
               println("colonPos at 0 is " + colonPos(i) + "Current level is " + curLevel);
-              newColonPos = bitmaps.generateColonPositions(colonPos(i), bitmaps.getEndRightBraces, curLevel + 1);
+              newColonPos = bitmaps.generateColonPositions(colonPos(i), currentRecord.length - 1, curLevel + 1);
             }
 
             println("bbb");

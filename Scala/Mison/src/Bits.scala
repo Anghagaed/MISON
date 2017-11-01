@@ -82,6 +82,9 @@ class Bits(val bit: Int) {
   def ^(operand: Bits): Bits = {
     new Bits(bits ^ operand.bits);
   }
+  def ==(operand: Int): Boolean = {
+    bits == operand;
+  }
   def +(operand: Int): Bits = {
     new Bits(bits + operand);
   }
