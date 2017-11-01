@@ -184,7 +184,7 @@ class MISONParser(
   // Parse one record (line) and determine if the record is part of the query.
   // Return true for success, false for failure
   private def parseLine(curLevel: Int, append: String, colonPos: ArrayBuffer[Int]): Boolean = {
-    System.out.println(colonPos.length + " mah stuff");
+    //System.out.println(colonPos.length + " mah stuff");
     for (i <- colonPos.length - 1 to 0 by -1) {
       //println("i: " + i)
       //System.out.println("i is " + i);

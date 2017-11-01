@@ -110,8 +110,21 @@ object Main {
 			System.out.println(q);
 		}
 	}
+	def BitmapTest() {
+	  var filePath = "./Test Files/blank.txt"
+	  var fileHandler: fileHandler = new fileHandler();
+	  fileHandler.setNewFilePath(filePath);
+	  fileHandler.getNext;
+	  val stringSplitted = fileHandler.getFileArray;
+	  var bitmaps = new Bitmaps(
+      3,
+      0,
+      stringSplitted);
+	  //println(bitmaps);
+	}
 	def main(args: Array[String]) {
-		Query3();
+		//Query3();
+		BitmapTest();
 		//BitsTest();
 		//val x: Char = ' ';
 		//println(x == ' ');

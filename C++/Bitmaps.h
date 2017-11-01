@@ -23,7 +23,7 @@ const bitset<B_INT> all0;
 * \, ", :, {, }.
 */
 class bitmaps {
-private:
+public:
 	struct mapContainer {
 		bitset<B_INT> escapeBitset, quoteBitset, colonBitset, commaBitset,
 			lbracketBitset, rbracketBitset, arraylbracketBitset, arrayrbracketBitset, structQBitset,

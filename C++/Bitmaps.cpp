@@ -1,7 +1,39 @@
 #include "Bitmaps.h"
 
 bitmaps::bitmaps() {
-	
+
+}
+
+void printAtI(int i, bitmaps& bm) {
+	cout << "String is: " << bm.word[i] << endl;
+	cout << "Phase 1: " << endl;
+	cout << "\\  bitset: " << bm.map[i].escapeBitset << endl;
+	cout << "\"  bitset: " << bm.map[i].quoteBitset << endl;
+	cout << ":  bitset: " << bm.map[i].colonBitset << endl;
+	cout << "{  bitset: " << bm.map[i].lbracketBitset << endl;
+	cout << "}  bitset: " << bm.map[i].rbracketBitset << endl;
+	cout << ",  bitset: " << bm.map[i].commaBitset << endl;
+	cout << "[  bitset: " << bm.map[i].arraylbracketBitset << endl;
+	cout << "]  bitset: " << bm.map[i].arrayrbracketBitset << endl;
+	cout << "Phase 2: " << endl;
+	cout << "SQ bitset: " << bm.map[i].structQBitset << endl;
+	cout << "Phase 3: " << endl;
+	cout << "strbitset: " << bm.map[i].strBitset << endl;
+	cout << "Phase 4: " << endl;
+	cout << "SC bitset: " << bm.map[i].structCBitset << endl;
+	for (int j = 0; j < bm.map[i].levels.size(); ++j) {
+		cout << "L" << j << ":        ";
+		cout << bm.map[i].levels[j] << endl;;
+	}
+	cout << endl;
+	cout << "SCMbitset: " << bm.map[i].structCMBitset << endl;
+	//cout << "CMLevels: " << bm.map[i].CMlevels.size() << endl;
+	for (int j = 0; j < bm.map[i].CMlevels.size(); ++j) {
+		cout << "L" << j << ":        ";
+		cout << bm.map[i].CMlevels[j] << endl;
+	}
+	cout << endl;
+	cout << endl;
 }
 
 bitmaps::mapContainer::mapContainer(int& layers, int& arraylayers) {
@@ -114,7 +146,7 @@ bool bitmaps::bitsetCreate() {
 
 		// Cannot Use bitset due to bitset not supporting - 1 operation
 		// bitset to_ulong convert the bits into unsigned long int unless the numbers of bits
-		// overflows the function 
+		// overflows the function
 		for (int j = 0; j < map.size(); ++j) {
 			unsigned mQuote = static_cast<unsigned> (map[j].structQBitset.to_ulong());
 			unsigned mString = 0;
@@ -172,7 +204,7 @@ bool bitmaps::bitsetCreate() {
 
 	//cout << "Phase 4" << endl;
 
-	// Phase 4 
+	// Phase 4
 	{
 		// copy colon bitmap to leveled colon bitmaps
 		// *** NOTE: map[0].structCBitset PART MUST BE MODIFIED
@@ -188,7 +220,7 @@ bool bitmaps::bitsetCreate() {
 
 		unsigned mLeft, mRight;									// m(left), m(right)
 		unsigned mLbit, mRbit;									// m(left bit), m(right bit)
-		
+
 		//for array support
 		unsigned mCMLeft, mCMRight;
 		unsigned mCMLbit, mCMRbit;
@@ -203,32 +235,86 @@ bool bitmaps::bitsetCreate() {
 		{
 			mLeft = static_cast<unsigned> (map[i].lbracketBitset.to_ulong());
 			mRight = static_cast<unsigned> (map[i].rbracketBitset.to_ulong());
-			
+
 			mCMLeft = static_cast<unsigned> (map[i].arraylbracketBitset.to_ulong());
 			mCMRight = static_cast<unsigned> (map[i].arrayrbracketBitset.to_ulong());
 
+			bitset<32>mRbs(mRight);
+			cout << "i = " << i << " mRight: " << mRbs << " bits = " << mRight << "\n";
 
 			do 													// iterate over each right brace
 			{
+				//cout << "i = " << i << endl;
 				// extract the rightmost 1
+				//if(i == 36) {
+				// 	bitset<32>mR(mRbit);
+				// 	bitset<32>mL(mLbit);
+				// 	bitset<32>mRbs(mRight);
+				// 	bitset<32>mLbs(mLeft);
+				// 	cout << "Before:\nmLbit =       " << mL << " bits = " << mLbit << "\n";
+    //     			cout << "mRbit =       " << mR << " bits = " << mRbit << "\n";
+    //     			cout << "mLeft =       " << mLbs << " bits = " << mLeft << "\n";
+        		//	cout << "Before while:\nBefore\nmRight =      " << mRbs << " bits = " << mRight << "\n";
+				//}
 				mRbit = mRight & -mRight;
 				mLbit = mLeft & -mLeft;
-
+				//if(i == 36) {
+				// 	bitset<32>mR(mRbit);
+				// 	bitset<32>mL(mLbit);
+				//    bitset<32>mRbs(mRight);
+				// 	bitset<32>mLbs(mLeft);
+				// 	cout << "After:\nmLbit =       " << mL << " bits = " << mLbit << "\n";
+    //     			cout << "mRbit =       " << mR << " bits = " << mRbit << "\n";
+    //     			cout << "mLeft =       " << mLbs << " bits = " << mLeft << "\n";
+        		//	cout << "After\nmRight =      " << mRbs << " bits = " << mRight << "\n";
+				//}
 				while (mLbit != 0 && (mRbit == 0 || mLbit < mRbit))
 				{
+					// if (i == 36) {
+					// 	cout << S.size() << endl;
+					// }
 					vector<unsigned> push;						// 0 = "j", 1 = mLbit
 					push.push_back(i);
 					push.push_back(mLbit);
 					S.push(push);								// push left bit to stack
 					mLeft = mLeft & (mLeft - 1);				// remove the rightmost 1
 					mLbit = mLeft & -mLeft;					// extract the rightmost 1
+					//cout << "loop i = " << i << endl;
+					//if (i == 36) {
+						//bitset<32> temp(push[1]);
+						//cout << "i = " << push[0] << " mLbit = " << temp << endl;
+					//}
 				}
+
+
+				// if(i == 36)
+				// {
+				// 		stack<vector<unsigned> > copy = S;
+				// 		printAtI(36, *this);
+				// 		int sizessss = copy.size();
+				// 		for (int abc = 0; abc < sizessss; ++abc) {
+				// 			vector<unsigned> xTemp = copy.top(); 
+				// 			bitset<32> temp(xTemp[1]);
+				// 			cout << xTemp[0] << " " << temp << endl;
+				// 			copy.pop();
+				// 		}	
+				// 		cout << "Size of copy " << copy.size() << " " << "Size of S " << S.size() << endl;
+				// }
+				// if (i == 37) {
+				// 	cout << "i is 37" << endl;
+				// 	printAtI(36, *this);
+				// 	exit(0);
+				// }
 				if (mRbit != 0)
 				{
-
 					vector<unsigned> pop = S.top();				// 0 = "j", 1 = mLbit
 					mLbit = pop[1];
 					S.pop();
+					// bitset<32> b(mLbit);
+					// cout << "i = " << i << endl;
+					// cout << "j = " << pop[0] << " mLbit = " << b << endl;
+					// bitset<32> c(mRbit);
+					// cout << "mRbit =       " << c << "\n" << endl;
 					//cout << "m(right bit) exists i: " << i << " j: " << pop[0] << endl;
 					//cout << "S.size() after pop: " << S.size() << endl;
 					if (0 < S.size() && S.size() <= lvls)	// clear bits at the upper level
@@ -269,7 +355,11 @@ bool bitmaps::bitsetCreate() {
 						}
 					}
 				}
+				//bitset<32>mRbs(mRight);
+				//cout << "After while loop:\nBefore\nmRight =      " << mRbs << " bits = " << mRight << "\n";
 				mRight &= mRight - 1;						// remove the rightmost 1
+				//mRbs = bitset<32>(mRight);
+				//cout << "After\nmRight =      " << mRbs << " bits = " << mRight << "\n\n";
 			} while (mRbit != 0);
 
 
@@ -350,7 +440,7 @@ bool bitmaps::bitsetCreate() {
 			temp1 = static_cast<unsigned> (map[a].levels[b].to_ulong());
 			temp2 = static_cast<unsigned> (map[a].levels[b - 1].to_ulong());
 			map[a].levels[b] = temp1 - (temp1 & temp2);
-		
+
 		}
 	}
 
@@ -362,7 +452,7 @@ bool bitmaps::bitsetCreate() {
 			temp1 = static_cast<unsigned> (map[a].CMlevels[b].to_ulong());
 			temp2 = static_cast<unsigned> (map[a].CMlevels[b - 1].to_ulong());
 			map[a].CMlevels[b] = temp1 - (temp1 & temp2);
-		
+
 		}
 	}
 
@@ -450,6 +540,8 @@ ostream& operator << (ostream &o, bitmaps& bm) {
 		cout << endl;
 	}
 }
+
+
 
 void bitmaps::printPhase4() {
 	cout << "Phase 4 Debug Prints" << endl;

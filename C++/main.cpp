@@ -13,10 +13,10 @@
 
 using namespace std;
 
-string defaultPath = "Test Files/jsonTest1.txt";
+string defaultPath = "Test Files/blank.txt";
 
 int main(int argc, char *argv[]) {
-	int layers = 2;
+	int layers = 3;
 	int arraylayers = 4;
 	vector<string> tester;
 	string filePath;
@@ -31,35 +31,35 @@ int main(int argc, char *argv[]) {
 	bitmaps test(layers, arraylayers, tester);
 	test.bitsetCreate();
 
-	cout << test;
+	//cout << test;
 	//test.printPhase4();
-	cout << "Finished printing bitmaps" << endl; 
-
-	vector<vector<int>> colonL;
-	vector<int> colonP;
-
-	vector<string> toHash;
-	string temp;
-	temp = "reviews"; toHash.push_back(temp);
-	temp = "attributes.breakfast"; toHash.push_back(temp);
-	temp = "attributes.lunch"; toHash.push_back(temp);
-
-	stringmap queryFields;
-	for (int i = 0; i < toHash.size(); ++i) {
-		hash<string> ptr;
-		pair<unsigned, string> toInsert(ptr(toHash[i]), toHash[i]);
-		//cout << toInsert.first() << " is " << toInsert.second() << endl;
-		queryFields.insert(toInsert);
-	}
-	for (auto& x : queryFields) { cout << x.first << " is " << x.second << endl; }
-	vector<pair<string, string> > result;
-	parser parserer(queryFields);
-	if (parserer.parseWord(fHandler.text, test, result)) {
-		cout << "The record fulfills the query" << endl;
-	}
-	else {
-		cout << "The record does not fulfills the query" << endl;
-	}
+	//cout << "Finished printing bitmaps" << endl;
+	//
+	// vector<vector<int>> colonL;
+	// vector<int> colonP;
+	//
+	// vector<string> toHash;
+	// string temp;
+	// temp = "reviews"; toHash.push_back(temp);
+	// temp = "attributes.breakfast"; toHash.push_back(temp);
+	// temp = "attributes.lunch"; toHash.push_back(temp);
+	//
+	// stringmap queryFields;
+	// for (int i = 0; i < toHash.size(); ++i) {
+	// 	hash<string> ptr;
+	// 	pair<unsigned, string> toInsert(ptr(toHash[i]), toHash[i]);
+	// 	//cout << toInsert.first() << " is " << toInsert.second() << endl;
+	// 	queryFields.insert(toInsert);
+	// }
+	// for (auto& x : queryFields) { cout << x.first << " is " << x.second << endl; }
+	// vector<pair<string, string> > result;
+	// parser parserer(queryFields);
+	// if (parserer.parseWord(fHandler.text, test, result)) {
+	// 	cout << "The record fulfills the query" << endl;
+	// }
+	// else {
+	// 	cout << "The record does not fulfills the query" << endl;
+	// }
 
 
 }

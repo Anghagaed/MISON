@@ -25,8 +25,6 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String]) {
       CMlevels(i) = new Bits(0);
   }
   private val B_INT = 32;
-  private val B_ZERO: Bits = new Bits(0);
-  private val B_ONE: Bits= new Bits(1);
   private var word: ArrayBuffer[String] = wordSplit;
   var map: Array[mapContainer] = new Array[mapContainer](word.size);
   for (i <- 0 until word.size)
@@ -122,89 +120,51 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String]) {
       map(i).structARBBitset = temp;
     }
   }
-  def printMapSPECword(i: Int) = {
-    var output: String = "";
-    output += "String is:  " + word(i);
-    output += "\nStringR is: " + word(i).reverse;
-    output += "\nPhase 1: ";
-    output += "\n\\  bitset:  " + map(i).escapeBitset;
-    output += "\n\"  bitset:  " + map(i).quoteBitset;
-    output += "\n:  bitset:  " + map(i).colonBitset;
-    output += "\n{  bitset:  " + map(i).lbracketBitset;
-    output += "\n}  bitset:  " + map(i).rbracketBitset;
-    output += "\n,  bitset:  " + map(i).commaBitset;
-    output += "\n[  bitset:  " + map(i).arraylbracketBitset;
-    output += "\n]  bitset:  " + map(i).arrayrbracketBitset;
-    output += "\nPhase 2: ";
-    output += "\nSQ bitset:  " + map(i).structQBitset;
-    output += "\nPhase 3: ";
-    output += "\nstrbitset:  " + map(i).strBitset;
-    output += "\nPhase 4: ";
-    output += "\nSC bitset:  " + map(i).structCBitset;
-    for (j <- 0 until map(i).levels.size) {
-      output += "\nL" + j + ":         ";
-      output += map(i).levels(j);
-    }
-    output += "\n\n";
-    println(output);
-  }
-
   def fillColonBits(): Unit = {
     // copy colon bitmap to leveled colon bitmaps
+
     for (i <- 0 until map.size) {
       for (j <- 0 until map(i).levels.size)
         map(i).levels(j) = map(i).structCBitset;
+      for (j <- 0 until map(i).CMlevels.size)
+        map(i).CMlevels(j) = map(i).structCMBitset;
     }
     var mLeft, mRight: Bits = new Bits(0); // m(left), m(right)
     var mLbit, mRbit: Bits = new Bits(0); // m(left bit), m(right bit)
 
+    //for array support
+    var mCMLeft, mCMRight: Bits = new Bits(0);
+    var mCMLbit, mCMRbit: Bits = new Bits(0);
+
     val lvls: Int = map(0).levels.size; // Number of nesting levels
+    val cmlvls: Int = map(0).CMlevels.size;
 
     // ListBuffer: Stack alternative
     var S: ListBuffer[Tuple2[Int, Bits]] = ListBuffer();
+    var SCM: ListBuffer[Tuple2[Int, Bits]] = ListBuffer();
 
     for (i <- 0 until map.size) {
       mLeft = map(i).lbracketBitset;
       mRight = map(i).rbracketBitset;
-      println("i = " + i + "mRight: " + mRight+ " bits = " + mRight.bits);
+
+      mCMLeft = map(i).arraylbracketBitset;
+      mCMRight = map(i).arrayrbracketBitset;
       do // iterate over each right brace
       {
-        //println("i = " + i);
         // extract the rightmost 1
-        //if(i == 36) {
-//          println("Before:\nmLbit =       " + mLbit + " bits = " + mLbit.bits);
-//          println("mRbit =       " + mRbit + " bits = " + mRbit.bits);
-//          println("mLeft =       " + mLeft + " bits = " + mLeft.bits);
-          //println("Before while:\nBefore\nmRight =      " + mRight + " bits = " + mRight.bits);
-        //} 
         mRbit = mRight & -mRight.bits; // MARKED
         mLbit = mLeft & -mLeft.bits; // MARKED
-        //if(i == 36) {
-//          println("After:\nmLbit =       " + mLbit + " bits = " + mLbit.bits);
-//          println("mRbit =       " + mRbit + " bits = " + mRbit.bits);
-//          println("mLeft =       " + mLeft + " bits = " + mLeft.bits);
-          //println("After\nmRight =      " + mRight + " bits = " + mRight.bits);
-        //} 
+
         while (!(mLbit == 0) && (mRbit == 0 || mLbit < mRbit)) { // MARKED
           // 1 = "j", 2 = mLbit
           S.insert(0, (i, mLbit));
-          //println("i = " + i + " mLBit " + mLbit);
           mLeft = mLeft & (mLeft - 1); // remove the rightmost 1
           mLbit = mLeft & -mLeft.bits; // extract the rightmost 1        // MARKED
-          //println("loop i = " +i);
         }
-//        if (i == 36) {
-//          println("i is 36 36 36 36 36");
-//          printMapSPECword(i);
-//          S.foreach(println);
-//        }
         if (!(mRbit == 0)) { // MARKED
           val pop = S.remove(0); // 0 = "j", 1 = mLbit
           val j = pop._1;
           mLbit = pop._2;
-//          println("i = " + i);
-//          println("j = " + j + " mLbit = " + mLbit);
-//          println("mRbit =       " + mRbit + "\n");
           if (0 < S.size && S.size <= lvls) // clear bits at the upper level
           {
             var flip: Bits = new Bits(0);
@@ -225,18 +185,56 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String]) {
             }
           }
         }
-        //println("After while loop:\nBefore\nmRight =      " + mRight + " bits = " + mRight.bits)
         mRight &= mRight - 1; // remove the rightmost 1
-        //println("After\nmRight =      " + mRight + " bits = " + mRight.bits + "\n")
       } while (!(mRbit == 0));
+      //for array support
+      do // iterate over each right brace
+      {
+        // extract the rightmost 1
+        mCMRbit = mCMRight & -mCMRight.bits; // MARKED
+        mCMLbit = mCMLeft & -mCMLeft.bits; // MARKED
 
+        while (!(mCMLbit == 0) && (mCMRbit == 0 || mCMLbit < mCMRbit)) { // MARKED
+          // 1 = "j", 2 = mLbit
+          SCM.insert(0, (i, mCMLbit));
+          mCMLeft = mCMLeft & (mCMLeft - 1); // remove the rightmost 1
+          mCMLbit = mCMLeft & -mCMLeft.bits; // extract the rightmost 1  // MARKED
+        }
+        if (!(mCMRbit == 0)) { // MARKED
+          val pop = SCM.remove(0); // 0 = "j", 1 = mCMLbit
+          val j = pop._1;
+          mCMLbit = pop._2;
+          if (0 < SCM.size && SCM.size <= cmlvls) // clear bits at the upper level
+          {
+            var flip: Bits = new Bits(0);
+            if (i == j) // nested object is inside the word
+            {
+              flip = mCMRbit - mCMLbit;
+              flip.flip();
+              map(i).CMlevels(SCM.size - 1) &= flip;
+            } else // nested object is across multiple words
+            {
+              map(j).CMlevels(SCM.size - 1) &= mCMLbit - 1;
+              flip = mCMRbit - 1;
+              flip.flip();
+
+              map(i).CMlevels(SCM.size - 1) &= flip;
+              for (k <- j + 1 until i) {
+                map(k).CMlevels(SCM.size - 1) = new Bits(0);
+              }
+            }
+          }
+        }
+        mCMRight &= mCMRight - 1; // remove the rightmost 1
+      } while (!(mCMRbit == 0)); // MARKED
     }
 
-//    println(word(36));
-//    for (x <- 0 until lvls) {
-//      println("L" + x + ":" + map(36).levels(x));
-//    }
-
+    println(word(36));
+    for(x <- 0 until lvls) {
+      println("L"+x+":"+map(36).levels(x));
+    }
+    
+    
     for (a <- 0 until map.size) {
       for (b <- lvls - 1 until 0 by -1) {
         val temp1 = map(a).levels(b);
@@ -244,7 +242,12 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String]) {
         map(a).levels(b) = temp1 - (temp1 & temp2);
 
       }
+      for (b <- cmlvls - 1 until 0 by -1) {
+        val temp1 = map(a).CMlevels(b);
+        val temp2 = map(a).CMlevels(b - 1);
+        map(a).CMlevels(b) = temp1 - (temp1 & temp2);
 
+      }
     }
   }
   //def generateColonPositions(start: Int, end: Int, level: Int): Vector[Int] = {
@@ -252,20 +255,21 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String]) {
   def generateColonPositions(start: Int, end: Int, level: Int): ArrayBuffer[Int] = {
     if (level >= this.layers) {
       return new ArrayBuffer[Int]();
-    } else {
+    } 
+    else {
       println("generate colon pos is called");
       var colonPositions = new ArrayBuffer[Int]();
       var mcolon: Bits = new Bits(0);
       for (i <- (start / B_INT) until ceil(end.toDouble / B_INT).toInt) {
-        if (i == 36) {
+        if(i == 36) {
           println("level: " + level);
-          println("word:   " + word(i));
-          println("wordr:  " + word(i).reverse);
+          println("word:   "+word(i));
+          println("wordr:  "+word(i).reverse);
         }
         mcolon = map(i).levels(level);
         while (!(mcolon == 0)) { // MARKED
           val mBit = (mcolon & -mcolon.bits) - 1; // MARKED
-          if (i == 36) {
+          if(i == 36) {
             println("mcolon: " + mcolon)
           }
           var offset: Int = i * B_INT + mBit.count();
