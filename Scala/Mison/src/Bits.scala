@@ -10,7 +10,7 @@ class Bits(val bit: Int) {
   // boolean operators
   def <(operand: Bits): Boolean = {
     val leftNeg = this.bits < 0;
-    val rightNeg = this.bits < 0;
+    val rightNeg = operand.bits < 0;
     if ((!leftNeg && !rightNeg)
       || (leftNeg && rightNeg)) {
       return bits < operand.bits;
@@ -20,7 +20,7 @@ class Bits(val bit: Int) {
   }
   def >(operand: Bits): Boolean = {
     val leftNeg = this.bits < 0;
-    val rightNeg = this.bits < 0;
+    val rightNeg = operand.bits < 0;
     if ((!leftNeg && !rightNeg)
       || (leftNeg && rightNeg)) {
       return bits > operand.bits;
@@ -36,7 +36,7 @@ class Bits(val bit: Int) {
       return true;
     }
     val leftNeg = this.bits < 0;
-    val rightNeg = this.bits < 0;
+    val rightNeg = operand.bits < 0;
     if ((!leftNeg && !rightNeg)
       || (leftNeg && rightNeg)) {
       return bits > operand.bits;
@@ -50,7 +50,7 @@ class Bits(val bit: Int) {
       return true;
     }
     val leftNeg = this.bits < 0;
-    val rightNeg = this.bits < 0;
+    val rightNeg = operand.bits < 0;
     if ((!leftNeg && !rightNeg)
       || (leftNeg && rightNeg)) {
       return bits < operand.bits;
@@ -60,6 +60,29 @@ class Bits(val bit: Int) {
     }
   }
 
+  // Ints comparison overload
+  def <(operand: Int): Boolean = {
+    val bitsRight = new Bits(operand);
+    return this < bitsRight;
+  }
+  def <=(operand: Int): Boolean = {
+    val bitsRight = new Bits(operand);
+    return this <= bitsRight;
+  }
+  
+  def >(operand: Int): Boolean = {
+    val bitsRight = new Bits(operand);
+    return this > bitsRight;
+  }
+  def >=(operand: Int): Boolean = {
+    val bitsRight = new Bits(operand);
+    return this >= bitsRight;
+  }
+  def ==(operand: Int): Boolean = {
+    val bitsRight = new Bits(operand);
+    return this == bitsRight;
+  }
+  
   // other operators
   def +(operand: Bits): Bits = {
     new Bits(bits + operand.bits);
@@ -81,9 +104,6 @@ class Bits(val bit: Int) {
   }
   def ^(operand: Bits): Bits = {
     new Bits(bits ^ operand.bits);
-  }
-  def ==(operand: Int): Boolean = {
-    bits == operand;
   }
   def +(operand: Int): Bits = {
     new Bits(bits + operand);
