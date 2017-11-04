@@ -49,7 +49,7 @@ object Main {
 		var testFile: ArrayBuffer[String] = new ArrayBuffer();
 
 		// Add files into testFile
-		testFile += "./Test Files/blank.txt";
+		testFile += "./Test Files/tweet.txt";
 
 		var query: ArrayBuffer[String] = new ArrayBuffer();
 		// Add queries into array buffer
@@ -58,6 +58,26 @@ object Main {
 		query += "user.name";
 		query += "user.description";
 
+		MISONParse(query, testFile, DEBUG_STATUS);
+	}
+	def Query4() {
+	  val DEBUG_STATUS = true;
+
+		var testFile: ArrayBuffer[String] = new ArrayBuffer();
+
+		// Add files into testFile
+		testFile += "./Test Files/blank.txt";
+
+		var query: ArrayBuffer[String] = new ArrayBuffer();
+		// Add queries into array buffer
+		//query += "quoted_status.entities.urls.display_url";
+		//query += "quoted_status.text";
+		query += "created_at";
+		query += "user.description";
+		query += "user.entities.description";
+		//query += "quoted_status.user.description";
+		//query += "quoted_status.user.entities.description";
+		
 		MISONParse(query, testFile, DEBUG_STATUS);
 	}
 	def BitsTest() {
@@ -123,7 +143,7 @@ object Main {
 	  println(bitmaps);
 	}
 	def main(args: Array[String]) {
-		Query3();
+		Query4();
 		//BitmapTest();
 		//BitsTest();
 		//val x: Char = ' ';
