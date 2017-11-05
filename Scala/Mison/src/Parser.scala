@@ -184,7 +184,7 @@ class MISONParser(
 
   // Parse one record (line) and determine if the record is part of the query.
   // Return true for success, false for failure
-  private def parseLine(curLevel: Int, append: String, colonPos: ArrayBuffer[Int]): Boolean = {
+  private def parseLine(curLevel: Int, append: String, colonPos: ArrayBuffer[Int], nextLevelColon: Int = -1): Boolean = {
     //System.out.println(colonPos.length + " mah stuff");
     for (i <- colonPos.length - 1 to 0 by -1) {
       //println("i: " + i)
@@ -229,7 +229,7 @@ class MISONParser(
         }
         if (nextChar == '{') {
           if (true) {
-            //if (curLevel > queryFieldsInfo.levelCount) {
+          //if (curLevel > queryFieldsInfo.levelCount) {
             //System.out.println("Nesting nesting nestin");
             //System.out.println(colonPos(i) + " " + colonPos(i - 1));
             //println("aaa");
@@ -237,10 +237,21 @@ class MISONParser(
             if (i != 0) {
               newColonPos = bitmaps.generateColonPositions(colonPos(i), colonPos(i - 1), curLevel + 1);
             } else {
-              //println("colonPos at 0 is " + colonPos(i) + "Current level is " + curLevel);
-              newColonPos = bitmaps.generateColonPositions(colonPos(i), currentRecord.length - 1, curLevel + 1);
+              println("At the final colon Position");
+              println("colonPos at 0 is " + colonPos(i) + " Current level is " + curLevel);
+              println("currentRecord final length is: " + currentRecord.length);
+              if (nextLevelColon == -1) {
+                newColonPos = bitmaps.generateColonPositions(colonPos(i), currentRecord.length - 1, curLevel + 1);
+              } else {
+                newColonPos = bitmaps.generateColonPositions(colonPos(i), nextLevelColon, curLevel + 1);
+              }
             }
-
+            
+            var nextNextLevelColon: Int = -1;
+            if (i != 0) {
+              nextNextLevelColon = colonPos(i - 1);
+            }
+            
             //println("bbb");
 
             val newAppend: String = currentField + '.';
@@ -249,12 +260,13 @@ class MISONParser(
               System.out.println("newColonPosition size " + newColonPos.size + " and its num");
               for (i <- 0 until newColonPos.size) {
                 System.out.print(newColonPos(i) + " ");
-
               }
+              println("");
+              System.out.println("Next level is " + (curLevel + 1));
               System.out.println("\nGoing to the next level and beyond");
             }
             matchingFieldNumber += 1;
-            parseLine(curLevel + 1, newAppend, newColonPos);
+            parseLine(curLevel + 1, newAppend, newColonPos, nextNextLevelColon);
             //System.out.println("Done with Nesting nesting nestin");
           }
         } else if (nextChar == '[') {
