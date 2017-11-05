@@ -12,7 +12,7 @@ import scala.collection.mutable.ArrayBuffer
  */
 import scala.collection.mutable.ListBuffer;
 import scala.math.ceil;
-class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String]) {
+class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String], DEBUG_FLAG: Boolean = false) {
 
   // constructor:on
   class mapContainer(layers: Int, arrayLayers: Int) {
@@ -26,7 +26,7 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String]) {
   }
   private val B_INT = 32;
   private val B_ZERO: Bits = new Bits(0);
-  private val B_ONE: Bits= new Bits(1);
+  private val B_ONE: Bits = new Bits(1);
   private var word: ArrayBuffer[String] = wordSplit;
   var map: Array[mapContainer] = new Array[mapContainer](word.size);
   for (i <- 0 until word.size)
@@ -171,20 +171,20 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String]) {
       {
         //println("i = " + i);
         // extract the rightmost 1
-//        if(i == 36) {
-//          println("Before:\nmLbit =       " + mLbit + " bits = " + mLbit.bits);
-//          println("mRbit =       " + mRbit + " bits = " + mRbit.bits);
-//          println("mLeft =       " + mLeft + " bits = " + mLeft.bits);
-//          println("mRight =      " + mRight + " bits = " + mRight.bits);
-//        } 
+        //        if(i == 36) {
+        //          println("Before:\nmLbit =       " + mLbit + " bits = " + mLbit.bits);
+        //          println("mRbit =       " + mRbit + " bits = " + mRbit.bits);
+        //          println("mLeft =       " + mLeft + " bits = " + mLeft.bits);
+        //          println("mRight =      " + mRight + " bits = " + mRight.bits);
+        //        } 
         mRbit = mRight & -mRight.bits; // MARKED
         mLbit = mLeft & -mLeft.bits; // MARKED
-//        if(i == 36) {
-//          println("After:\nmLbit =       " + mLbit + " bits = " + mLbit.bits);
-//          println("mRbit =       " + mRbit + " bits = " + mRbit.bits);
-//          println("mLeft =       " + mLeft + " bits = " + mLeft.bits);
-//          println("mRight =      " + mRight + " bits = " + mRight.bits + "\n");
-//        } 
+        //        if(i == 36) {
+        //          println("After:\nmLbit =       " + mLbit + " bits = " + mLbit.bits);
+        //          println("mRbit =       " + mRbit + " bits = " + mRbit.bits);
+        //          println("mLeft =       " + mLeft + " bits = " + mLeft.bits);
+        //          println("mRight =      " + mRight + " bits = " + mRight.bits + "\n");
+        //        } 
         while (!(mLbit == 0) && (mRbit == 0 || mLbit < mRbit)) { // MARKED
           // 1 = "j", 2 = mLbit
           S.insert(0, (i, mLbit));
@@ -193,18 +193,18 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String]) {
           mLbit = mLeft & -mLeft.bits; // extract the rightmost 1        // MARKED
           //println("loop i = " +i);
         }
-//        if (i == 36) {
-//          println("i is 36 36 36 36 36");
-//          printMapSPECword(i);
-//          S.foreach(println);
-//        }
+        //        if (i == 36) {
+        //          println("i is 36 36 36 36 36");
+        //          printMapSPECword(i);
+        //          S.foreach(println);
+        //        }
         if (!(mRbit == 0)) { // MARKED
           val pop = S.remove(0); // 0 = "j", 1 = mLbit
           val j = pop._1;
           mLbit = pop._2;
-//          println("i = " + i);
-//          println("j = " + j + " mLbit = " + mLbit);
-//          println("mRbit =       " + mRbit + "\n");
+          //          println("i = " + i);
+          //          println("j = " + j + " mLbit = " + mLbit);
+          //          println("mRbit =       " + mRbit + "\n");
           if (0 < S.size && S.size <= lvls) // clear bits at the upper level
           {
             var flip: Bits = new Bits(0);
@@ -232,10 +232,10 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String]) {
 
     }
 
-//    println(word(36));
-//    for (x <- 0 until lvls) {
-//      println("L" + x + ":" + map(36).levels(x));
-//    }
+    //    println(word(36));
+    //    for (x <- 0 until lvls) {
+    //      println("L" + x + ":" + map(36).levels(x));
+    //    }
 
     for (a <- 0 until map.size) {
       for (b <- lvls - 1 until 0 by -1) {
@@ -251,23 +251,27 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String]) {
   //  var colonPositions = Vector.empty[Int];
   def generateColonPositions(start: Int, end: Int, level: Int): ArrayBuffer[Int] = {
     if (level >= this.layers) {
+      if (DEBUG_FLAG == true) {
+        System.out.println("Bitmaps: GENERATE COLON POS ERROR");
+        System.out.println("Input level is: " + level + " but max layers is: " + (this.layers - 1));
+      }
       return new ArrayBuffer[Int]();
     } else {
       //println("generate colon pos is called");
       var colonPositions = new ArrayBuffer[Int]();
       var mcolon: Bits = new Bits(0);
       for (i <- (start / B_INT) until ceil(end.toDouble / B_INT).toInt) {
-//        if (i == 36) {
-//          println("level: " + level);
-//          println("word:   " + word(i));
-//          println("wordr:  " + word(i).reverse);
-//        }
+        //        if (i == 36) {
+        //          println("level: " + level);
+        //          println("word:   " + word(i));
+        //          println("wordr:  " + word(i).reverse);
+        //        }
         mcolon = map(i).levels(level);
         while (!(mcolon == 0)) { // MARKED
           val mBit = (mcolon & -mcolon.bits) - 1; // MARKED
-//          if (i == 36) {
-//            println("mcolon: " + mcolon)
-//          }
+          //          if (i == 36) {
+          //            println("mcolon: " + mcolon)
+          //          }
           var offset: Int = i * B_INT + mBit.count();
           if (start <= offset && offset <= end) {
             colonPositions = (offset) +: colonPositions;

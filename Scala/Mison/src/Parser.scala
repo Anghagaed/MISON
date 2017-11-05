@@ -171,7 +171,8 @@ class MISONParser(
     bitmaps = new Bitmaps(
       queryFieldsInfo.nestingLevels,
       defaultArrayLayers,
-      stringSplitted);
+      stringSplitted,
+      DEBUG_FLAG);
 
     if (DEBUG_FLAG == true) {
       System.out.println("CurrentRecord: " + currentRecord);
@@ -192,19 +193,24 @@ class MISONParser(
       //System.out.println(bitmaps);
 
       var endPos = bitmaps.getStartingBoundary(colonPos(i));
-      //System.out.println("endPos: " + endPos);
 
       // start pos of field name
       var startPos = bitmaps.getStartingBoundary(endPos - 1) + 1;
-      //System.out.println("startPos: " + startPos);
 
       // Error Checking, remove for 
       if (DEBUG_FLAG == true) {
+        System.out.println("startPos: " + startPos + " endPos: " + endPos);
+        System.out.println("Colon Pos is: " + colonPos(i));
         if (endPos == -1 || startPos == -1) {
-          //System.out.println("startPos: " + startPos + " endPos: " + endPos);
-          //System.out.println("This record: " + currentRecord + "\n has no quotes at all");
+          System.out.println("startPos: " + startPos + " endPos: " + endPos);
+          System.out.println("This record: " + currentRecord + "\n has no quotes at all");
           return false;
         }
+      }
+
+      if (endPos == 4061 && startPos == 4050) {
+        //println("Append is currently " + append);
+        //println("THE SUBSTRING IS " +  currentRecord.substring(startPos, endPos));
       }
 
       val currentField = append + currentRecord.substring(startPos, endPos);
@@ -240,8 +246,7 @@ class MISONParser(
             val newAppend: String = currentField + '.';
             if (DEBUG_FLAG == true) {
               System.out.println(newAppend);
-              System.out.println("newColonPosition");
-              System.out.println(newColonPos.size);
+              System.out.println("newColonPosition size " + newColonPos.size + " and its num");
               for (i <- 0 until newColonPos.size) {
                 System.out.print(newColonPos(i) + " ");
 
@@ -295,8 +300,7 @@ class MISONParser(
             val fieldValue = currentRecord.substring(startPos, endPos);
             if (DEBUG_FLAG == true) {
               System.out.println("Match found");
-              System.out.println(fieldValue);
-              System.out.println(currentField);
+              System.out.println(fieldValue + " is associated with " + currentField);
             }
             val pos = valid.get;
             //System.out.println("fieldValue is " + fieldValue);
@@ -307,6 +311,8 @@ class MISONParser(
 
         // Check if all fields were matched
         // Might need to reformat the string currentRecord?
+        println("Matching Field Number is " + matchingFieldNumber);
+        println("queryFieldsInfo.hashFields.size " + queryFieldsInfo.hashFields.size);
         if (matchingFieldNumber == queryFieldsInfo.hashFields.size) {
           if (DEBUG_FLAG == true) {
             System.out.println("Number is matching, all matches found");

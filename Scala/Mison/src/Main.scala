@@ -66,7 +66,7 @@ object Main {
 		var testFile: ArrayBuffer[String] = new ArrayBuffer();
 
 		// Add files into testFile
-		testFile += "./Test Files/tweet.txt";
+		testFile += "./Test Files/blank.txt";
 
 		var query: ArrayBuffer[String] = new ArrayBuffer();
 		// Add queries into array buffer
