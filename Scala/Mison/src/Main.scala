@@ -70,13 +70,25 @@ object Main {
 
 		var query: ArrayBuffer[String] = new ArrayBuffer();
 		// Add queries into array buffer
-		query += "quoted_status.entities.urls.display_url";
-		//query += "quoted_status.text";
+		query += "quoted_status.entities.urls";
+		query += "quoted_status.text";
 		query += "created_at";
 		query += "user.description";
-		query += "user.entities.description";
-		//query += "quoted_status.user.description";
-		//query += "quoted_status.user.entities.description";
+		query += "quoted_status.user.description";
+		
+		MISONParse(query, testFile, DEBUG_STATUS);
+	}
+	def Query5() {
+	  val DEBUG_STATUS = false;
+
+		var testFile: ArrayBuffer[String] = new ArrayBuffer();
+
+		// Add files into testFile
+		testFile += "./Test Files/tweet.txt";
+
+		var query: ArrayBuffer[String] = new ArrayBuffer();
+		// Add queries into array buffer
+		query += "extended_entities.media";
 		
 		MISONParse(query, testFile, DEBUG_STATUS);
 	}
