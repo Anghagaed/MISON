@@ -172,7 +172,7 @@ class MISONParser(
       queryFieldsInfo.nestingLevels,
       defaultArrayLayers,
       stringSplitted);
-    
+
     if (DEBUG_FLAG == true) {
       System.out.println("CurrentRecord: " + currentRecord);
     }
@@ -223,7 +223,7 @@ class MISONParser(
         }
         if (nextChar == '{') {
           if (true) {
-          //if (curLevel > queryFieldsInfo.levelCount) {
+            //if (curLevel > queryFieldsInfo.levelCount) {
             //System.out.println("Nesting nesting nestin");
             //System.out.println(colonPos(i) + " " + colonPos(i - 1));
             //println("aaa");
@@ -231,18 +231,13 @@ class MISONParser(
             if (i != 0) {
               newColonPos = bitmaps.generateColonPositions(colonPos(i), colonPos(i - 1), curLevel + 1);
             } else {
-              println("colonPos at 0 is " + colonPos(i) + "Current level is " + curLevel);
+              //println("colonPos at 0 is " + colonPos(i) + "Current level is " + curLevel);
               newColonPos = bitmaps.generateColonPositions(colonPos(i), currentRecord.length - 1, curLevel + 1);
             }
 
             //println("bbb");
 
-            var newAppend: String = "";
-            if (curLevel == 0) {
-              newAppend = currentField + '.';
-            } else {
-              newAppend = append + '.' + currentField;
-            }
+            val newAppend: String = currentField + '.';
             if (DEBUG_FLAG == true) {
               System.out.println(newAppend);
               System.out.println("newColonPosition");
@@ -260,7 +255,9 @@ class MISONParser(
         } else if (nextChar == '[') {
           val output: String = bitmaps.getArraySubString(colonPos(i), curLevel, currentRecord);
           //val output: String = bitmaps.getArraySubString(colonPos(i), curLevel);
-          System.out.println("Array Field output is " + output);
+          if (DEBUG_FLAG == true) {
+            System.out.println("Array Field output is " + output);
+          }
           val pos = queryFieldsInfo.fieldsOrder.get(currentField).get;
           lineOutput(pos) = output;
           matchingFieldNumber += 1;
@@ -276,8 +273,10 @@ class MISONParser(
             endPos = endPos - 1;
           }
           val fieldValue = currentRecord.substring(startPos, endPos);
-          System.out.println(fieldValue);
-          System.out.println(currentField);
+          if (DEBUG_FLAG == true) {
+            System.out.println(fieldValue);
+            System.out.println(currentField);
+          }
           val pos = queryFieldsInfo.fieldsOrder.get(currentField).get;
           //System.out.println("fieldValue is " + fieldValue);
           lineOutput(pos) = fieldValue;
@@ -288,7 +287,9 @@ class MISONParser(
         // Check if all fields were matched
         // Might need to reformat the string currentRecord?
         if (matchingFieldNumber == queryFieldsInfo.hashFields.size) {
-          //System.out.println("Number is matching");
+          if (DEBUG_FLAG == true) {
+            System.out.println("Number is matching, all matches found");
+          }
           return true;
         }
 
