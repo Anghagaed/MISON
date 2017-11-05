@@ -253,35 +253,56 @@ class MISONParser(
             //System.out.println("Done with Nesting nesting nestin");
           }
         } else if (nextChar == '[') {
-          val output: String = bitmaps.getArraySubString(colonPos(i), curLevel, currentRecord);
-          //val output: String = bitmaps.getArraySubString(colonPos(i), curLevel);
-          if (DEBUG_FLAG == true) {
-            System.out.println("Array Field output is " + output);
+          val valid = queryFieldsInfo.fieldsOrder.get(currentField);
+          if (valid == None) {
+            // Check if currentField is actually valid
+            if (DEBUG_FLAG == true) {
+              System.out.println("ISSUES WITH INPUTTED QUERY");
+              System.out.println("Field " + currentField + " is not in the hashmap");
+              System.out.println("THIS OCCURS WHEN TRYING TO GET AN ARRAY FIELD");
+            }
+          } else {
+            val output: String = bitmaps.getArraySubString(colonPos(i), curLevel, currentRecord);
+            //val output: String = bitmaps.getArraySubString(colonPos(i), curLevel);
+            if (DEBUG_FLAG == true) {
+              System.out.println("Array Field output is " + output);
+            }
+            System.out.println(currentField);
+            val pos = valid.get;
+            lineOutput(pos) = output;
+            matchingFieldNumber += 1;
           }
-          val pos = queryFieldsInfo.fieldsOrder.get(currentField).get;
-          lineOutput(pos) = output;
-          matchingFieldNumber += 1;
         } else {
           //System.out.println("Match found");
-          endPos = bitmaps.getEndingBoundary(colonPos(i));
-          startPos = colonPos(i) + 1;
-          //System.out.println("startPos: " + startPos);
-          //System.out.println("endPos: " + endPos);
-          if (currentRecord.charAt(startPos) == '\"') {
-            // Change startPos and endPos to compensate for extra " character
-            startPos = startPos + 1;
-            endPos = endPos - 1;
+          val valid = queryFieldsInfo.fieldsOrder.get(currentField);
+          if (valid == None) {
+            // Check if currentField is actually valid
+            if (DEBUG_FLAG == true) {
+              System.out.println("ISSUES WITH INPUTTED QUERY");
+              System.out.println("Field " + currentField + " is not in the hashmap");
+              System.out.println("THIS OCCURS WHEN TRYING TO GET SOMETHING");
+            }
+          } else {
+            endPos = bitmaps.getEndingBoundary(colonPos(i));
+            startPos = colonPos(i) + 1;
+            //System.out.println("startPos: " + startPos);
+            //System.out.println("endPos: " + endPos);
+            if (currentRecord.charAt(startPos) == '\"') {
+              // Change startPos and endPos to compensate for extra " character
+              startPos = startPos + 1;
+              endPos = endPos - 1;
+            }
+            val fieldValue = currentRecord.substring(startPos, endPos);
+            if (DEBUG_FLAG == true) {
+              System.out.println("Match found");
+              System.out.println(fieldValue);
+              System.out.println(currentField);
+            }
+            val pos = valid.get;
+            //System.out.println("fieldValue is " + fieldValue);
+            lineOutput(pos) = fieldValue;
+            matchingFieldNumber += 1;
           }
-          val fieldValue = currentRecord.substring(startPos, endPos);
-          if (DEBUG_FLAG == true) {
-            System.out.println(fieldValue);
-            System.out.println(currentField);
-          }
-          val pos = queryFieldsInfo.fieldsOrder.get(currentField).get;
-          //System.out.println("fieldValue is " + fieldValue);
-          lineOutput(pos) = fieldValue;
-          matchingFieldNumber += 1;
-
         }
 
         // Check if all fields were matched

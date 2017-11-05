@@ -66,11 +66,11 @@ object Main {
 		var testFile: ArrayBuffer[String] = new ArrayBuffer();
 
 		// Add files into testFile
-		testFile += "./Test Files/blank.txt";
+		testFile += "./Test Files/tweet.txt";
 
 		var query: ArrayBuffer[String] = new ArrayBuffer();
 		// Add queries into array buffer
-		//query += "quoted_status.entities.urls.display_url";
+		query += "quoted_status.entities.urls.display_url";
 		//query += "quoted_status.text";
 		query += "created_at";
 		query += "user.description";
