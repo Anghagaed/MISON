@@ -66,7 +66,7 @@ object Main {
 		var testFile: ArrayBuffer[String] = new ArrayBuffer();
 
 		// Add files into testFile
-		testFile += "./Test Files/blank.txt";
+		testFile += "./Test Files/tweet.txt";
 
 		var query: ArrayBuffer[String] = new ArrayBuffer();
 		// Add queries into array buffer
@@ -89,6 +89,36 @@ object Main {
 		var query: ArrayBuffer[String] = new ArrayBuffer();
 		// Add queries into array buffer
 		query += "extended_entities.media";
+		
+		MISONParse(query, testFile, DEBUG_STATUS);
+	}
+	def Query6() {
+	  val DEBUG_STATUS = false;
+
+		var testFile: ArrayBuffer[String] = new ArrayBuffer();
+
+		// Add files into testFile
+		testFile += "./Test Files/tweet.txt";
+
+		var query: ArrayBuffer[String] = new ArrayBuffer();
+		// Add queries into array buffer
+		query += "extended_entities.media";
+		
+		MISONParse(query, testFile, DEBUG_STATUS);
+	}
+	def Query7() {
+	  val DEBUG_STATUS = true;
+
+		var testFile: ArrayBuffer[String] = new ArrayBuffer();
+
+		// Add files into testFile
+		testFile += "./Test Files/blank.txt";
+
+		var query: ArrayBuffer[String] = new ArrayBuffer();
+		// Add queries into array buffer
+		query += "created_at";
+		query += "text";
+		query += "retweet_status.retweet_count";
 		
 		MISONParse(query, testFile, DEBUG_STATUS);
 	}
@@ -155,7 +185,7 @@ object Main {
 	  println(bitmaps);
 	}
 	def main(args: Array[String]) {
-		Query4();
+		Query7();
 		//BitmapTest();
 		//BitsTest();
 		//val x: Char = ' ';

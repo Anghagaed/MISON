@@ -257,6 +257,8 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String], DEB
       }
       return new ArrayBuffer[Int]();
     } else {
+//      if(start > end)
+//        println("start > end???!?!?!!?");
       //println("generate colon pos is called");
       var colonPositions = new ArrayBuffer[Int]();
       var mcolon: Bits = new Bits(0);
@@ -267,6 +269,12 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String], DEB
         //          println("wordr:  " + word(i).reverse);
         //        }
         mcolon = map(i).levels(level);
+        val tempColPos = colonPositions;
+//        if(level == 2) {
+//          println("(Before loop)printing colonPos: ");
+//          colonPositions.foreach(println);
+//          println("stop printing colonPos");
+//        }
         while (!(mcolon == 0)) { // MARKED
           val mBit = (mcolon & -mcolon.bits) - 1; // MARKED
           //          if (i == 36) {
@@ -278,6 +286,11 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String], DEB
           }
           mcolon = mcolon & (mcolon - 1);
         }
+//        if(level == 2 && colonPositions.size != tempColPos.size) {
+//          println("(After loop)we added the following in colonPos (for start = " + start + " end = " + end + " i = " + i + ")");
+//          colonPositions.diff(tempColPos).foreach(println);
+//          println("stop printing");
+//        }
       }
       ////println("Colon Position is: ");
       //for (i <- 0 until colonPositions.length) {
