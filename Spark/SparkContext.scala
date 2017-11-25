@@ -789,6 +789,19 @@ class SparkContext(config: SparkConf) extends Logging {
     }
   }
 
+  def readFile(): ArrayBuffer[String] = {
+    val ddd: ArrayBuffer[String] = new ArrayBuffer();
+    var input = scala.io.StdIn.readLine()
+    var it = Some(scala.io.Source.fromFile(input).getLines)
+    while(it.get.hasNext) {
+      ddd += it.get.next()
+    }
+    for(d <- ddd) {
+      System.out.println(d)
+    }
+    return ddd;
+  }
+
   /** MISON ONLY
    *
    * Ask Yun for Description
@@ -797,10 +810,12 @@ class SparkContext(config: SparkConf) extends Logging {
     filePaths: Seq[String],
     DEBUG_STATUS: Boolean = false) {
 
-    val qqq: ArrayBuffer[String] = new ArrayBuffer();
-    val fff: ArrayBuffer[String] = new ArrayBuffer();
-    fff += "tweet.txt";
-    qqq += "created_at";
+    var qqq: ArrayBuffer[String] = new ArrayBuffer();
+    var fff: ArrayBuffer[String] = new ArrayBuffer();
+    System.out.println("Data file: ")
+    fff = readFile()
+    System.out.println("Query file: ")
+    qqq = readFile()
 
     val parser = new MISONParser(
       qqq, // queryFieldsList.toBuffer,
