@@ -14,6 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+// scalastyle:off println
+
 package Bits
 
 class Bits(val bit: Int) {
@@ -194,3 +197,5 @@ class Bits(val bit: Int) {
     return -1;
   }
 }
+
+// scalastyle:on println

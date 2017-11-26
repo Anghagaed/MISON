@@ -789,9 +789,10 @@ class SparkContext(config: SparkConf) extends Logging {
     }
   }
 
-  def readFile(): ArrayBuffer[String] = {
+  def readFile(file: String): ArrayBuffer[String] = {
     val ddd: ArrayBuffer[String] = new ArrayBuffer();
-    var input = scala.io.StdIn.readLine()
+    // var input = scala.io.StdIn.readLine()
+    var input = file;
     var it = Some(scala.io.Source.fromFile(input).getLines)
     while(it.get.hasNext) {
       ddd += it.get.next()
@@ -806,16 +807,9 @@ class SparkContext(config: SparkConf) extends Logging {
    *
    * Ask Yun for Description
    */
-  def MISONParse(queryFieldsList: Seq[String],
-    filePaths: Seq[String],
-    DEBUG_STATUS: Boolean = false) {
-
-    var qqq: ArrayBuffer[String] = new ArrayBuffer();
-    var fff: ArrayBuffer[String] = new ArrayBuffer();
-    System.out.println("Data file: ")
-    fff = readFile()
-    System.out.println("Query file: ")
-    qqq = readFile()
+  def MISONParse(fff: ArrayBuffer[String],
+    qqq: ArrayBuffer[String],
+    DEBUG_STATUS: Boolean = false): RDD[String] = {
 
     val parser = new MISONParser(
       qqq, // queryFieldsList.toBuffer,
@@ -826,6 +820,8 @@ class SparkContext(config: SparkConf) extends Logging {
     for (q <- result) {
        System.out.println(q);
     }
+    var testBurn = result.toSeq;
+    return parallelize[String](testBurn);
   }
 
   /** Distribute a local Scala collection to form an RDD.

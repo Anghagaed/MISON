@@ -21,6 +21,8 @@ import scala.collection.mutable.ArrayBuffer
 import scala.collection.mutable.ListBuffer
 import scala.math.ceil
 
+// scalastyle:off println
+
 class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String],
 DEBUG_FLAG: Boolean = false) {
   class mapContainer(layers: Int, arrayLayers: Int) {
@@ -414,3 +416,5 @@ structALBBitset, structARBBitset: Bits = new Bits(0);
   createBitmap;
   toString()
 }
+
+// scalastyle:on println

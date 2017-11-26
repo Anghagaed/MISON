@@ -21,7 +21,7 @@ import Bitmaps._
 import scala.collection.immutable.HashMap
 import scala.collection.mutable._
 
-
+// scalastyle:off println
 class MISONParser(
     queryFieldsList: ArrayBuffer[String],
     filePaths: ArrayBuffer[String] = new ArrayBuffer[String],
@@ -130,11 +130,10 @@ class MISONParser(
       val initialColonPos = bitmaps.generateColonPositions(0, currentRecord.length - 1, 0);
       val queryResult = parseLine(0, "", initialColonPos);
       if (queryResult) {
-        var output: String = "|" + lineOutput(0);
+        var output: String = lineOutput(0);
         for (i <- 1 until lineOutput.length) {
-          output += "|" + lineOutput(i);
+          output += "  ,  " + lineOutput(i);
         }
-        output += "|";
         result += output;
       }
       if (DEBUG_FLAG == true) {
@@ -261,6 +260,9 @@ class MISONParser(
           } else {
             endPos = bitmaps.getEndingBoundary(colonPos(i));
             startPos = colonPos(i) + 1;
+            while (currentRecord.charAt(startPos) == ' ') {
+              startPos += 1;
+            }
             if (currentRecord.charAt(startPos) == '\"') {
               startPos = startPos + 1;
               endPos = endPos - 1;
@@ -289,3 +291,5 @@ class MISONParser(
     return false;
   }
 }
+
+// scalastyle:on println
