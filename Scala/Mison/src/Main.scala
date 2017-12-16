@@ -112,13 +112,13 @@ object Main {
 		var testFile: ArrayBuffer[String] = new ArrayBuffer();
 
 		// Add files into testFile
-		testFile += "./Test Files/blank.txt";
+		testFile += "./Test Files/tweet1.json";
 
 		var query: ArrayBuffer[String] = new ArrayBuffer();
 		// Add queries into array buffer
 		query += "created_at";
 		query += "text";
-		query += "retweet_status.retweet_count";
+		query += "entities.user_mentions";
 		
 		MISONParse(query, testFile, DEBUG_STATUS);
 	}
