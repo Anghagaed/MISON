@@ -1,13 +1,24 @@
-package Bits
-
 /*
- * Mutable Container that emulates unsigned int for supports with bitwise operation
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
+package Bits
 
 class Bits(val bit: Int) {
   var bits: Int = bit;
   private var SIZEOFINT: Int = 32;
-  // boolean operators
   def <(operand: Bits): Boolean = {
     val leftNeg = this.bits < 0;
     val rightNeg = operand.bits < 0;
@@ -59,8 +70,6 @@ class Bits(val bit: Int) {
       return (rightNeg == true);
     }
   }
-
-  // Ints comparison overload
   def <(operand: Int): Boolean = {
     val bitsRight = new Bits(operand);
     return this < bitsRight;
@@ -69,7 +78,6 @@ class Bits(val bit: Int) {
     val bitsRight = new Bits(operand);
     return this <= bitsRight;
   }
-  
   def >(operand: Int): Boolean = {
     val bitsRight = new Bits(operand);
     return this > bitsRight;
@@ -82,8 +90,6 @@ class Bits(val bit: Int) {
     val bitsRight = new Bits(operand);
     return this == bitsRight;
   }
-  
-  // other operators
   def +(operand: Bits): Bits = {
     new Bits(bits + operand.bits);
   }
@@ -136,21 +142,17 @@ class Bits(val bit: Int) {
       return new Bits(this.shiftLeft(shiftBy));
     }
   }
-
-  // (bitwise) setter
   def set(index: Int, value: Int) {
     bits &= ~(1 << index);
-    if (value == 1)
+    if (value == 1) {
       bits |= 1 << index;
+    }
   }
-
-  // (bitwise) getter
   def get(index: Int): Int = {
     var mask: Int = 1 << index;
     mask = ((mask & bits) >> index);
     return absolute(mask);
   }
-  // return absolute value
   private def absolute(input: Int): Int = {
     if (input >= 0) {
       return input;
@@ -158,17 +160,13 @@ class Bits(val bit: Int) {
       return -input;
     }
   }
-  // toString
-  def toBinary(i: Int, digits: Int = 32) = //Credit: https://stackoverflow.com/questions/9442381/formatting-binary-values-in-scala
+  def toBinary(i: Int, digits: Int = 32): String =
     String.format("%" + digits + "s", i.toBinaryString).replace(' ', '0')
   override def toString: String = toBinary(bits);
-
-  // Etc...
   def count(): Int = bits.toBinaryString.count(_ == '1');
   def flip(): Unit = {
     bits = ~bits;
   }
-  // Assume int is 32 bit.
   def mirror(): Unit = {
     for (i <- 0 until 16) {
       var temp: Int = get(i);
@@ -176,9 +174,6 @@ class Bits(val bit: Int) {
       set(31 - i, temp);
     }
   }
-
-  // shiftLeft function for negative scenerio
-
   private def shiftLeft(shiftNum: Int): Int = {
     var temp: Int = get(31);
     var bit: Int = this.bits;
@@ -187,21 +182,15 @@ class Bits(val bit: Int) {
     bit |= temp << 30;
     return bit;
   }
-
-  // get position of next bit that is a one starting from startingPos right to left.
-  // return the position or -1 if failed
   def getNextOnPosition(startingPos: Int): Int = {
     if ((bits) == 0 || startingPos > SIZEOFINT) {
-      //System.out.println("0 or pos too big");
       return -1;
     }
     for (i <- startingPos until (SIZEOFINT)) {
-      //System.out.println("i is " + i + " with this.get(i) is " + this.get(i));
       if (this.get(i) == 1) {
         return i;
       }
     }
-    //System.out.println("Found Nothing");
     return -1;
   }
 }
