@@ -20,9 +20,6 @@ import java.io.IOException
 
 import scala.collection.mutable.ArrayBuffer
 import scala.io.Source._
-
-// scalastyle:off println
-
 class fileHandler() {
   private var text: String = "";
   private var arr = ArrayBuffer.empty[String];
@@ -58,5 +55,3 @@ class fileHandler() {
     return true;
   }
 }
-
-// scalastyle:on println

@@ -168,7 +168,14 @@ class MISONParser(
     append: String,
     colonPos: ArrayBuffer[Int],
     nextLevelColon: Int = -1): Boolean = {
+    println(curLevel + " Before Loop: " + append);
+    println("colonPos.length " + colonPos.length);
+    val test: String = "TestingString";
+    println("testString: " + test);
     for (i <- colonPos.length - 1 to 0 by -1) {
+      println(curLevel + " After Loop: " + append);
+      println("colonPos.length " + colonPos.length);
+      println("testString: " + test);
       var endPos = bitmaps.getStartingBoundary(colonPos(i));
       var startPos = bitmaps.getStartingBoundary(endPos - 1) + 1;
 
@@ -277,8 +284,8 @@ class MISONParser(
             matchingFieldNumber += 1;
           }
         }
-        println("Matching Field Number is " + matchingFieldNumber);
-        println("queryFieldsInfo.hashFields.size " + queryFieldsInfo.hashFields.size);
+        // println("Matching Field Number is " + matchingFieldNumber);
+        // println("queryFieldsInfo.hashFields.size " + queryFieldsInfo.hashFields.size);
         if (matchingFieldNumber == queryFieldsInfo.hashFields.size) {
           if (DEBUG_FLAG == true) {
             System.out.println("Number is matching, all matches found");
@@ -288,6 +295,7 @@ class MISONParser(
 
       }
     }
+    println("Done with the loop " + curLevel);
     return false;
   }
 }
