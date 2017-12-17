@@ -4,7 +4,7 @@
 
 import tweepy #https://github.com/tweepy/tweepy
 import json
-
+import glob
 
 #Twitter API credentials
 consumer_key = "s95wwE7JG7DtLWbBHmgm8XP7p"
@@ -13,7 +13,7 @@ access_key = "877999455940759552-kBjJ0rGPYVHdA3GXSsZXStp9QFSobzQ"
 access_secret = "hcqHzFILYbcGaycdOw2dSDE9pDPbAFrqKExTqSUlaiydA"
 
 
-def get_all_tweets(screen_name):
+def get_all_tweets(file_name, screen_name):
     
     #Twitter only allows access to a users most recent 3240 tweets with this method
     
@@ -52,7 +52,7 @@ def get_all_tweets(screen_name):
         print "...%s tweets downloaded so far" % (len(alltweets))
        
     #write tweet objects to JSON
-    file = open('tweet.json', 'wb') 
+    file = open(file_name, 'wb') 
     print "Writing tweet objects to JSON please wait..."
     for status in alltweets:
 		json.dump(status._json,file,sort_keys = True)
@@ -63,6 +63,41 @@ def get_all_tweets(screen_name):
     file.close()
 
 if __name__ == '__main__':
-    #pass in the username of the account you want to download
-    get_all_tweets("@flySFO")
+	#file name
+	file_name = 'tweet'
+	#screen names
+	screen_names = ['google','nfl','foxsoccer','workday','trello',
+	'slackhq','discordapp','skype','foodnetwork','ucmerced','ucberkeley',
+	'ucsantabarbara','ucsandiego','ucdavis','ucriverside','csuf',
+	'calstatela','sdsu','csumb','csunorthridge','sfsu','sfgov',
+	'costco','dell','acer','hp','android','stanford','harvard','mit',
+	'princeton','lacity','netflix','hulu','youtube','oracle','adobe',
+	'airbnb','yelp','lyft','uber','intel','cisco','wallmart','target',
+	'foodmaxx','glassdoor','indeed','linkedin','ibm','lgus','samsung',
+	'verizon','att','comcast','github','bitbucket','java',
+	'c_plus_plus','thepsf','scalainc','rails','nodejs',
+	'sqlserver','mysql','theasf','olympics','spacex',
+	'technicolor','activision','snap','symantec',
+	'ticketmaster','belkin','vmware','firefox','malwarebytes',
+	'pandaexpress','dominos','mcdonalds','starbucks','kfc',
+	'burgerking','jackbox','carlsjr','subway','pizzahut',
+	'cocacola','pepsi','water','wfp','un','who']
 
+	print "Downloading " + str(len(screen_names)) + " files"
+	
+	i = 1
+	#start getting all tweets
+	#pass in the username of the account and file name you want to download
+	while i <= len(screen_names):
+		print "Getting tweets("+str(i+83)+") from " + screen_names[i-1]
+		get_all_tweets(file_name+str(i+83)+'.json', screen_names[i-1])
+		i = i + 1
+	
+	print "Merging " + str(len(screen_names)) + " files into tweet.txt"
+	#merge the json files into tweet.txt
+	read_files = glob.glob("*.json")
+	with open("tweet.txt", "wb") as outfile:
+	    for f in read_files:
+	        with open(f, "rb") as infile:
+	            outfile.write(infile.read())
+	print "Done"
