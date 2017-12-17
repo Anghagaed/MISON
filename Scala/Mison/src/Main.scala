@@ -30,7 +30,7 @@ object Main {
 
 	}
 	def Query2() {
-		val DEBUG_STATUS = false;
+		val DEBUG_STATUS = true;
 
 		var testFile: ArrayBuffer[String] = new ArrayBuffer();
 
@@ -44,7 +44,7 @@ object Main {
 		MISONParse(query, testFile, DEBUG_STATUS);
 	}
 	def Query3() {
-		val DEBUG_STATUS = false;
+		val DEBUG_STATUS = true;
 
 		var testFile: ArrayBuffer[String] = new ArrayBuffer();
 
@@ -61,7 +61,7 @@ object Main {
 		MISONParse(query, testFile, DEBUG_STATUS);
 	}
 	def Query4() {
-	  val DEBUG_STATUS = false;
+	  val DEBUG_STATUS = true;
 
 		var testFile: ArrayBuffer[String] = new ArrayBuffer();
 
@@ -107,36 +107,19 @@ object Main {
 		MISONParse(query, testFile, DEBUG_STATUS);
 	}
 	def Query7() {
-	  val DEBUG_STATUS = false;
+	  val DEBUG_STATUS = true;
 
 		var testFile: ArrayBuffer[String] = new ArrayBuffer();
 
 		// Add files into testFile
-		testFile += "./Test Files/tweet_100.txt";
+		testFile += "./Test Files/tweet1.json";
 
 		var query: ArrayBuffer[String] = new ArrayBuffer();
 		// Add queries into array buffer
 		query += "created_at";
 		query += "text";
-		query += "retweeted_status.retweet_count";
+		query += "entities.user_mentions";
 		
-		MISONParse(query, testFile, DEBUG_STATUS);
-	}
-	def Query8() {
-		val DEBUG_STATUS = false;
-
-		var testFile: ArrayBuffer[String] = new ArrayBuffer();
-
-		// Add files into testFile
-		testFile += "./Test Files/tweet_100.txt";
-
-		var query: ArrayBuffer[String] = new ArrayBuffer();
-		// Add queries into array buffer
-		query += "user.created_at";
-		query += "text";
-		query += "user.name";
-		query += "user.description";
-
 		MISONParse(query, testFile, DEBUG_STATUS);
 	}
 	def BitsTest() {
@@ -202,7 +185,7 @@ object Main {
 	  println(bitmaps);
 	}
 	def main(args: Array[String]) {
-		Query1();
+		Query7();
 		//BitmapTest();
 		//BitsTest();
 		//val x: Char = ' ';
