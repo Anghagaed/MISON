@@ -173,7 +173,6 @@ class MISONParser(
       defaultArrayLayers,
       stringSplitted,
       DEBUG_FLAG);
-
     if (DEBUG_FLAG == true) {
       System.out.println("CurrentRecord: " + currentRecord);
     }

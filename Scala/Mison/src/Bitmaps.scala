@@ -34,11 +34,13 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String], DEB
   // constructor:off
 
   // methods:on
+  // createBitmap - Creates the bitmap with given split string arrays
   def createBitmap: Unit = {
     fillBits(); // phase 1 & 2
-    convertToStruct(); // phase 3/(pre)4
+    convertToStruct(); // phase 3 (includes commas)
     fillColonBits(); // phase 4
-    //println(toString())
+    fillCommaBits(); // phase 4 (but with commas)
+    
   }
   def fillBits(): Unit = {
     var prev: Array[Char] = new Array[Char](2);
@@ -148,7 +150,7 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String], DEB
     output += "\n\n";
     println(output);
   }
-
+  // fillColonBits - Creates leveled colons
   def fillColonBits(): Unit = {
     // copy colon bitmap to leveled colon bitmaps
     for (i <- 0 until map.size) {
@@ -166,45 +168,21 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String], DEB
     for (i <- 0 until map.size) {
       mLeft = map(i).lbracketBitset;
       mRight = map(i).rbracketBitset;
-      //println("i = " + i + "mRight: " + mRight+ " bits = " + mRight.bits);
       do // iterate over each right brace
       {
-        //println("i = " + i);
-        // extract the rightmost 1
-        //        if(i == 36) {
-        //          println("Before:\nmLbit =       " + mLbit + " bits = " + mLbit.bits);
-        //          println("mRbit =       " + mRbit + " bits = " + mRbit.bits);
-        //          println("mLeft =       " + mLeft + " bits = " + mLeft.bits);
-        //          println("mRight =      " + mRight + " bits = " + mRight.bits);
-        //        } 
-        mRbit = mRight & -mRight.bits; // MARKED
-        mLbit = mLeft & -mLeft.bits; // MARKED
-        //        if(i == 36) {
-        //          println("After:\nmLbit =       " + mLbit + " bits = " + mLbit.bits);
-        //          println("mRbit =       " + mRbit + " bits = " + mRbit.bits);
-        //          println("mLeft =       " + mLeft + " bits = " + mLeft.bits);
-        //          println("mRight =      " + mRight + " bits = " + mRight.bits + "\n");
-        //        } 
-        while (!(mLbit == 0) && (mRbit == 0 || mLbit < mRbit)) { // MARKED
+        // extract the rightmost 1 
+        mRbit = mRight & -mRight.bits; 
+        mLbit = mLeft & -mLeft.bits; 
+        while (!(mLbit == 0) && (mRbit == 0 || mLbit < mRbit)) { 
           // 1 = "j", 2 = mLbit
           S.insert(0, (i, mLbit));
-          //println("i = " + i + " mLBit " + mLbit);
           mLeft = mLeft & (mLeft - 1); // remove the rightmost 1
-          mLbit = mLeft & -mLeft.bits; // extract the rightmost 1        // MARKED
-          //println("loop i = " +i);
+          mLbit = mLeft & -mLeft.bits; // extract the rightmost 1        
         }
-        //        if (i == 36) {
-        //          println("i is 36 36 36 36 36");
-        //          printMapSPECword(i);
-        //          S.foreach(println);
-        //        }
-        if (!(mRbit == 0)) { // MARKED
+        if (!(mRbit == 0)) { 
           val pop = S.remove(0); // 0 = "j", 1 = mLbit
           val j = pop._1;
           mLbit = pop._2;
-          //          println("i = " + i);
-          //          println("j = " + j + " mLbit = " + mLbit);
-          //          println("mRbit =       " + mRbit + "\n");
           if (0 < S.size && S.size <= lvls) // clear bits at the upper level
           {
             var flip: Bits = new Bits(0);
@@ -225,30 +203,83 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String], DEB
             }
           }
         }
-        //println("After while loop:\nBefore\nmRight =      " + mRight + " bits = " + mRight.bits)
         mRight &= mRight - 1; // remove the rightmost 1
-        //println("After\nmRight =      " + mRight + " bits = " + mRight.bits + "\n")
       } while (!(mRbit == 0));
-
     }
-
-    //    println(word(36));
-    //    for (x <- 0 until lvls) {
-    //      println("L" + x + ":" + map(36).levels(x));
-    //    }
-
     for (a <- 0 until map.size) {
       for (b <- lvls - 1 until 0 by -1) {
         val temp1 = map(a).levels(b);
         val temp2 = map(a).levels(b - 1);
         map(a).levels(b) = temp1 - (temp1 & temp2);
-
       }
-
     }
   }
-  //def generateColonPositions(start: Int, end: Int, level: Int): Vector[Int] = {
-  //  var colonPositions = Vector.empty[Int];
+  // fillCommaBits - creates leveled commas
+  def fillCommaBits(): Unit = {
+    // copy Comma bitmap to leveled Comma bitmaps
+    for (i <- 0 until map.size) {
+      for (j <- 0 until map(i).CMlevels.size)
+        map(i).CMlevels(j) = map(i).structCMBitset;
+    }
+    var mLeft, mRight: Bits = new Bits(0); // m(left), m(right)
+    var mLbit, mRbit: Bits = new Bits(0); // m(left bit), m(right bit)
+
+    val lvls: Int = map(0).CMlevels.size; // Number of nesting CMlevels
+
+    // ListBuffer: Stack alternative
+    var S: ListBuffer[Tuple2[Int, Bits]] = ListBuffer();
+
+    for (i <- 0 until map.size) {
+      mLeft = map(i).arraylbracketBitset;
+      mRight = map(i).arrayrbracketBitset;
+      do // iterate over each right brace
+      {
+        // extract the rightmost 1 
+        mRbit = mRight & -mRight.bits; 
+        mLbit = mLeft & -mLeft.bits; 
+        while (!(mLbit == 0) && (mRbit == 0 || mLbit < mRbit)) { 
+          // 1 = "j", 2 = mLbit
+          S.insert(0, (i, mLbit));
+          mLeft = mLeft & (mLeft - 1); // remove the rightmost 1
+          mLbit = mLeft & -mLeft.bits; // extract the rightmost 1        
+        }
+        if (!(mRbit == 0)) { 
+          val pop = S.remove(0); // 0 = "j", 1 = mLbit
+          val j = pop._1;
+          mLbit = pop._2;
+          println("mRbit != 0 (S.size = " + S.size + ")");
+          if (0 <= S.size && S.size <= lvls) // clear bits at the upper level
+          {
+            var flip: Bits = new Bits(0);
+            if (i == j) // nested object is inside the word
+            {
+              flip = mRbit - mLbit;
+              flip.flip();
+              map(i).CMlevels(S.size) &= flip;
+            } else // nested object is across multiple words
+            {
+              map(j).CMlevels(S.size) &= mLbit - 1;
+              flip = mRbit - 1;
+              flip.flip();
+              map(i).CMlevels(S.size) &= flip;
+              for (k <- j + 1 until i-1) {
+                map(k).CMlevels(S.size) = new Bits(0);
+              }
+            }
+          }
+        }
+        mRight &= mRight - 1; // remove the rightmost 1
+      } while (!(mRbit == 0));
+    }
+    for (a <- 0 until map.size) {
+      for (b <- lvls - 1 until 0 by -1) {
+        val temp1 = map(a).CMlevels(b);
+        val temp2 = map(a).CMlevels(b - 1);
+        map(a).CMlevels(b) = temp1 - (temp1 & temp2);
+      }
+    }
+  }
+  
   def generateColonPositions(start: Int, end: Int, level: Int): ArrayBuffer[Int] = {
     if (level >= this.layers) {
       if (DEBUG_FLAG == true) {
@@ -257,72 +288,47 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String], DEB
       }
       return new ArrayBuffer[Int]();
     } else {
-//      if(start > end)
-//        println("start > end???!?!?!!?");
-      //println("generate colon pos is called");
       var colonPositions = new ArrayBuffer[Int]();
       var mcolon: Bits = new Bits(0);
       for (i <- (start / B_INT) until ceil(end.toDouble / B_INT).toInt) {
-        //        if (i == 36) {
-        //          println("level: " + level);
-        //          println("word:   " + word(i));
-        //          println("wordr:  " + word(i).reverse);
-        //        }
         mcolon = map(i).levels(level);
         val tempColPos = colonPositions;
-//        if(level == 2) {
-//          println("(Before loop)printing colonPos: ");
-//          colonPositions.foreach(println);
-//          println("stop printing colonPos");
-//        }
-        while (!(mcolon == 0)) { // MARKED
-          val mBit = (mcolon & -mcolon.bits) - 1; // MARKED
-          //          if (i == 36) {
-          //            println("mcolon: " + mcolon)
-          //          }
+        while (!(mcolon == 0)) { 
+          val mBit = (mcolon & -mcolon.bits) - 1; 
           var offset: Int = i * B_INT + mBit.count();
           if (start <= offset && offset <= end) {
             colonPositions = (offset) +: colonPositions;
           }
           mcolon = mcolon & (mcolon - 1);
         }
-//        if(level == 2 && colonPositions.size != tempColPos.size) {
-//          println("(After loop)we added the following in colonPos (for start = " + start + " end = " + end + " i = " + i + ")");
-//          colonPositions.diff(tempColPos).foreach(println);
-//          println("stop printing");
-//        }
       }
-      ////println("Colon Position is: ");
-      //for (i <- 0 until colonPositions.length) {
-      //  print(colonPositions(i) + " ");
-      //}
-      //colonPositions.foreach(x => print(s"${x} "));
-      ////println();
-      //println("ccccccc");
       return colonPositions;
     }
   }
   def generateCommaPositions(start: Int, end: Int, level: Int): ArrayBuffer[Int] = {
-    var commaPositions = new ArrayBuffer[Int]();
-    var mcomma: Bits = new Bits(0);
-    for (i <- (start / B_INT) until ceil(end.toDouble / B_INT).toInt) {
-      mcomma = map(i).CMlevels(level);
-      while (!(mcomma == 0)) { // MARKED
-        val mBit = (mcomma & -mcomma.bits) - 1; // MARKED
-        var offset: Int = i * B_INT + mBit.count();
-        if (start <= offset && offset <= end) {
-          commaPositions = (offset) +: commaPositions;
-        }
-        mcomma = mcomma & (mcomma - 1);
+    if (level >= this.arrayLayers) {
+      if (DEBUG_FLAG == true) {
+        System.out.println("Bitmaps: GENERATE COMMA POS ERROR");
+        System.out.println("Input level is: " + level + " but max arrayLayers is: " + (this.arrayLayers - 1));
       }
+      return new ArrayBuffer[Int]();
+    } else {
+      var commaPositions = new ArrayBuffer[Int]();
+      var mComma: Bits = new Bits(0);
+      for (i <- (start / B_INT) until ceil(end.toDouble / B_INT).toInt) {
+        mComma = map(i).CMlevels(level);
+        val tempColPos = commaPositions;
+        while (!(mComma == 0)) { 
+          val mBit = (mComma & -mComma.bits) - 1; 
+          var offset: Int = i * B_INT + mBit.count();
+          if (start <= offset && offset <= end) {
+            commaPositions = (offset) +: commaPositions;
+          }
+          mComma = mComma & (mComma - 1);
+        }
+      }
+      return commaPositions;
     }
-    ////println("Comma Position is: ");
-    //for (i <- 0 until colonPositions.length) {
-    //  print(colonPositions(i) + " ");
-    //}
-    commaPositions.foreach(x => print(s"${x} "));
-    //println();
-    return commaPositions;
   }
   override def toString: String = {
     var output: String = "";
@@ -348,6 +354,11 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String], DEB
         output += "\nL" + j + ":         ";
         output += map(i).levels(j);
       }
+      output += "\nSCM bitset: " + map(i).structCMBitset;
+      for (j <- 0 until map(i).CMlevels.size) {
+        output += "\nL" + j + ":         ";
+        output += map(i).CMlevels(j);
+      }
       output += "\n\n";
     }
     return output;
@@ -356,20 +367,9 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String], DEB
     var output: Int = -1;
     var startingLevel: Int = colonPosition / 32;
     var pos = 31 - (colonPosition % 32);
-    /*
-    //System.out.//println("colonPosition: " + colonPosition);
-    //System.out.//println("StartingLevel: " + startingLevel);
-    //System.out.//println("Pos " + pos);
-    //System.out.//println("Starting loop");
-    * 
-    */
     for (i <- startingLevel to 0 by -1) {
-      ////System.out.//println("Pos is " + pos);
-      ////System.out.//println(map(i).structQBitset);
       map(i).structQBitset.mirror();
-      ////System.out.//println(map(i).structQBitset);
       output = map(i).structQBitset.getNextOnPosition(pos);
-      ////System.out.//println("i " + i + " " + output);
       if (output != -1) {
         map(i).structQBitset.mirror();
         return (31 - output) + (32 * i);
@@ -382,68 +382,61 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String], DEB
   // Given a colon position to an array field, it generates a substring enclosed by array field
   // Returns null if enclosing the whole substring is impossible
   // Assumes that there is the end array bracket and colon position is valid
-  def getArraySubString(colonPos: Int, level: Int): String = {
-    var start = colonPos + 1; // start range of substring
-    var end: Int = -1; // end range of substring in endWord
-    var startWord: Int = (colonPos / 32); // word to begin searching
-    var endWord: Int = -1; // end word
-    var currentLevel: Int = level; // used to find the end bracket
-    var index = colonPos % 32; // index used to help searching for the end
-    // start search
-    var i = startWord;
-    while (i < map.size && currentLevel != 0) {
-      var bothnegative = false;
-      // extract next location for both '[' bracket and ']' bracket
-      while (currentLevel != 0 && !bothnegative) {
-        val arraylbracketpos = map(i).arraylbracketBitset.getNextOnPosition(index);
-        val arrayrbracketpos = map(i).arrayrbracketBitset.getNextOnPosition(index);
-
-        // left bracket is closer
-        if (arraylbracketpos != -1 && arraylbracketpos < arrayrbracketpos) {
-          currentLevel += 1;
-          index = arraylbracketpos;
-        } // right bracket is closer
-        else if (arrayrbracketpos != -1 && arrayrbracketpos < arraylbracketpos) {
-          currentLevel -= 1;
-          index = arrayrbracketpos;
-        } else
-          bothnegative = true;
-        // check for end condition
-        if (currentLevel == 0) {
-          endWord = i;
-          end = index;
-        }
-      }
-      // reset index
-      index = 0;
-    }
-    // generate the result
-    var subStr: String = "";
-    for (i <- startWord until endWord)
-      subStr += word(i);
-    subStr += word(endWord).substring(0, end);
-    return subStr;
-  }
+//  def getArraySubString(colonPos: Int, level: Int): String = {
+//    var start = colonPos + 1; // start range of substring
+//    var end: Int = -1; // end range of substring in endWord
+//    var startWord: Int = (colonPos / 32); // word to begin searching
+//    var endWord: Int = -1; // end word
+//    var currentLevel: Int = level; // used to find the end bracket
+//    var index = colonPos % 32; // index used to help searching for the end
+//    // start search
+//    var i = startWord;
+//    while (i < map.size && currentLevel != 0) {
+//      var bothnegative = false;
+//      // extract next location for both '[' bracket and ']' bracket
+//      while (currentLevel != 0 && !bothnegative) {
+//        val arraylbracketpos = map(i).arraylbracketBitset.getNextOnPosition(index);
+//        val arrayrbracketpos = map(i).arrayrbracketBitset.getNextOnPosition(index);
+//
+//        // left bracket is closer
+//        if (arraylbracketpos != -1 && arraylbracketpos < arrayrbracketpos) {
+//          currentLevel += 1;
+//          index = arraylbracketpos;
+//        } // right bracket is closer
+//        else if (arrayrbracketpos != -1 && arrayrbracketpos < arraylbracketpos) {
+//          currentLevel -= 1;
+//          index = arrayrbracketpos;
+//        } else
+//          bothnegative = true;
+//        // check for end condition
+//        if (currentLevel == 0) {
+//          endWord = i;
+//          end = index;
+//        }
+//      }
+//      // reset index
+//      index = 0;
+//    }
+//    // generate the result
+//    var subStr: String = "";
+//    for (i <- startWord until endWord)
+//      subStr += word(i);
+//    subStr += word(endWord).substring(0, end);
+//    return subStr;
+//  }
   def getArraySubString(colonPos: Int, level: Int, str: String): String = {
-    //println(str);
     var start = colonPos + 2; // start range of loop
     var end: Int = -1; // end range of substring in endWord
     var startWord: Int = start / 32; // word to begin searching
-    //var endWord:Int = -1;                // end word
     var count: Int = 1; // used to find the end bracket
     var index = start % 32; // index used to help searching for the end
     // start search
     var i = startWord;
-    //println(index);
-    //println(colonPos + 1);
-    //println(str(start));
     var foundEndpt = false;
-    //println("Starting while loop 1");
 
     while (i < map.size && !foundEndpt) {
       // extract next location for both '[' bracket and ']' bracket
       var bothnegative = false;
-      //println("Starting while loop 2 at i " + i);
       while (!foundEndpt && !bothnegative) {
         val arraylbracketpos = map(i).arraylbracketBitset.getNextOnPosition(index);
         val arrayrbracketpos = map(i).arrayrbracketBitset.getNextOnPosition(index);
@@ -471,8 +464,6 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String], DEB
         }
         // check for end condition
         if (count == 1) {
-          println("Found EndPt");
-          //endWord = i;
           end = i * B_INT + index;
           foundEndpt = true;
         }
@@ -506,27 +497,16 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String], DEB
     var startingLevel: Int = colonPosition / 32;
     var pos = colonPosition % 32;
     for (i <- startingLevel until map.length by 1) {
-      ////System.out.//println("Pos is " + pos + " for iteration " + i);
-      ////System.out.//println("struct CM Bitset: " + map(i).structCMBitset);
-      ////System.out.//println("struct R Bitset: " + map(i).structRBitset);
       var commaPos = map(i).structCMBitset.getNextOnPosition(pos);
       var bracketPos = map(i).structRBitset.getNextOnPosition(pos);
-      ////System.out.//println("commaPos is " + commaPos);
-      ////System.out.//println("bracketPos is " + bracketPos);
-
       if (commaPos != -1 && bracketPos != -1) {
-        ////System.out.//println("Output Code 0");
         val returnVal = if (commaPos < bracketPos) commaPos else bracketPos;
-        ////System.out.//println("returnVal is " + returnVal);
         return returnVal + (32 * i);
       } else if (commaPos != -1) {
-        ////System.out.//println("Output Code 1");
         return commaPos + (32 * i);
       } else if (bracketPos != -1) {
-        ////System.out.//println("Output Code 2");
         return bracketPos + (32 * i);
       }
-
       pos = 0;
     }
     return -1;

@@ -184,8 +184,13 @@ object Main {
       stringSplitted);
 	  println(bitmaps);
 	}
+	def UnicodeTest() {
+	  var unicodeStr = "\u2026";
+	  println("\\u2026 = "+unicodeStr);
+	}
 	def main(args: Array[String]) {
-		Query7();
+		//UnicodeTest();
+	  Query1();
 		//BitmapTest();
 		//BitsTest();
 		//val x: Char = ' ';
