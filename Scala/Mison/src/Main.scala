@@ -173,16 +173,28 @@ object Main {
 		}
 	}
 	def BitmapTest() {
-	  var filePath = "./Test Files/blank.txt"
+	  var filePath = "./Test Files/jsonTest1.txt"
 	  var fileHandler: fileHandler = new fileHandler();
 	  fileHandler.setNewFilePath(filePath);
 	  fileHandler.getNext;
 	  val stringSplitted = fileHandler.getFileArray;
 	  var bitmaps = new Bitmaps(
-      3,
-      0,
+      2,
+      2,
       stringSplitted);
 	  println(bitmaps);
+	  for (i <- 0 until stringSplitted.size) {
+	    println("Generating colons for " + i + "th row...");
+	    val start = 32*i;
+	    val end = (32*(i+1)-1);
+	    val ab1 = bitmaps.generateCommaPositions(start,end,0);
+	    val ab2 = bitmaps.generateCommaPositions(start,end,1);
+	    print("AB1: ");
+	    ab1.foreach(x => print(s"$x "));
+	    print("\nAb2: ");
+	    ab2.foreach(x => print(s"$x "));
+	    println();
+	  }
 	}
 	def UnicodeTest() {
 	  var unicodeStr = "\u2026";
@@ -190,7 +202,7 @@ object Main {
 	}
 	def main(args: Array[String]) {
 		//UnicodeTest();
-	  Query1();
+	  BitmapTest();
 		//BitmapTest();
 		//BitsTest();
 		//val x: Char = ' ';

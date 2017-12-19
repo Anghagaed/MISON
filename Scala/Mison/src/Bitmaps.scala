@@ -247,7 +247,6 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String], DEB
           val pop = S.remove(0); // 0 = "j", 1 = mLbit
           val j = pop._1;
           mLbit = pop._2;
-          println("mRbit != 0 (S.size = " + S.size + ")");
           if (0 <= S.size && S.size <= lvls) // clear bits at the upper level
           {
             var flip: Bits = new Bits(0);
