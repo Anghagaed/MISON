@@ -123,43 +123,54 @@ object Main {
 		MISONParse(query, testFile, DEBUG_STATUS);
 	}
 	def BitsTest() {
-		var x:Bits = new Bits(Int.MaxValue);
-	x += 1;
-	println(x)
-	var y:Bits = new Bits(1);
-	//    println("start");
-	for(i <- 0 until 32) {
-		//      if(x == y){
-		//        println(x)
-		//      }
-		println("extracting 1")
-		println("before:"+x)
+		// Testing union operation
+	  var x:Bits = new Bits(Int.MaxValue);
+	  println("x=   "+x);
+	  x.flip();
+	  println("x(f)="+x);
+	  println("x+1= "+(x+1));
+	  var y:Bits = new Bits(12345);
+	  println("y=   "+y);
+	  println("x+y= "+(x+y));
+	  /*
+  	x += 1;
+  	println(x)
+  	var y:Bits = new Bits(1);
+  	//    println("start");
+  	for(i <- 0 until 32) {
+  		//      if(x == y){
+  		//        println(x)
+  		//      }
+  		println("extracting 1")
+  		println("before:"+x)
+  
+  		var z = x & -x.bits
+  		//println(new Bits(-x.bits))
+  		println("after: "+z)
+  
+  		println("remove 1")
+  		println("before:"+x)
+  
+  		z = x & (x - 1)
+  		//println((x-1))
+  		println("after: "+z)
+  
+  
+  		x.set(i,1)
 
-		var z = x & -x.bits
-		//println(new Bits(-x.bits))
-		println("after: "+z)
-
-		println("remove 1")
-		println("before:"+x)
-
-		z = x & (x - 1)
-		//println((x-1))
-		println("after: "+z)
-
-
-		x.set(i,1)
-
-	}
-	//    println("end");
-	println("extracting 1")
-	var z = x & -x.bits
-	println(new Bits(-x.bits))
-	println(z)
-
-	println("remove 1")
-	z = x & (x - 1)
-	println((x-1))
-	println(z)
+  	}
+  	//    println("end");
+  	println("extracting 1")
+  	var z = x & -x.bits
+  	println(new Bits(-x.bits))
+  	println(z)
+  
+  	println("remove 1")
+  	z = x & (x - 1)
+  	println((x-1))
+  	println(z)
+  	* 
+  	*/
 	}
 
 	def MISONParse(queryFieldsList: ArrayBuffer[String],
@@ -184,9 +195,13 @@ object Main {
       stringSplitted);
 	  println(bitmaps);
 	  for (i <- 0 until stringSplitted.size) {
-	    println("Generating colons for " + i + "th row...");
 	    val start = 32*i;
 	    val end = (32*(i+1)-1);
+	    println("Generating all colons for " + i + "th row...");
+	    val ab = bitmaps.generateAllColonPositions(start,end);
+	    print("AB:  ");
+	    ab.foreach(x => print(s"$x "));
+	    println("\nGenerating commas for " + i + "th row...");
 	    val ab1 = bitmaps.generateCommaPositions(start,end,0);
 	    val ab2 = bitmaps.generateCommaPositions(start,end,1);
 	    print("AB1: ");
@@ -202,8 +217,7 @@ object Main {
 	}
 	def main(args: Array[String]) {
 		//UnicodeTest();
-	  BitmapTest();
-		//BitmapTest();
+		BitmapTest();
 		//BitsTest();
 		//val x: Char = ' ';
 		//println(x == ' ');

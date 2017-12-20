@@ -278,7 +278,21 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String], DEB
       }
     }
   }
-  
+  def generateAllColonPositions(start: Int, end: Int): ArrayBuffer[Int] = {
+    var colonPositions = new ArrayBuffer[Int]();
+    for (i <- (start / B_INT) until ceil(end.toDouble / B_INT).toInt) {
+      var mcolon = map(i).structCBitset;
+      while(!(mcolon == 0)) {
+        val mBit = (mcolon & -mcolon.bits) - 1; 
+        var offset: Int = i * B_INT + mBit.count();
+        if (start <= offset && offset <= end) {
+          colonPositions = (offset) +: colonPositions;
+        }
+        mcolon = mcolon & (mcolon - 1);
+      }
+    }
+    return colonPositions;
+  }
   def generateColonPositions(start: Int, end: Int, level: Int): ArrayBuffer[Int] = {
     if (level >= this.layers) {
       if (DEBUG_FLAG == true) {
@@ -291,7 +305,6 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String], DEB
       var mcolon: Bits = new Bits(0);
       for (i <- (start / B_INT) until ceil(end.toDouble / B_INT).toInt) {
         mcolon = map(i).levels(level);
-        val tempColPos = colonPositions;
         while (!(mcolon == 0)) { 
           val mBit = (mcolon & -mcolon.bits) - 1; 
           var offset: Int = i * B_INT + mBit.count();
@@ -316,7 +329,6 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String], DEB
       var mComma: Bits = new Bits(0);
       for (i <- (start / B_INT) until ceil(end.toDouble / B_INT).toInt) {
         mComma = map(i).CMlevels(level);
-        val tempColPos = commaPositions;
         while (!(mComma == 0)) { 
           val mBit = (mComma & -mComma.bits) - 1; 
           var offset: Int = i * B_INT + mBit.count();
