@@ -503,7 +503,7 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String], DEB
     } while (x != -1);
 
   }
-
+  // For {} Parsing
   def getEndingBoundary(colonPosition: Int): Int = {
     var startingLevel: Int = colonPosition / 32;
     var pos = colonPosition % 32;
@@ -522,7 +522,7 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String], DEB
     }
     return -1;
   }
-
+  // For {} Parsing
   def getEndRightBraces: Int = {
     var pos = -1;
     var temp = map(map.length - 1).structRBitset.getNextOnPosition(0);
@@ -534,6 +534,31 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String], DEB
     println(pos);
     return pos;
   }
+  
+  def getNextLeftBracket(position: Int) = {
+    
+  }
+  
+  // for [] parsing
+  def getIntermediateStart(commaPosition: Int): Int = {
+    var startingLevel: Int = commaPosition / 32;
+    var pos = commaPosition % 32;
+    for (i <- startingLevel until map.length by 1) {
+      var commaPos = map(i).structCMBitset.getNextOnPosition(pos);
+      var colonPos = map(i).structCBitset.getNextOnPosition(pos);
+      if (commaPos != -1 && colonPos != -1) {
+        val returnVal = if (commaPos < colonPos) commaPos else colonPos;
+        return returnVal + (32 * i);
+      } else if (commaPos != -1) {
+        return commaPos + (32 * i);
+      } else if (colonPos != -1) {
+        return colonPos + (32 * i);
+      }
+      pos = 0;
+    }
+    return -1;
+  }
+  
   // methods:off
   createBitmap;
   toString()

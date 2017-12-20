@@ -104,7 +104,7 @@ class MISONParser(
     }
   }
 
-  println("IN fking MISON");
+  //println("IN fking MISON");
   var queryFieldsInfo: queryFields = new queryFields(queryFieldsList);
   private var fileHandler: fileHandler = new fileHandler();
   private var result: ArrayBuffer[String] = new ArrayBuffer[String];
@@ -289,35 +289,69 @@ class MISONParser(
     }
     return false;
   }
-  
-  def parseArray(colonPos: Int, lastField: Boolean): String = {
+  // Only one parameter will be have valid input, the other parameter will be -01
+  private def parseArray(start: Int, end: Int, level: Int): String = {
+    // Initialize start or end depending on which is invalid
+    if (start == -1) {
+      
+    }
+    if (end == -1) {
+      
+    }
     
-    // Need to implement a way to get the end
-    val start = colonPos + 1;
-    val end = 0; //bitmaps.getEnd();
-    val startLevel = 0;
-    var commaPos = bitmaps.generateCommaPositions(start, end, startLevel);
-    val output = parseArrayField(startLevel, commaPos);
+    var commaPos = bitmaps.generateCommaPositions(start, end, level);
+    val output = parseArrayField(level, commaPos);
     return "[" + output + "]";
   }
   
-  def parseArrayField(curLevel: Int, commaPos: ArrayBuffer[Int]): String = {
+  private def parseArrayField(curLevel: Int, commaPos: ArrayBuffer[Int]): String = {
      var output = "";
-     for (i <- commaPos.length - 1 to 0 by -1) {
-       // Grab Field 
-       // Considers ["x": 25, 30] 
-       // Considers [25, 30]
-       // Considers singular cases
-       val currentField = currentRecord.substring(0, commaPos(i));// Grab field;
-       
-       // Need to figure out format for append
-       // but basic idea is:
-       output = output + currentField;
-       
-     }
+     
+     // Grab the first field in the array
+     output = output + arrayFirstField(curLevel, commaPos);
+     
+     // Grab all field inbetween first and last
+     output = output + arrayIntermediate(curLevel, commaPos);
+     
+     // Grab the final field in the array
+     output = output + arrayFinalField(curLevel, commaPos);
      return output;
   }
   
+  private def arrayFirstField(curLevel: Int, commaPos: ArrayBuffer[Int]): String = {
+    var output = "";
+    
+    return output;
+  }
+  
+  private def arrayFinalField(curLevel: Int, commaPos: ArrayBuffer[Int]): String = {
+    var output = "";
+    
+    return output;
+  }
+  
+  private def arrayIntermediate(curLevel: Int, commaPos: ArrayBuffer[Int]): String = {
+    var output = "";
+    
+    for (i <- commaPos.length - 1 to 0 by -1) {
+      val previousChar = currentRecord.charAt(commaPos(i) - 1);
+      // Handles internal nesting
+      if (previousChar == ']') {
+        val arrayOutput = parseArray(-1, commaPos(i) - 1, curLevel + 1);
+        output = output + arrayOutput + ", ";
+      } else {
+        // No array nesting, can safely grab values
+        val end = commaPos(i);
+        val start = bitmaps.getIntermediateStart(end);
+        
+        val currentField = currentRecord.substring(start, end);
+        
+        output = output + currentField + ", ";
+      }
+    }
+    
+    return output;
+  }
 }
 
 // scalastyle:on println
