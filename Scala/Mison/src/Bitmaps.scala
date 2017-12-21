@@ -572,7 +572,7 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String], DEB
   // For [] Parsing, arrayFirstField(...) only
   def getFirstStart(commaPosition: Int): Int = {
     var startingLevel: Int = commaPosition / 32;
-    var pos = commaPosition % 32;
+    var pos = 31 - (commaPosition % 32);
     for (i <- startingLevel until 0 by -1) {
       map(i).structALBBitset.mirror();
       map(i).structCBitset.mirror();
@@ -600,14 +600,25 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String], DEB
   }
   
   // For [] Parsing, arrayFinalField(...) only
-  def getFinalEnd(commaPosition: Int): (Int, Option[Boolean]) = {
-    
-    return (-1, None);
+  // Find the next structural colon
+  def getFinalStart(position: Int): Int = {
+    var startingLevel: Int = position / 32;
+    var pos = 31 - (position % 32);
+    for (i <- startingLevel until 0 by -1) {
+      map(i).structCBitset.mirror();
+      var commaPos = map(i).structCMBitset.getNextOnPosition(pos);
+      if (commaPos != -1) {
+        return commaPos;
+      }
+      pos = 0;
+      map(i).structCBitset.mirror();
+    }
+    return -1;
   }
   // for [] parsing, arrayIntermediate(...) only
   def getIntermediateStart(commaPosition: Int): (Int, Option[Boolean]) = {
     var startingLevel: Int = commaPosition / 32;
-    var pos = commaPosition % 32;
+    var pos = 31 - (commaPosition % 32);
     for (i <- startingLevel until 0 by -1) {
       map(i).structCMBitset.mirror();
       map(i).structCBitset.mirror();

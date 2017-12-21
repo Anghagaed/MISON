@@ -217,9 +217,11 @@ object Main {
 	}
 	def main(args: Array[String]) {
 		//UnicodeTest();
-		BitmapTest();
+		//BitmapTest();
 		//BitsTest();
 		//val x: Char = ' ';
 		//println(x == ' ');
+	  //println((Some(false)));
+	  Query1();
 	}
 }

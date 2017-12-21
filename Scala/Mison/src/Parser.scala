@@ -306,11 +306,11 @@ class MISONParser(
     }
     
     var commaPos = bitmaps.generateCommaPositions(start, end, level);
-    val output = parseArrayField(level, commaPos);
+    val output = parseArrayField(level, commaPos, end);
     return "[" + output + "]";
   }
   
-  private def parseArrayField(curLevel: Int, commaPos: ArrayBuffer[Int]): String = {
+  private def parseArrayField(curLevel: Int, commaPos: ArrayBuffer[Int], end: Int): String = {
      var output = "";
      
      // Grab the first field in the array
@@ -320,7 +320,7 @@ class MISONParser(
      output = output + arrayIntermediate(curLevel, commaPos);
      
      // Grab the final field in the array
-     output = output + arrayFinalField(curLevel, commaPos(commaPos.length - 1));
+     output = output + arrayFinalField(curLevel, commaPos(commaPos.length - 1), end);
      return output;
   }
   
@@ -349,22 +349,37 @@ class MISONParser(
     return output;
   }
   // Handles index = Length - 1 case
-  private def arrayFinalField(curLevel: Int, commaPos: Int): String = {
+  private def arrayFinalField(curLevel: Int, commaPos: Int, endInput: Int): String = {
     var output = "";
-    var start = commaPos + 1;
-    var nextChar = currentRecord.charAt(start);
+    var startTemp = commaPos + 1;
+    var nextChar = currentRecord.charAt(startTemp);
     while (nextChar == ' ') {
-      start = start + 1;
-      nextChar = currentRecord.charAt(start);
+      startTemp = startTemp + 1;
+      nextChar = currentRecord.charAt(startTemp);
     }
     if (nextChar == '[') {
-      val arrayOutput = parseArray(start, -1, curLevel + 1);
+      val arrayOutput = parseArray(startTemp, -1, curLevel + 1);
       output = output + arrayOutput + ", ";
     } else if (nextChar == '{') {
       
     } else {
-      val (end, typeBool) = bitmaps.getFinalEnd(start);
-      
+      //val (start, typeBool) = bitmaps.getFinalEnd(endInput);
+      var start = -1;
+      var end = -1;
+      if (nextChar == '"') {
+        // Start a colon
+        //start = bitmaps.getFinalStart(end
+        start = bitmaps.getFinalStart(endInput) + 1;
+        end = endInput - 2;
+        var charTemp = currentRecord.charAt(start);
+        while (charTemp == ' ' || charTemp == '"') {
+          start = start + 1;
+          charTemp = currentRecord.charAt(start);
+        }
+      } else {
+        start = startTemp;
+        end = endInput;
+      }
       val currentField = currentRecord.substring(start, end);  
       output = output + currentField + ", ";
     }
