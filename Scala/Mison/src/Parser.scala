@@ -363,7 +363,10 @@ class MISONParser(
     } else if (nextChar == '{') {
       
     } else {
+      val (end, typeBool) = bitmaps.getFinalEnd(start);
       
+      val currentField = currentRecord.substring(start, end);  
+      output = output + currentField + ", ";
     }
     return output;
   }

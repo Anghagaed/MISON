@@ -571,28 +571,71 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String], DEB
   }
   // For [] Parsing, arrayFirstField(...) only
   def getFirstStart(commaPosition: Int): Int = {
+    var startingLevel: Int = commaPosition / 32;
+    var pos = commaPosition % 32;
+    for (i <- startingLevel until 0 by -1) {
+      map(i).structALBBitset.mirror();
+      map(i).structCBitset.mirror();
+      var commaPos = map(i).structALBBitset.getNextOnPosition(pos);
+      var colonPos = map(i).structCBitset.getNextOnPosition(pos);
+      if (commaPos != -1 && colonPos != -1) {
+        map(i).structALBBitset.mirror();
+        map(i).structCBitset.mirror();
+        val returnVal = if (commaPos < colonPos) commaPos else colonPos;
+        return returnVal + (32 * i);
+      } else if (commaPos != -1) {
+        map(i).structALBBitset.mirror();
+        map(i).structCBitset.mirror();
+        return commaPos + (32 * i);
+      } else if (colonPos != -1) {
+        map(i).structALBBitset.mirror();
+        map(i).structCBitset.mirror();
+        return colonPos + (32 * i);
+      }
+      pos = 0;
+      map(i).structALBBitset.mirror();
+      map(i).structCBitset.mirror();
+    }
     return -1;
   }
   
+  // For [] Parsing, arrayFinalField(...) only
+  def getFinalEnd(commaPosition: Int): (Int, Option[Boolean]) = {
+    
+    return (-1, None);
+  }
   // for [] parsing, arrayIntermediate(...) only
-  def getIntermediateStart(commaPosition: Int): (Int, Boolean) = {
+  def getIntermediateStart(commaPosition: Int): (Int, Option[Boolean]) = {
     var startingLevel: Int = commaPosition / 32;
     var pos = commaPosition % 32;
-    for (i <- startingLevel until map.length by 1) {
+    for (i <- startingLevel until 0 by -1) {
+      map(i).structCMBitset.mirror();
+      map(i).structCBitset.mirror();
       var commaPos = map(i).structCMBitset.getNextOnPosition(pos);
       var colonPos = map(i).structCBitset.getNextOnPosition(pos);
       if (commaPos != -1 && colonPos != -1) {
+        map(i).structCMBitset.mirror();
+        map(i).structCBitset.mirror();
+        
         val returnVal = if (commaPos < colonPos) commaPos else colonPos;
         val returnBol = if (commaPos < colonPos) false else true;
-        return (returnVal + (32 * i), returnBol);
+        return (returnVal + (32 * i), Option(returnBol));
       } else if (commaPos != -1) {
-        return (commaPos + (32 * i), false);
+        map(i).structCMBitset.mirror();
+        map(i).structCBitset.mirror();
+        
+        return (commaPos + (32 * i), Option(false));
       } else if (colonPos != -1) {
-        return (colonPos + (32 * i), true);
+        map(i).structCMBitset.mirror();
+        map(i).structCBitset.mirror();
+        
+        return (colonPos + (32 * i), Option(true));
       }
       pos = 0;
+      map(i).structCMBitset.mirror();
+      map(i).structCBitset.mirror();
     }
-    return -1;
+    return (-1, None);
   }
   
   // methods:off
