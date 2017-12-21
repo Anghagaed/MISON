@@ -374,22 +374,7 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String], DEB
     }
     return output;
   }
-  def getStartingBoundary(colonPosition: Int): Int = {
-    var output: Int = -1;
-    var startingLevel: Int = colonPosition / 32;
-    var pos = 31 - (colonPosition % 32);
-    for (i <- startingLevel to 0 by -1) {
-      map(i).structQBitset.mirror();
-      output = map(i).structQBitset.getNextOnPosition(pos);
-      if (output != -1) {
-        map(i).structQBitset.mirror();
-        return (31 - output) + (32 * i);
-      }
-      map(i).structQBitset.mirror();
-      pos = 0;
-    }
-    return -1;
-  }
+
   // Given a colon position to an array field, it generates a substring enclosed by array field
   // Returns null if enclosing the whole substring is impossible
   // Assumes that there is the end array bracket and colon position is valid
@@ -503,6 +488,26 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String], DEB
     } while (x != -1);
 
   }
+  
+  // For {} Parsing
+  
+  def getStartingBoundary(colonPosition: Int): Int = {
+    var output: Int = -1;
+    var startingLevel: Int = colonPosition / 32;
+    var pos = 31 - (colonPosition % 32);
+    for (i <- startingLevel to 0 by -1) {
+      map(i).structQBitset.mirror();
+      output = map(i).structQBitset.getNextOnPosition(pos);
+      if (output != -1) {
+        map(i).structQBitset.mirror();
+        return (31 - output) + (32 * i);
+      }
+      map(i).structQBitset.mirror();
+      pos = 0;
+    }
+    return -1;
+  }
+  
   // For {} Parsing
   def getEndingBoundary(colonPosition: Int): Int = {
     var startingLevel: Int = colonPosition / 32;
@@ -534,13 +539,43 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String], DEB
     println(pos);
     return pos;
   }
-  
-  def getNextLeftBracket(position: Int) = {
-    
+  // For [] Parsing
+  def getNextLeftBracket(position: Int): Int = {
+    var startingLevel: Int = position / 32;
+    var pos = 31 - (position % 32);
+    for (i <- startingLevel until 0 by -1) {
+      map(i).structALBBitset.mirror();
+      val output = map(i).structALBBitset.getNextOnPosition(pos);
+      if (output != -1) {
+        map(i).structALBBitset.mirror();
+        return (31 - output) + (32 * i);
+      }
+      map(i).structALBBitset.mirror();
+      pos = 0;
+    }
+    return -1;
   }
   
-  // for [] parsing
-  def getIntermediateStart(commaPosition: Int): Int = {
+  // For [] Parsing
+  def getNextRightBracket(position: Int): Int = {
+    var startingLevel: Int = position / 32;
+    var pos = position % 32;
+    for (i <- startingLevel until map.length by 1) {
+      val output = map(i).structARBBitset.getNextOnPosition(pos);
+      if (output != -1) {
+        return output + (32 * i);
+      }
+      pos = 0;
+    }
+    return -1;
+  }
+  // For [] Parsing, arrayFirstField(...) only
+  def getFirstStart(commaPosition: Int): Int = {
+    return -1;
+  }
+  
+  // for [] parsing, arrayIntermediate(...) only
+  def getIntermediateStart(commaPosition: Int): (Int, Boolean) = {
     var startingLevel: Int = commaPosition / 32;
     var pos = commaPosition % 32;
     for (i <- startingLevel until map.length by 1) {
@@ -548,11 +583,12 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String], DEB
       var colonPos = map(i).structCBitset.getNextOnPosition(pos);
       if (commaPos != -1 && colonPos != -1) {
         val returnVal = if (commaPos < colonPos) commaPos else colonPos;
-        return returnVal + (32 * i);
+        val returnBol = if (commaPos < colonPos) false else true;
+        return (returnVal + (32 * i), returnBol);
       } else if (commaPos != -1) {
-        return commaPos + (32 * i);
+        return (commaPos + (32 * i), false);
       } else if (colonPos != -1) {
-        return colonPos + (32 * i);
+        return (colonPos + (32 * i), true);
       }
       pos = 0;
     }

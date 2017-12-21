@@ -290,13 +290,19 @@ class MISONParser(
     return false;
   }
   // Only one parameter will be have valid input, the other parameter will be -01
-  private def parseArray(start: Int, end: Int, level: Int): String = {
-    // Initialize start or end depending on which is invalid
-    if (start == -1) {
-      
+  private def parseArray(startInput: Int, endInput: Int, level: Int): String = {
+    // Initialize start or end depending on which input is invalid
+    // Issues to fix, brackets are not level handled
+    // Will need to fix the two functions to handle levels
+    var start = -1;
+    var end = -1;
+    if (startInput == -1) {
+      start = bitmaps.getNextLeftBracket(endInput);
+      end = endInput;
     }
-    if (end == -1) {
-      
+    if (endInput == -1) {
+      start = startInput;
+      end = bitmaps.getNextRightBracket(startInput);
     }
     
     var commaPos = bitmaps.generateCommaPositions(start, end, level);
@@ -308,44 +314,84 @@ class MISONParser(
      var output = "";
      
      // Grab the first field in the array
-     output = output + arrayFirstField(curLevel, commaPos);
+     output = output + arrayFirstField(curLevel, commaPos(0));
      
      // Grab all field inbetween first and last
      output = output + arrayIntermediate(curLevel, commaPos);
      
      // Grab the final field in the array
-     output = output + arrayFinalField(curLevel, commaPos);
+     output = output + arrayFinalField(curLevel, commaPos(commaPos.length - 1));
      return output;
   }
   
-  private def arrayFirstField(curLevel: Int, commaPos: ArrayBuffer[Int]): String = {
+  // Handle index = 0 case
+  private def arrayFirstField(curLevel: Int, commaPos: Int): String = {
     var output = "";
+    if (DEBUG_FLAG == true) {
+      if (commaPos == 0) {
+        println("Array Field Error commaPos(i) or commaPos is 0");
+        return "";
+      }
+    }
+    val previousChar = currentRecord.charAt(commaPos - 1);
+    if (previousChar == ']') {
+      val arrayOutput = parseArray(-1, commaPos - 1, curLevel + 1);
+      output = output + arrayOutput + ", ";
+    } else if (previousChar == '}') {
     
+    } else {
+      val end = commaPos;
+      val start = bitmaps.getFirstStart(end);
+      
+      val currentField = currentRecord.substring(start, end);  
+      output = output + currentField + ", ";
+    }
     return output;
   }
-  
-  private def arrayFinalField(curLevel: Int, commaPos: ArrayBuffer[Int]): String = {
+  // Handles index = Length - 1 case
+  private def arrayFinalField(curLevel: Int, commaPos: Int): String = {
     var output = "";
-    
+    var start = commaPos + 1;
+    var nextChar = currentRecord.charAt(start);
+    while (nextChar == ' ') {
+      start = start + 1;
+      nextChar = currentRecord.charAt(start);
+    }
+    if (nextChar == '[') {
+      val arrayOutput = parseArray(start, -1, curLevel + 1);
+      output = output + arrayOutput + ", ";
+    } else if (nextChar == '{') {
+      
+    } else {
+      
+    }
     return output;
   }
-  
+  // Handles from index = [1, length - 2]
   private def arrayIntermediate(curLevel: Int, commaPos: ArrayBuffer[Int]): String = {
     var output = "";
     
-    for (i <- commaPos.length - 1 to 0 by -1) {
+    for (i <- commaPos.length - 2 to 1 by -1) {
+      if (DEBUG_FLAG == true) {
+        if (commaPos == 0) {
+          println("Array Field Error commaPos(i) or commaPos is 0");
+          return "";
+        }
+      }
+      
       val previousChar = currentRecord.charAt(commaPos(i) - 1);
       // Handles internal nesting
       if (previousChar == ']') {
         val arrayOutput = parseArray(-1, commaPos(i) - 1, curLevel + 1);
         output = output + arrayOutput + ", ";
+      } else if (previousChar == '}') {
+        
       } else {
         // No array nesting, can safely grab values
         val end = commaPos(i);
-        val start = bitmaps.getIntermediateStart(end);
+        val (start, typeBool) = bitmaps.getIntermediateStart(end);
         
         val currentField = currentRecord.substring(start, end);
-        
         output = output + currentField + ", ";
       }
     }
