@@ -152,6 +152,11 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String], DEB
   }
   // fillColonBits - Creates leveled colons
   def fillColonBits(): Unit = {
+    // To avoid crashes
+    if(layers == 0) {
+      println("structural layers = 0\nStopping fillColonBits");
+      return;
+    }
     // copy colon bitmap to leveled colon bitmaps
     for (i <- 0 until map.size) {
       for (j <- 0 until map(i).levels.size)
@@ -216,6 +221,11 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String], DEB
   }
   // fillCommaBits - creates leveled commas
   def fillCommaBits(): Unit = {
+    // To avoid crashes
+    if(arrayLayers == 0) {
+      println("array layers = 0\nStopping fillCommaBits");
+      return;
+    }
     // copy Comma bitmap to leveled Comma bitmaps
     for (i <- 0 until map.size) {
       for (j <- 0 until map(i).CMlevels.size)
@@ -294,6 +304,11 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String], DEB
     return colonPositions;
   }
   def generateColonPositions(start: Int, end: Int, level: Int): ArrayBuffer[Int] = {
+    // To avoid crashes
+    if(layers == 0) {
+      println("structural layers = 0\ngenerateColonPositions");
+      return new ArrayBuffer[Int];
+    }
     if (level >= this.layers) {
       if (DEBUG_FLAG == true) {
         System.out.println("Bitmaps: GENERATE COLON POS ERROR");
@@ -318,6 +333,11 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String], DEB
     }
   }
   def generateCommaPositions(start: Int, end: Int, level: Int): ArrayBuffer[Int] = {
+    // To avoid crashes
+    if(arrayLayers == 0) {
+      println("array layers = 0\ngenerateCommaPositions");
+      return new ArrayBuffer[Int];
+    }
     if (level >= this.arrayLayers) {
       if (DEBUG_FLAG == true) {
         System.out.println("Bitmaps: GENERATE COMMA POS ERROR");

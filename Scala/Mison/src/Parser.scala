@@ -147,6 +147,7 @@ class MISONParser(
   }
 
   private def initLineParse() {
+    defaultArrayLayers = 4; // please change this
     val stringSplitted = fileHandler.getFileArray;
     currentRecord = fileHandler.getLineString;
     bitmaps = new Bitmaps(
@@ -160,7 +161,6 @@ class MISONParser(
     }
     matchingFieldNumber = 0;
     lineOutput = new Array[String](queryFieldsInfo.fieldsOrder.size);
-    defaultArrayLayers = 0;
   }
 
   private def parseLine(curLevel: Int,
