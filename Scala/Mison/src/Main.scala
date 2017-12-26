@@ -172,7 +172,7 @@ object Main {
   	* 
   	*/
 	}
-
+	
 	def MISONParse(queryFieldsList: ArrayBuffer[String],
 			filePaths: ArrayBuffer[String] = new ArrayBuffer[String],
 			DEBUG_STATUS: Boolean) {
@@ -212,16 +212,35 @@ object Main {
 	  }
 	}
 	def UnicodeTest() {
-	  var unicodeStr = "\u2026";
-	  println("\\u2026 = "+unicodeStr);
+	  var strToFix = "{\"id\":\"\\u2026 <-Unicode Str\"}";
+	  println(FixString(strToFix));
+	}
+	def FixString(string: String) : String = {
+	  var newString = string;
+	  // Find the 1st problematic string
+	  var start = string.indexOf("\\u");
+	  while(start != -1) {
+	    // Extract the problematic string
+	    val end = start + 6;
+	    val wrongString = string.substring(start,end);
+	    // Convert to unicode
+	    val hexCode = wrongString.substring(2);
+	    val intCode = Integer.parseInt(hexCode, 16);
+	    val finalString = new String(Character.toChars(intCode));
+	    // Replace
+	    newString = string.replace(wrongString,finalString);
+	    // Find next problematic string
+	    start = string.indexOf("\\u", end);
+	  }
+	  return newString;
 	}
 	def main(args: Array[String]) {
-		//UnicodeTest();
+		UnicodeTest();
 		//BitmapTest();
 		//BitsTest();
 		//val x: Char = ' ';
 		//println(x == ' ');
 	  //println((Some(false)));
-	  Query1();
+	  //Query1();
 	}
 }
