@@ -12,17 +12,15 @@ import scala.collection.mutable.ArrayBuffer
  */
 import scala.collection.mutable.ListBuffer;
 import scala.math.ceil;
-class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String], DEBUG_FLAG: Boolean = false) {
+class Bitmaps(layers: Int, wordSplit: ArrayBuffer[String], DEBUG_FLAG: Boolean = false) {
 
   // constructor:on
-  class mapContainer(layers: Int, arrayLayers: Int) {
+  class mapContainer(layers: Int) {
     var escapeBitset, quoteBitset, colonBitset, commaBitset, lbracketBitset, rbracketBitset, arraylbracketBitset, arrayrbracketBitset, structQBitset, strBitset, structCBitset, structLBitset, structRBitset, structCMBitset, structALBBitset, structARBBitset: Bits = new Bits(0);
     var levels: Array[Bits] = new Array[Bits](layers);
-    var CMlevels: Array[Bits] = new Array[Bits](arrayLayers);
+    var CMlevels: Array[Bits] = null;
     for (i <- 0 until layers)
       levels(i) = new Bits(0);
-    for (i <- 0 until arrayLayers)
-      CMlevels(i) = new Bits(0);
   }
   private val B_INT = 32;
   private val B_ZERO: Bits = new Bits(0);
@@ -30,7 +28,7 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String], DEB
   private var word: ArrayBuffer[String] = wordSplit;
   var map: Array[mapContainer] = new Array[mapContainer](word.size);
   for (i <- 0 until word.size)
-    map(i) = new mapContainer(layers, arrayLayers);
+    map(i) = new mapContainer(layers);
   // constructor:off
 
   // methods:on
@@ -39,8 +37,6 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String], DEB
     fillBits(); // phase 1 & 2
     convertToStruct(); // phase 3 (includes commas)
     fillColonBits(); // phase 4
-    fillCommaBits(); // phase 4 (but with commas)
-    
   }
   def fillBits(): Unit = {
     var prev: Array[Char] = new Array[Char](2);
@@ -220,14 +216,15 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String], DEB
     }
   }
   // fillCommaBits - creates leveled commas
-  def fillCommaBits(): Unit = {
+  def fillCommaBits(start: Int, end: Int, level: Int): Unit = {
     // To avoid crashes
-    if(arrayLayers == 0) {
-      println("array layers = 0\nStopping fillCommaBits");
+    if(level == 0) {
+      println("array layer requested = 0\nStopping fillCommaBits");
       return;
     }
-    // copy Comma bitmap to leveled Comma bitmaps
-    for (i <- 0 until map.size) {
+    // initialize and set default bits to leveled commas
+    for (i <- start until end) {
+      map(i).CMlevels = new Array[Bits](level);
       for (j <- 0 until map(i).CMlevels.size)
         map(i).CMlevels(j) = map(i).structCMBitset;
     }
@@ -239,10 +236,11 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String], DEB
     // ListBuffer: Stack alternative
     var S: ListBuffer[Tuple2[Int, Bits]] = ListBuffer();
 
-    for (i <- 0 until map.size) {
+    for (i <- start until end) {
       mLeft = map(i).arraylbracketBitset;
       mRight = map(i).arrayrbracketBitset;
-      do // iterate over each right brace
+      // iterate over each right brace
+      do
       {
         // extract the rightmost 1 
         mRbit = mRight & -mRight.bits; 
@@ -280,7 +278,7 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String], DEB
         mRight &= mRight - 1; // remove the rightmost 1
       } while (!(mRbit == 0));
     }
-    for (a <- 0 until map.size) {
+    for (a <- start until end) {
       for (b <- lvls - 1 until 0 by -1) {
         val temp1 = map(a).CMlevels(b);
         val temp2 = map(a).CMlevels(b - 1);
@@ -306,7 +304,7 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String], DEB
   def generateColonPositions(start: Int, end: Int, level: Int): ArrayBuffer[Int] = {
     // To avoid crashes
     if(layers == 0) {
-      println("structural layers = 0\ngenerateColonPositions");
+      println("structural layers = 0\nStopping generateColonPositions");
       return new ArrayBuffer[Int];
     }
     if (level >= this.layers) {
@@ -333,33 +331,21 @@ class Bitmaps(layers: Int, arrayLayers: Int, wordSplit: ArrayBuffer[String], DEB
     }
   }
   def generateCommaPositions(start: Int, end: Int, level: Int): ArrayBuffer[Int] = {
-    // To avoid crashes
-    if(arrayLayers == 0) {
-      println("array layers = 0\ngenerateCommaPositions");
-      return new ArrayBuffer[Int];
-    }
-    if (level >= this.arrayLayers) {
-      if (DEBUG_FLAG == true) {
-        System.out.println("Bitmaps: GENERATE COMMA POS ERROR");
-        System.out.println("Input level is: " + level + " but max arrayLayers is: " + (this.arrayLayers - 1));
-      }
-      return new ArrayBuffer[Int]();
-    } else {
-      var commaPositions = new ArrayBuffer[Int]();
-      var mComma: Bits = new Bits(0);
-      for (i <- (start / B_INT) until ceil(end.toDouble / B_INT).toInt) {
-        mComma = map(i).CMlevels(level);
-        while (!(mComma == 0)) { 
-          val mBit = (mComma & -mComma.bits) - 1; 
-          var offset: Int = i * B_INT + mBit.count();
-          if (start <= offset && offset <= end) {
-            commaPositions = (offset) +: commaPositions;
-          }
-          mComma = mComma & (mComma - 1);
-        }
-      }
-      return commaPositions;
-    }
+		var commaPositions = new ArrayBuffer[Int]();
+		var mComma: Bits = new Bits(0);
+		for (i <- (start / B_INT) until ceil(end.toDouble / B_INT).toInt;
+		  if(map(i).CMlevels.size != 0 && map(i).CMlevels.size >= level)) {
+		  mComma = map(i).CMlevels(level);
+			while (!(mComma == 0)) { 
+				val mBit = (mComma & -mComma.bits) - 1; 
+				var offset: Int = i * B_INT + mBit.count();
+				if (start <= offset && offset <= end) {
+					commaPositions = (offset) +: commaPositions;
+				}
+				mComma = mComma & (mComma - 1);
+			}
+		}
+		return commaPositions;
   }
   override def toString: String = {
     var output: String = "";

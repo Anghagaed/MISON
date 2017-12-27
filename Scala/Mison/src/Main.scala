@@ -6,7 +6,9 @@ import Parser._;
 //import scala.collection.mutable.Stack;
 import scala.collection.immutable._;
 import scala.collection.mutable._;
-
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException
 // Comment by Hang : I made changes to fileHandler and all the test function using previous version is causing error
 //                   I taken the libery to comment out all test functions that are currently having an error due to 
 //                   this change.
@@ -132,45 +134,6 @@ object Main {
 	  var y:Bits = new Bits(12345);
 	  println("y=   "+y);
 	  println("x+y= "+(x+y));
-	  /*
-  	x += 1;
-  	println(x)
-  	var y:Bits = new Bits(1);
-  	//    println("start");
-  	for(i <- 0 until 32) {
-  		//      if(x == y){
-  		//        println(x)
-  		//      }
-  		println("extracting 1")
-  		println("before:"+x)
-  
-  		var z = x & -x.bits
-  		//println(new Bits(-x.bits))
-  		println("after: "+z)
-  
-  		println("remove 1")
-  		println("before:"+x)
-  
-  		z = x & (x - 1)
-  		//println((x-1))
-  		println("after: "+z)
-  
-  
-  		x.set(i,1)
-
-  	}
-  	//    println("end");
-  	println("extracting 1")
-  	var z = x & -x.bits
-  	println(new Bits(-x.bits))
-  	println(z)
-  
-  	println("remove 1")
-  	z = x & (x - 1)
-  	println((x-1))
-  	println(z)
-  	* 
-  	*/
 	}
 	
 	def MISONParse(queryFieldsList: ArrayBuffer[String],
@@ -190,7 +153,6 @@ object Main {
 	  fileHandler.getNext;
 	  val stringSplitted = fileHandler.getFileArray;
 	  var bitmaps = new Bitmaps(
-      2,
       2,
       stringSplitted);
 	  println(bitmaps);

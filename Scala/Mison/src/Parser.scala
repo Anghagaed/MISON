@@ -152,7 +152,6 @@ class MISONParser(
     currentRecord = fileHandler.getLineString;
     bitmaps = new Bitmaps(
       queryFieldsInfo.nestingLevels,
-      defaultArrayLayers,
       stringSplitted,
       DEBUG_FLAG);
 
