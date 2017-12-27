@@ -797,10 +797,32 @@ class SparkContext(config: SparkConf) extends Logging {
     while(it.get.hasNext) {
       ddd += it.get.next()
     }
-    for(d <- ddd) {
-      System.out.println(d)
-    }
+    // for(d <- ddd) {
+    //   System.out.println(d)
+    // }
     return ddd;
+  }
+
+  def fixString(string: String) : String = {
+    var newString = string;
+    // Find the 1st problematic string
+    var start = string.indexOf("\\u");
+    while (start != -1) {
+      // Extract the problematic string
+      val end = start + 6;
+      val wrongString = newString.substring(start, end);
+      // Convert to unicode
+      val hexCode = wrongString.substring(2);
+      val intCode = Integer.parseInt(hexCode, 16);
+      val correctString = new String(Character.toChars(intCode));
+      // Replace
+      newString = newString.replace(wrongString, correctString);
+      // Find next problematic string
+      start = newString.indexOf("\\u", start + 1);
+    }
+    // Replace " errors
+    newString = newString.replace("\\\"", "\"");
+    return newString;
   }
 
   /** MISON ONLY
@@ -816,9 +838,12 @@ class SparkContext(config: SparkConf) extends Logging {
       fff, // filePaths.toBuffer,
       DEBUG_STATUS);
     val result = parser.parseQuery();
-    System.out.println("Printing Result now");
-    for (q <- result) {
-       System.out.println(q);
+    // System.out.println("Printing Result now");
+    // for (q <- result) {
+    //    System.out.println(q);
+    // }
+    for (i <- 0 until result.size) {
+      result(i) = fixString(result(i));
     }
     var testBurn = result.toSeq;
     return parallelize[String](testBurn);

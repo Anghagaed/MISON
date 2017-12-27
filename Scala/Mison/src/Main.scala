@@ -174,25 +174,29 @@ object Main {
 	  }
 	}
 	def UnicodeTest() {
+	  println("Test:1");
 	  var strToFix = "{\"id\":\"\\u2026 <-Unicode Str\"}";
+	  println(FixString(strToFix));
+	  println("Test:2");
+	  strToFix = "Tue Feb 10 19:14:39 +0000 2009  ,  Check your schedule! Google Calendar now has more features on web to help teams set and get ready for meetings. a\\u2b07a b\\ufe0fb https://t.co/lzZnAVKiIz  ,  Google  ,  News and updates from Google";
 	  println(FixString(strToFix));
 	}
 	def FixString(string: String) : String = {
 	  var newString = string;
 	  // Find the 1st problematic string
 	  var start = string.indexOf("\\u");
-	  while(start != -1) {
+	  while (start != -1) {
 	    // Extract the problematic string
 	    val end = start + 6;
-	    val wrongString = string.substring(start,end);
+	    val wrongString = newString.substring(start, end);
 	    // Convert to unicode
 	    val hexCode = wrongString.substring(2);
 	    val intCode = Integer.parseInt(hexCode, 16);
-	    val finalString = new String(Character.toChars(intCode));
+	    val correctString = new String(Character.toChars(intCode));
 	    // Replace
-	    newString = string.replace(wrongString,finalString);
+	    newString = newString.replace(wrongString, correctString);
 	    // Find next problematic string
-	    start = string.indexOf("\\u", end);
+	    start = newString.indexOf("\\u", start + 1);
 	  }
 	  return newString;
 	}
