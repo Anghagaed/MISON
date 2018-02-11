@@ -1,2 +1,2 @@
-created_at
-text
+quoted_status.source
+quoted_status.contributors

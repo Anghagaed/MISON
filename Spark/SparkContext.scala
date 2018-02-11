@@ -797,11 +797,11 @@ class SparkContext(config: SparkConf) extends Logging {
     while(it.get.hasNext) {
       ddd += it.get.next()
     }
-    // for(d <- ddd) {
-    //   System.out.println(d)
-    // }
     return ddd;
   }
+
+  /** MISON Parser
+   */
 
   def fixString(string: String) : String = {
     var newString = string;
@@ -825,10 +825,6 @@ class SparkContext(config: SparkConf) extends Logging {
     return newString;
   }
 
-  /** MISON ONLY
-   *
-   * Ask Yun for Description
-   */
   def MISONParse(fff: ArrayBuffer[String],
     qqq: ArrayBuffer[String],
     DEBUG_STATUS: Boolean = false): RDD[String] = {
@@ -838,13 +834,6 @@ class SparkContext(config: SparkConf) extends Logging {
       fff, // filePaths.toBuffer,
       DEBUG_STATUS);
     val result = parser.parseQuery();
-    // System.out.println("Printing Result now");
-    // for (q <- result) {
-    //    System.out.println(q);
-    // }
-    for (i <- 0 until result.size) {
-      result(i) = fixString(result(i));
-    }
     var testBurn = result.toSeq;
     return parallelize[String](testBurn);
   }

@@ -103,7 +103,6 @@ class MISONParser(
     }
   }
 
-  println("IN fking MISON");
   var queryFieldsInfo: queryFields = new queryFields(queryFieldsList);
   private var fileHandler: fileHandler = new fileHandler();
   private var result: ArrayBuffer[String] = new ArrayBuffer[String];
@@ -121,6 +120,27 @@ class MISONParser(
       parseFile(filePaths(i));
     }
     return result;
+  }
+  private def fixString(string: String) : String = {
+    var newString = string;
+    // Find the 1st problematic string
+    var start = string.indexOf("\\u");
+    while (start != -1) {
+      // Extract the problematic string
+      val end = start + 6;
+      val wrongString = newString.substring(start, end);
+      // Convert to unicode
+      val hexCode = wrongString.substring(2);
+      val intCode = Integer.parseInt(hexCode, 16);
+      val correctString = new String(Character.toChars(intCode));
+      // Replace
+      newString = newString.replace(wrongString, correctString);
+      // Find next problematic string
+      start = newString.indexOf("\\u", start + 1);
+    }
+    // Replace " errors
+    newString = newString.replace("\\\"", "\"");
+    return newString;
   }
   private def parseFile(filePath: String): Boolean = {
     fileHandler.setNewFilePath(filePath);
@@ -168,14 +188,11 @@ class MISONParser(
     append: String,
     colonPos: ArrayBuffer[Int],
     nextLevelColon: Int = -1): Boolean = {
-    println(curLevel + " Before Loop: " + append);
-    println("colonPos.length " + colonPos.length);
     val test: String = "TestingString";
-    println("testString: " + test);
     for (i <- colonPos.length - 1 to 0 by -1) {
-      println(curLevel + " After Loop: " + append);
-      println("colonPos.length " + colonPos.length);
-      println("testString: " + test);
+      // println(curLevel + " After Loop: " + append);
+      // println("colonPos.length " + colonPos.length);
+      // println("testString: " + test);
       var endPos = bitmaps.getStartingBoundary(colonPos(i));
       var startPos = bitmaps.getStartingBoundary(endPos - 1) + 1;
 
@@ -295,7 +312,7 @@ class MISONParser(
 
       }
     }
-    println("Done with the loop " + curLevel);
+    // println("Done with the loop " + curLevel);
     return false;
   }
 }

@@ -1,5 +1,5 @@
-val query = "MQuery.txt";
-val file = "MData.txt";
+val query = "test/MQuery.txt";
+val file = "test/MData.txt";
 val fff = sc.readFile(file);
 val qqq = sc.readFile(query);
 
@@ -8,7 +8,6 @@ import org.apache.spark.sql._
 import org.apache.spark.sql.types._
 
 val rADF = adf.map(_.split("  ,  ")).map(a => Row.fromSeq(a));
-rADF.collect().foreach(println);
 
 var schemaString = "";
 var sqlQuery = "";
@@ -24,18 +23,8 @@ val DFadf = spark.createDataFrame(rADF, schema)
 
 val sqlContext = new org.apache.spark.sql.SQLContext(sc)
 
-val DF2 = sqlContext.read.json("Example/tweet2.json");
+val DF2 = sqlContext.read.json("test/tweet_10.json");
 
-DF2.createOrReplaceTempView("testDifference");
-
-val SQLString = "SELECT " + sqlQuery.substring(0, sqlQuery.length - 2) + " FROM testDifference";
-
-println(SQLString);
-
-//val DF3 = sqlContext.sql("SELECT created_at, favorite_count ,id_str, retweet_count, user.created_at FROM testDifference");
-
-val DF3 = sqlContext.sql(SQLString);
-
-DFadf.show()
-DF3.show();
+// Non relational query
+val DF3 = DF2.select("quoted_status.source","quoted_status.contributors");
 DFadf.except(DF3).show();

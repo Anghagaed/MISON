@@ -180,25 +180,29 @@ object Main {
 	  println("Test:2");
 	  strToFix = "Tue Feb 10 19:14:39 +0000 2009  ,  Check your schedule! Google Calendar now has more features on web to help teams set and get ready for meetings. a\\u2b07a b\\ufe0fb https://t.co/lzZnAVKiIz  ,  Google  ,  News and updates from Google";
 	  println(FixString(strToFix));
+	  strToFix = "<a href=\\\"http://www.socialflow.com\\\" rel=\"nofollow\\\">SocialFlow</a>";
+	  println(FixString(strToFix));
 	}
 	def FixString(string: String) : String = {
 	  var newString = string;
-	  // Find the 1st problematic string
-	  var start = string.indexOf("\\u");
-	  while (start != -1) {
-	    // Extract the problematic string
-	    val end = start + 6;
-	    val wrongString = newString.substring(start, end);
-	    // Convert to unicode
-	    val hexCode = wrongString.substring(2);
-	    val intCode = Integer.parseInt(hexCode, 16);
-	    val correctString = new String(Character.toChars(intCode));
-	    // Replace
-	    newString = newString.replace(wrongString, correctString);
-	    // Find next problematic string
-	    start = newString.indexOf("\\u", start + 1);
-	  }
-	  return newString;
+    // Find the 1st problematic string
+    var start = string.indexOf("\\u");
+    while (start != -1) {
+      // Extract the problematic string
+      val end = start + 6;
+      val wrongString = newString.substring(start, end);
+      // Convert to unicode
+      val hexCode = wrongString.substring(2);
+      val intCode = Integer.parseInt(hexCode, 16);
+      val correctString = new String(Character.toChars(intCode));
+      // Replace
+      newString = newString.replace(wrongString, correctString);
+      // Find next problematic string
+      start = newString.indexOf("\\u", start + 1);
+    }
+    // Replace " errors
+    newString = newString.replace("\\\"", "\"");
+    return newString;
 	}
 	def main(args: Array[String]) {
 		UnicodeTest();
