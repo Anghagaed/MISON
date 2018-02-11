@@ -388,7 +388,7 @@ class MISONParser(
   private def arrayIntermediate(curLevel: Int, commaPos: ArrayBuffer[Int]): String = {
     var output = "";
     
-    for (i <- commaPos.length - 2 to 1 by -1) {
+    for (i <- commaPos.length - 2 to 0 by -1) {
       if (DEBUG_FLAG == true) {
         if (commaPos == 0) {
           println("Array Field Error commaPos(i) or commaPos is 0");
