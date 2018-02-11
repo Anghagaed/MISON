@@ -28,10 +28,10 @@ $ build/sbt clean package
   - *Mtweet.txt*: JSON data (fileHandler only supports text files)
   - *tweet_10.json*: JSON data for Spark as Spark supports JSON files
   - *testCorrectness.scala*: compares MISON's data frame and Spark's data frame
-* In the terminal, type the following in order to compile. Note: There is more detailed information at Spark's [website](https://spark.apache.org/developer-tools.html).
+* In the terminal, type the following in the directory *spark-2.1.1*. Note: There is more detailed information at Spark's [website](https://spark.apache.org/developer-tools.html).
 ```
 $ export SPARK_PREPEND_CLASSES=true
-$ build/sbt ~compile
+$ build/sbt compile
 ```
 * In the terminal, type *./spark-shell* in directory *spark-2.1.1/bin* to start running Spark.
 * When the Spark interface appears, type the following to run the test.
