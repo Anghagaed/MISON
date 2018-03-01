@@ -1,5 +1,5 @@
 # MISON Parser
-* A Sequential MISON Parser for proof of concept. MISON is a parser that parses only certain columns to improve performance. Implementation is based on the research paper *Mison: A Fast JSON Parser for Data Analytics*.
+* A Sequential MISON Parser for proof of concept. MISON is a query-based parser that parses only certain columns to improve performance. Implementation is based on the research paper *Mison: A Fast JSON Parser for Data Analytics*.
 
 ## Features
 * Extracts JSON data based on specified columns
@@ -42,7 +42,7 @@ $ build/sbt compile
 ## Known Bugs/Potential Improvements
 * Spark takes account of a case where the column doesn't exist (creates a record and treats the missing columns as null) while this parser doesn't (doesn't create a record). 
 * Spark has its own JSON parsing system while this parser uses its own, which may have some issues (ex: it doesn't detect unicode characters, so a string manipulation function *fixString* was implemented in SparkContext). Using built-in Spark classes/functions may boost performance.
-* The parser's performance can be dramatically improved with parallel computing.
+* The parser's performance can be dramatically improved with parallel computing and speculative parsing.
 
 ## Authors
 * [List of contributors](https://github.com/Anghagaed/MISON/graphs/contributors):
